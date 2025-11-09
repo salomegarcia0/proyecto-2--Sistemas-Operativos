@@ -10,10 +10,13 @@ package Clases;
  */
 public class Bloque {
     private int size;
-    private boolean available=true; //inicialmente sera true, es decir el bloque esta disponible para guardar informacion
+    private boolean available; //inicialmente sera true, es decir el bloque esta disponible para guardar informacion
+    private String nameArchivo;
 
-    public Bloque(int size) {
+    public Bloque(int size, String nameArchivo) {
         this.size = size;
+        this.available = true;
+        this.nameArchivo = nameArchivo;
     }
 
     public boolean isAvailable() {
