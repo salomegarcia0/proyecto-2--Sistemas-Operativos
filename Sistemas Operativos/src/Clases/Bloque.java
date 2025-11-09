@@ -10,8 +10,7 @@ package Clases;
  */
 public class Bloque {
     private int size;
-    private boolean available=true; //inicialmente al iniciarl el programa sera true, es decir el bloque esta disponible para guardar
-    //informacion
+    private boolean available=true; //inicialmente sera true, es decir el bloque esta disponible para guardar informacion
 
     public Bloque(int size) {
         this.size = size;
