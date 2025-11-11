@@ -3,23 +3,21 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Clases;
-
 import Estructuras.ListaEnlazada;
+import Clases.Usuario;
 
 /**
  *
  * @author pjroj
  */
-public class Archivo {
-    private String name;
-    private int size;
-    private ListaEnlazada blockList;
-    private Usuario usuario;   
+public class Directorio {
+    private String name; 
+    private Usuario usuario; 
+    private int size;//el tamaño total contenido, esto puede cambiar
 
-    public Archivo(String name, int size, ListaEnlazada blockList, Usuario usuario) {
+    public Directorio(String name, int size, Usuario usuario) {
         this.name = name;
         this.size = size;
-        this.blockList = blockList;
         this.usuario = usuario;
     }
 
@@ -37,14 +35,6 @@ public class Archivo {
 
     public void setSize(int size) {
         this.size = size;
-    }
-
-    public ListaEnlazada getBlockList() {
-        return blockList;
-    }
-
-    public void setBlockList(ListaEnlazada blockList) {
-        this.blockList = blockList;
     }
 
     public Usuario getUsuario() {
