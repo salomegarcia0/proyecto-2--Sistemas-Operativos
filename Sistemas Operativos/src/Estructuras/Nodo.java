@@ -9,19 +9,19 @@ package Estructuras;
  * @author salom
  */
 public class Nodo {
-    private Object element;
+    private int element;
     private Nodo next;
 
-    public Nodo(Object element) {
+    public Nodo(int element) {
         this.element = element;
         this.next = null;
     }
 
-    public Object getElement() {
+    public int getElement() {
         return element;
     }
 
-    public void setElement(Object element) {
+    public void setElement(int element) {
         this.element = element;
     }
 

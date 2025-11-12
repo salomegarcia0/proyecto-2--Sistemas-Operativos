@@ -7,15 +7,17 @@ import Clases.*;
 /**
  *
  * @author pjroj
+ * El SD es una lista doblemente enlazada
  */
 public class SD {
-    private NodoBloque head;
+    private NodoBloque head,tail;
     private NodoBloque lector; //es como un apuntador hacia un bloque para indicar la ultima posicion del cabezal
     private int size; //el tamaño maximo del SD será 10 por el momento.
     
     
     public SD() {
         this.head = null;
+        this.tail = null;
         this.lector = null;
         this.size = 0;
     }
@@ -35,87 +37,126 @@ public class SD {
     public void setSize(int size) {
         this.size = size;
     }
+
+    public NodoBloque getTail() {
+        return tail;
+    }
+
+    public void setTail(NodoBloque tail) {
+        this.tail = tail;
+    }
+
+    public NodoBloque getLector() {
+        return lector;
+    }
+
+    public void setLector(NodoBloque lector) {
+        this.lector = lector;
+    }
     
     public void insertBegin(Bloque element) {
         NodoBloque nodo = new NodoBloque(element);
         if (isEmpty()) {
             setHead(nodo);
+            setTail(nodo);
         } else {
-           nodo.setNext(getHead());
-           setHead(nodo);
+            getHead().setPrevious(nodo);
+            nodo.setNext(getHead());
+            setHead(nodo);
         }
+        //Para colocar el cabezal al inicio    
+        setLector(getHead());
         size++;
     }
-    
+
     public void insertFinal(Bloque element) {
         NodoBloque nodo = new NodoBloque(element);
         if (isEmpty()) {
             setHead(nodo);
+            setTail(nodo);
+            setLector(getHead());
         } else {
-           NodoBloque pointer = getHead();
-           while (pointer.getNext() != null) {
-               pointer = pointer.getNext();
-           }
-           pointer.setNext(nodo);
+            nodo.setPrevious(getTail());
+            getTail().setNext(nodo);
+            setTail(nodo);
         }
         size++;
     }
+
+    /*
+    Todas esta funciones de insertData son funciones cuando ya al lista fue creada, es decir ya tiene la cantidad de bloques
+    que definimos que tendría el SD, solo estamos accediendo a ellas para modificar la información que estos guardan
+    necesita el nombre del archivo que se quiere guardar en el bloque
+    */
+    public void insertDataBegin(String nombreArchivo) {
+        NodoBloque nodo = getHead();
+        if (nodo.getElement().isAvailable() == false) {
+            System.out.println("El primer bloque ya esta ocupado");
+        } else if (nodo.getElement().isAvailable() == true){
+            //se setea el nombre del archivo que se esta guardando en partes
+            nodo.getElement().setNameArchivo(nombreArchivo);
+            //se cambia el estado del bloque a desocupado
+            nodo.getElement().setAvailable(false);
+        }
+    }
     
-    public void insertInIndex(Bloque element, int index) {
-        NodoBloque nodo = new NodoBloque(element);
-        if (isEmpty()) {
-            setHead(nodo);
-        } else {
-            if (index < 0) {
-                System.out.println("Index Error");
-            } else if (index > size) {
-                System.out.println("Index Error");
-            } else if (index == size) {
-                insertFinal(element);
-            } else if (index == 0) {
-                insertBegin(element);
+     public void insertDataFinal(String nombreArchivo) {
+        NodoBloque nodo = getTail();
+        if (nodo.getElement().isAvailable() == false) {
+            System.out.println("El último bloque ya esta ocupado");
+        } else if (nodo.getElement().isAvailable() == true){
+            //se setea el nombre del archivo que se esta guardando en partes
+            nodo.getElement().setNameArchivo(nombreArchivo);
+            //se cambia el estado del bloque a desocupado
+            nodo.getElement().setAvailable(false);
+        }
+    }
+    
+    /*
+     Esta funcion de insertcion es solo para cargar los datos iniciales del sistema,ya que lso archivos iniciales tienen guardado una lista
+    con los apuntadores a los bloque donde se guardo la informacion
+     */
+     
+    public void insertInIndex(Archivo archivo) {
+        ListaEnlazada lista = archivo.getBlockList();
+        Nodo nlista = lista.getHead();
+        while(nlista != null){
+            //index 0
+            if (nlista.getElement() == 0) {
+                insertDataBegin(archivo.getName());
+            
+            //index = size - 1
+            } else if (nlista.getElement() == (size-1)){
+                insertDataFinal(archivo.getName());
             } else {
-                NodoBloque pointer = getHead();
-                int aux = 0; 
-                while (pointer.getNext() != null && aux < index - 1) {
-                    pointer = pointer.getNext();
-                    aux++;
+                if ((nlista.getElement() > (int)((size-1)/2))) {
+                    NodoBloque pointer = getTail();
+                    int end = size - nlista.getElement();
+                    int aux = 0;    
+                    while (aux < end) {
+                        pointer = pointer.getPrevious();
+                        aux++;
+                    }
+                    //se inserta la informacion en el bloque y se cambia su estado a false (que esta ocupado)
+                    pointer.getElement().setNameArchivo(archivo.getName());
+                    pointer.getElement().setAvailable(false);
+                } else {
+                    int aux = 1; 
+                    NodoBloque pointer = getHead();
+                    while (aux < nlista.getElement()) {
+                        pointer = pointer.getNext();
+                        aux++;
+                    }
+                    //se inserta la informacion en el bloque y se cambia su estado a false (que esta ocupado)
+                    pointer.getElement().setNameArchivo(archivo.getName());
+                    pointer.getElement().setAvailable(false);
                 }
-                nodo.setNext(pointer.getNext());
-                pointer.setNext(nodo); 
             }
+        nlista = nlista.getNext();
         }
-        size++;
     }
-    //
-    public void insertInicialData(Archivo archivo){
-        Nodo pointer = archivo.getBlockList().getHead();
-        NodoBloque bloque = getHead();
-        System.out.println("EN PROCESO");
-//        while (pointer != null){
-//            if (pointer.getElement() < 0) {
-//                    System.out.println("Index Error");
-//                } else if (pointer.getElement() > size) {
-//                    System.out.println("Index Error");
-//                } else if (pointer.getElement() == size) {
-//                    //insertFinal(element);
-//                } else if (pointer.getElement() == 0) {
-//                    //insertBegin(element);
-//                } else {
-//                    //NodoBloque pointer = getHead();
-//                    int aux = 0; 
-//                    while (pointer.getNext() != null && aux < pointer.getElement() - 1) {
-//                        pointer = pointer.getNext();
-//                        aux++;
-//                    }
-//                    //nodo.setNext(pointer.getNext());
-//                    //pointer.setNext(nodo); 
-//                }
-//            }
-//            //pointer = pointer.getNext();
-//        
-        }
     
+
     
     public Bloque deleteBegin(){
         if (isEmpty()) {
@@ -189,3 +230,4 @@ public class SD {
     }
     
 }
+

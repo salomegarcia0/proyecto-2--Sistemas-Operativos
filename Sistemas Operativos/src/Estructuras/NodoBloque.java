@@ -11,11 +11,12 @@ import Clases.Bloque;
  */
 public class NodoBloque {
     private Bloque element;
-    private NodoBloque next;
+    private NodoBloque next,previous;
 
     public NodoBloque(Bloque element) {
         this.element = element;
         this.next = null;
+        this.previous = null;
     }
 
     public Bloque getElement() {
@@ -34,6 +35,12 @@ public class NodoBloque {
         this.next = next;
     }
 
-   
+    public NodoBloque getPrevious() {
+        return previous;
+    }
+
+    public void setPrevious(NodoBloque previous) {
+        this.previous = previous;
+    }
     
 }
