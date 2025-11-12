@@ -22,5 +22,39 @@ public class Archivo {
         this.blockList = blockList;
         this.usuario = usuario;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public ListaEnlazada getBlockList() {
+        return blockList;
+    }
+
+    public void setBlockList(ListaEnlazada blockList) {
+        this.blockList = blockList;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+    
+    
         
 }
