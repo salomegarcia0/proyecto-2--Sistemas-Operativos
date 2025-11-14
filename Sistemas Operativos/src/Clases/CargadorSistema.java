@@ -37,14 +37,18 @@ public class CargadorSistema {
         }
     }
     
-    private static Usuario buscarAdmin(Usuario[] usuarios) {
-        for (Usuario u : usuarios)
-            if(u.getType() == TipoUsuario.ADMIN)
-                return u;
-        return usuarios[0];
+    //este metodo es para cuando no carga el archivo o json o en su defecto no existe ninguno, se inicializa el sistema vacio
+    public static SistemaArchivos cargarSistemaVacio(){
+        Usuario admin = new Usuario("admin", TipoUsuario.ADMIN);
+        Usuario user1 = new Usuario("user1", TipoUsuario.USER);
+        Usuario user2 = new Usuario("user2", TipoUsuario.USER);
+        
+        Usuario[] usuarios = {admin, user1, user2};
+        
+        Directorio root = new Directorio("root", admin, 0, 0, 0, true);
+        
+        return new SistemaArchivos(root, usuarios, usuarios.length);
     }
-    
-
     
     private static Usuario[] cargarUsuarios(JsonArray arrayUsuarios){
         Usuario [] usuarios = new Usuario[arrayUsuarios.size()];
