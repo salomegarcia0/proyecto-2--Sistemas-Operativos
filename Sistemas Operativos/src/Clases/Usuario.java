@@ -16,4 +16,21 @@ public class Usuario {
         this.name = name;
         this.type = type;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public TipoUsuario getType() {
+        return type;
+    }
+
+    public void setType(TipoUsuario type) {
+        this.type = type;
+    }
+    
 }

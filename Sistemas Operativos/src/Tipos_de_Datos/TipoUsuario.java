@@ -10,5 +10,5 @@ package Tipos_de_Datos;
  */
 public enum TipoUsuario {
     ADMIN,
-    CLIENT,
+    USER,
 }
