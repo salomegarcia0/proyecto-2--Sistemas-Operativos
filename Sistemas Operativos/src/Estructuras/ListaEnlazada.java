@@ -34,7 +34,7 @@ public class ListaEnlazada {
         this.size = size;
     }
     
-    public void insertBegin(int element) {
+    public void insertBegin(Object element) {
         Nodo nodo = new Nodo(element);
         if (isEmpty()) {
             setHead(nodo);
@@ -45,7 +45,7 @@ public class ListaEnlazada {
         size++;
     }
     
-    public void insertFinal(int element) {
+    public void insertFinal(Object element) {
         Nodo nodo = new Nodo(element);
         if (isEmpty()) {
             setHead(nodo);
@@ -59,7 +59,7 @@ public class ListaEnlazada {
         size++;
     }
     
-    public void insertInIndex(int element, int index) {
+    public void insertInIndex(Object element, int index) {
         Nodo nodo = new Nodo(element);
         if (isEmpty()) {
             setHead(nodo);

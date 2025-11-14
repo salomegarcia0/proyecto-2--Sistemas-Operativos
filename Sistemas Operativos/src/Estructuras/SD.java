@@ -54,6 +54,10 @@ public class SD {
         this.lector = lector;
     }
     
+    /*
+    Insercion de nodos de tipo Bloque
+    */
+    
     public void insertBegin(Bloque element) {
         NodoBloque nodo = new NodoBloque(element);
         if (isEmpty()) {
@@ -93,6 +97,8 @@ public class SD {
         if (nodo.getElement().isAvailable() == false) {
             System.out.println("El primer bloque ya esta ocupado");
         } else if (nodo.getElement().isAvailable() == true){
+            //para ubicar al cabezal en esta posicion
+            setLector(nodo);
             //se setea el nombre del archivo que se esta guardando en partes
             nodo.getElement().setNameArchivo(nombreArchivo);
             //se cambia el estado del bloque a desocupado
@@ -100,11 +106,13 @@ public class SD {
         }
     }
     
-     public void insertDataFinal(String nombreArchivo) {
+    public void insertDataFinal(String nombreArchivo) {
         NodoBloque nodo = getTail();
         if (nodo.getElement().isAvailable() == false) {
             System.out.println("El último bloque ya esta ocupado");
         } else if (nodo.getElement().isAvailable() == true){
+            //para ubicar al cabezal en esta posicion
+            setLector(nodo);
             //se setea el nombre del archivo que se esta guardando en partes
             nodo.getElement().setNameArchivo(nombreArchivo);
             //se cambia el estado del bloque a desocupado
@@ -113,28 +121,30 @@ public class SD {
     }
     
     /*
-     Esta funcion de insertcion es solo para cargar los datos iniciales del sistema,ya que lso archivos iniciales tienen guardado una lista
+     Esta funcion de insertDataInIndex es solo para cargar los datos iniciales del sistema,ya que los archivos iniciales tienen guardado una lista
     con los apuntadores a los bloque donde se guardo la informacion
      */
      
-    public void insertInIndex(Archivo archivo) {
+    public void insertDataInIndex(Archivo archivo) {
         ListaEnlazada lista = archivo.getBlockList();
         Nodo nlista = lista.getHead();
         while(nlista != null){
             //index 0
-            if (nlista.getElement() == 0) {
+            if ((int)nlista.getElement() == 0) {
                 insertDataBegin(archivo.getName());
             
             //index = size - 1
-            } else if (nlista.getElement() == (size-1)){
+            } else if ((int)nlista.getElement() == (size-1)){
                 insertDataFinal(archivo.getName());
             } else {
-                if ((nlista.getElement() > (int)((size-1)/2))) {
+                if (((int)nlista.getElement() > (int)((size-1)/2))) {
                     NodoBloque pointer = getTail();
-                    int end = size - nlista.getElement();
+                    int end = size - (int)nlista.getElement();
                     int aux = 0;    
                     while (aux < end) {
                         pointer = pointer.getPrevious();
+                        //para ubicar al cabezal en esta posicion
+                        setLector(pointer);
                         aux++;
                     }
                     //se inserta la informacion en el bloque y se cambia su estado a false (que esta ocupado)
@@ -143,8 +153,10 @@ public class SD {
                 } else {
                     int aux = 1; 
                     NodoBloque pointer = getHead();
-                    while (aux < nlista.getElement()) {
+                    while (aux < (int)nlista.getElement()) {
                         pointer = pointer.getNext();
+                        //para ubicar al cabezal en esta posicion
+                        setLector(pointer);
                         aux++;
                     }
                     //se inserta la informacion en el bloque y se cambia su estado a false (que esta ocupado)
@@ -155,8 +167,6 @@ public class SD {
         nlista = nlista.getNext();
         }
     }
-    
-
     
     public Bloque deleteBegin(){
         if (isEmpty()) {
