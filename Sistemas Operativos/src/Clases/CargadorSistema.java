@@ -11,6 +11,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Clase para leer el json y poder cargar el sistema
@@ -18,10 +20,21 @@ import java.io.FileReader;
  */
 public class CargadorSistema {
     
-    public static SistemaArchivos cargarSistema(String rutaArchivo){
-        try{
+    public static SistemaArchivos cargarSistema(){
+       return cargarDesdeRecursos();
+    }
+    
+    private static SistemaArchivos cargarDesdeRecursos(){
+         try{
+             
+            InputStream inputStream = CargadorSistema.class.getResourceAsStream("/recursos/sistema_Archivos.json");
+            
+            if (inputStream == null){
+                return cargarSistemaVacio();
+            }
+             
             Gson gson = new Gson();
-            JsonObject json = gson.fromJson(new FileReader(rutaArchivo), JsonObject.class); //esto va a abrir el archivo
+            JsonObject json = gson.fromJson(new InputStreamReader(inputStream), JsonObject.class); //esto va a abrir el archivo
             
             //leer usuarios
             JsonArray arrayUsuarios = json.getAsJsonArray("usuarios");

@@ -20,7 +20,7 @@ public class main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        SistemaArchivos sistema = CargadorSistema.cargarSistema(rutaArchivo);
+        SistemaArchivos sistema = CargadorSistema.cargarSistema();
         if (sistema == null){
             sistema = CargadorSistema.cargarSistemaVacio();
         }

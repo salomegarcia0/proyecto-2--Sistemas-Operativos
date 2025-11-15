@@ -1,0 +1,132 @@
+{
+  "usuarios": [
+    {
+      "nombre": "admin",
+      "tipo": "ADMIN"
+    },
+    {
+      "nombre": "user1",
+      "tipo": "USER"
+    },
+    {
+      "nombre": "user2",
+      "tipo": "USER"
+    }
+  ],
+  "sistemaArchivos": {
+    "nombre": "root",
+    "tipo": "DIRECTORIO",
+    "usuario": "admin",
+    "size": 85,
+    "cantidadArchivos": 12,
+    "cantidadSubDir": 4,
+    "esPublico": true,
+    "contenido": [
+      {
+        "nombre": "sistema",
+        "tipo": "DIRECTORIO",
+        "usuario": "admin",
+        "size": 15,
+        "cantidadArchivos": 4,
+        "cantidadSubDir": 2,
+        "esPublico": false,
+        "contenido": [
+          {
+            "name": "config.txt",
+            "tipo": "ARCHIVO",
+            "usuario": "admin",
+            "size": 3,
+            "blockList": [
+              0,
+              1,
+              2
+            ]
+          },
+          {
+            "nombre": "logs",
+            "tipo": "DIRECTORIO",
+            "usuario": "admin",
+            "size": 7,
+            "cantidadArchivos": 1,
+            "cantidadSubDir": 0,
+            "esPublico": false,
+            "contenido": [
+              {
+                "name": "system.log",
+                "tipo": "ARCHIVO",
+                "usuario": "admin",
+                "size": 7,
+                "blockList": [
+                  3,
+                  4,
+                  5,
+                  6,
+                  7
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "nombre": "home",
+        "tipo": "DIRECTORIO",
+        "usuario": "admin",
+        "size": 45,
+        "cantidadArchivos": 5,
+        "cantidadSubDir": 2,
+        "esPublico": false,
+        "contenido": [
+          {
+            "nombre": "user1",
+            "tipo": "DIRECTORIO",
+            "usuario": "user1",
+            "size": 20,
+            "cantidadArchivos": 3,
+            "cantidadSubDir": 1,
+            "esPublico": false,
+            "contenido": [
+              {
+                "nombre": "documentos",
+                "tipo": "DIRECTORIO",
+                "usuario": "user1",
+                "size": 15,
+                "cantidadArchivos": 2,
+                "cantidadSubDir": 0,
+                "esPublico": false,
+                "contenido": [
+                  {
+                    "name": "tarea.pdf",
+                    "tipo": "ARCHIVO",
+                    "usuario": "user1",
+                    "size": 8,
+                    "blockList": [
+                      10,
+                      11,
+                      12,
+                      13,
+                      14
+                    ]
+                  },
+                  {
+                    "name": "notas.txt",
+                    "tipo": "ARCHIVO",
+                    "usuario": "user1",
+                    "size": 7,
+                    "blockList": [
+                      18,
+                      19,
+                      20,
+                      21,
+                      22
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

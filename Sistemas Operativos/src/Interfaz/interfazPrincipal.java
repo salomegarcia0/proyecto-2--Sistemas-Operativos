@@ -26,7 +26,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
     }
     
     private void cargarArbol(){
-        SistemaArchivos sistema = CargadorSistema.cargarSistema("C:/Users/salom/Downloads/sistema_archivos.json"); //ojo aca que solo acepta el archivo con este nombre, revisar solo prueba
+        SistemaArchivos sistema = CargadorSistema.cargarSistema(); //ojo aca que solo acepta el archivo con este nombre, revisar solo prueba
         
         if (sistema == null){
             sistema = CargadorSistema.cargarSistemaVacio();
