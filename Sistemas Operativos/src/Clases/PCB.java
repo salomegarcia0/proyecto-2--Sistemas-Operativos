@@ -4,6 +4,7 @@
  */
 package Clases;
 import Tipos_de_Datos.*;
+import Estructuras.*;
 
 /**
  * Clase para crear los procesos de la simualacion
@@ -13,8 +14,16 @@ public class PCB {
 
     private int procesoID;
     private String procesoNombre;
+    //El archivo al cual se le hará la operacion CRUD
+    private Archivo archivo;
     private EstadoProceso estadoActual;
+    //CRUD
     private TipoProceso tipoProceso;
+    /*
+    SOLO APLICA PARA ELIMINAR, MODIFICAR Y LEER
+    Será una especie de copia de lista de bloques del archivo, de tal forma de que sea mas facil a la hora de ordenar dicha lista en el caso de politicas SSTF Y SCAN donde se busca
+    */
+    private ListaEnlazada listaBloques;
     private int PC;
     private int MAR;
     
@@ -24,9 +33,11 @@ public class PCB {
     */
     private long tiempoEnCPU;     
 
-    public PCB(int procesoID, String procesoNombre) {
+    public PCB(int procesoID, String procesoNombre, Archivo archivo, TipoProceso tipoProceso) {
         this.procesoID = procesoID;
         this.procesoNombre = procesoNombre;
+        this.archivo = archivo;
+        this.tipoProceso = tipoProceso;
         this.PC = PC;
         this.MAR = MAR;
         this.tiempoEnCPU = tiempoEnCPU;
@@ -85,7 +96,14 @@ public class PCB {
     public void setTiempoEnCPU(long tiempoEnCPU) {
         this.tiempoEnCPU = tiempoEnCPU;
     }
-    
+
+    public Archivo getArchivo() {
+        return archivo;
+    }
+
+    public void setArchivo(Archivo archivo) {
+        this.archivo = archivo;
+    }
     
     
 }

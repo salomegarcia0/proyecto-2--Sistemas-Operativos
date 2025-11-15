@@ -24,7 +24,7 @@ public class FileExplorer {
     private static int countInstrucciones;
     //ioExceptionCycle: cada cuantas lecturas ocurre una interrupcion de E/S
     //Cada 10 kecturas (asi lo definimos inicialmente)
-    private static int ioExceptionCycle = 10;
+    private static int ioExceptionCycle = 15;
     //cuanto tiempo estara bloqueado el proceso cuando ocurre una operacion de E/S
     //Bloqueado durante 5 lecturas (asi lo definimos inicialmente)
     private static int ioCompletionTime = 5;

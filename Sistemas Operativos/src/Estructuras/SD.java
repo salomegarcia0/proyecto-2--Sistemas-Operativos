@@ -13,6 +13,7 @@ public class SD {
     private NodoBloque head,tail;
     private NodoBloque lector; //es como un apuntador hacia un bloque para indicar la ultima posicion del cabezal
     private int size; //el tamaño maximo del SD será 10 por el momento.
+    private int sizeAvailable; //el tamaño de bloques disponibles, será todos aquellos bloques con available = true que es como se definieron inicialmente por defecto 
     
     
     public SD() {
@@ -20,6 +21,7 @@ public class SD {
         this.tail = null;
         this.lector = null;
         this.size = 0;
+        this.sizeAvailable = 0;
     }
 
     public NodoBloque getHead() {
@@ -53,6 +55,14 @@ public class SD {
     public void setLector(NodoBloque lector) {
         this.lector = lector;
     }
+
+    public int getSizeDisponible() {
+        return sizeAvailable;
+    }
+
+    public void setSizeDisponible(int sizeAvailable) {
+        this.sizeAvailable = sizeAvailable;
+    }
     
     /*
     Insercion de nodos de tipo Bloque
@@ -71,6 +81,7 @@ public class SD {
         //Para colocar el cabezal al inicio    
         setLector(getHead());
         size++;
+        sizeAvailable++;
     }
 
     public void insertFinal(Bloque element) {
@@ -85,6 +96,7 @@ public class SD {
             setTail(nodo);
         }
         size++;
+        sizeAvailable++;
     }
 
     /*
@@ -103,6 +115,8 @@ public class SD {
             nodo.getElement().setNameArchivo(nombreArchivo);
             //se cambia el estado del bloque a desocupado
             nodo.getElement().setAvailable(false);
+            //se le resta uno a sizeAvailable ya que ahora un bloque estará ocupado
+            sizeAvailable--;
         }
     }
     
@@ -117,6 +131,8 @@ public class SD {
             nodo.getElement().setNameArchivo(nombreArchivo);
             //se cambia el estado del bloque a desocupado
             nodo.getElement().setAvailable(false);
+            //se le resta uno a sizeAvailable ya que ahora un bloque estará ocupado
+            sizeAvailable--;
         }
     }
     
@@ -150,6 +166,8 @@ public class SD {
                     //se inserta la informacion en el bloque y se cambia su estado a false (que esta ocupado)
                     pointer.getElement().setNameArchivo(archivo.getName());
                     pointer.getElement().setAvailable(false);
+                    //se le resta uno a sizeAvailable ya que ahora un bloque estará ocupado
+                    sizeAvailable--;
                 } else {
                     int aux = 1; 
                     NodoBloque pointer = getHead();
@@ -162,6 +180,8 @@ public class SD {
                     //se inserta la informacion en el bloque y se cambia su estado a false (que esta ocupado)
                     pointer.getElement().setNameArchivo(archivo.getName());
                     pointer.getElement().setAvailable(false);
+                    //se le resta uno a sizeAvailable ya que ahora un bloque estará ocupado
+                    sizeAvailable--;
                 }
             }
         nlista = nlista.getNext();
