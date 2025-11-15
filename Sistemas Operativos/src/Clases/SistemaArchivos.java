@@ -12,6 +12,8 @@ public class SistemaArchivos {
     private Directorio root;
     private Usuario[] usuarios;
     private int totalUsuarios;
+    
+    
 
     public SistemaArchivos(Directorio root, Usuario[] usuarios, int totalUsuarios) {
         this.root = root;

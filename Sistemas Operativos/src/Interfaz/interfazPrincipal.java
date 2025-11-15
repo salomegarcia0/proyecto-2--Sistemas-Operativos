@@ -9,18 +9,14 @@ import Clases.CargadorSistema;
 import Clases.Directorio;
 import Clases.SistemaArchivos;
 import Estructuras.Nodo;
-import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 /**
  *
  * @author salom
  */
 public class interfazPrincipal extends javax.swing.JFrame {
-    
-    private JTree arbolSistema;
-    
+
     /**
      * Creates new form interfazPrincipal
      */
@@ -30,7 +26,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
     }
     
     private void cargarArbol(){
-        SistemaArchivos sistema = CargadorSistema.cargarSistema("sistema_archivos.json"); //ojo aca que solo acepta el archivo con este nombre, revisar solo prueba
+        SistemaArchivos sistema = CargadorSistema.cargarSistema("C:/Users/salom/Downloads/sistema_archivos.json"); //ojo aca que solo acepta el archivo con este nombre, revisar solo prueba
         
         if (sistema == null){
             sistema = CargadorSistema.cargarSistemaVacio();
@@ -71,34 +67,20 @@ public class interfazPrincipal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        base = new javax.swing.JPanel();
+        panel1 = new java.awt.Panel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        arbolSistema = new javax.swing.JTree();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        base.setBackground(new java.awt.Color(204, 204, 204));
-        base.setForeground(new java.awt.Color(0, 0, 0));
+        panel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        javax.swing.GroupLayout baseLayout = new javax.swing.GroupLayout(base);
-        base.setLayout(baseLayout);
-        baseLayout.setHorizontalGroup(
-            baseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 666, Short.MAX_VALUE)
-        );
-        baseLayout.setVerticalGroup(
-            baseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 431, Short.MAX_VALUE)
-        );
+        jScrollPane1.setViewportView(arbolSistema);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(base, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(base, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        );
+        panel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 160, -1));
+
+        getContentPane().add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 680, 440));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -139,6 +121,8 @@ public class interfazPrincipal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel base;
+    private javax.swing.JTree arbolSistema;
+    private javax.swing.JScrollPane jScrollPane1;
+    private java.awt.Panel panel1;
     // End of variables declaration//GEN-END:variables
 }
