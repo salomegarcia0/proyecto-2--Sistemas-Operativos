@@ -98,6 +98,15 @@ public class SD {
         size++;
         sizeAvailable++;
     }
+    
+    //se le pasaria el parametro sizeList que será la cantidad de bloque que tendra el SD, inicialmente lo definiremos como 10
+    public void crearSD(int sizeList){
+        String archivo = "vacio";
+        for (int i = 0; i < sizeList; i++) {
+            Bloque bloque = new Bloque(archivo,i);
+            insertFinal(bloque);
+        }
+    }
 
     /*
     Todas esta funciones de insertData son funciones cuando ya al lista fue creada, es decir ya tiene la cantidad de bloques

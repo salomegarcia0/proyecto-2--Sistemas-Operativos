@@ -12,11 +12,20 @@ import Estructuras.*;
  */
 public class FileExplorer {
     private static SD SD;
+    private static int sizeBloque = 100; //el valor del "tamaño de los bloques, es base a esto que es simularemos la "memoria disponible" en el SD
     private static Cola listo;
     private static Cola colaListos;
     private static PCB procesoEnEjecucion;
     private static Cola colaBloqueados;
     private static Cola colaTerminado;
+    /*
+    Variables booleanas para saber la politica que esta activa;
+    */
+    private static boolean FIFO = true; //inicialmente será FIFO la politica con la que iniciara
+    private static boolean SSTF = false;
+    private static boolean SCAN = false;
+    private static boolean C_SCAN = false;
+    
     //para definir el tiempo que dura una lectura en ms (queremos inicialmente 1000ms = 1seg)
     private static int ciclo_reloj = 1000;
     //para saber cuantas lecturas se han completado hasta el momento
