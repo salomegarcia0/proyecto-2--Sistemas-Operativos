@@ -12,7 +12,7 @@ import Estructuras.ListaEnlazada;
  */
 public class Archivo {
     private String name;
-    private int size;
+    private int size; //cantidad de bloques es la que esta dividio o se dividira
     private ListaEnlazada blockList;
     private Usuario usuario;   
 

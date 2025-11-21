@@ -14,7 +14,7 @@ public class SD {
     private NodoBloque lector; //es como un apuntador hacia un bloque para indicar la ultima posicion del cabezal
     private int size; //el tamaño maximo del SD será 10 por el momento.
     private int sizeAvailable; //el tamaño de bloques disponibles, será todos aquellos bloques con available = true que es como se definieron inicialmente por defecto 
-    
+    private boolean reversa ; //
     
     public SD() {
         this.head = null;
@@ -22,6 +22,7 @@ public class SD {
         this.lector = null;
         this.size = 0;
         this.sizeAvailable = 0;
+        this.reversa = false;
     }
 
     public NodoBloque getHead() {
@@ -63,6 +64,22 @@ public class SD {
     public void setSizeDisponible(int sizeAvailable) {
         this.sizeAvailable = sizeAvailable;
     }
+
+    public int getSizeAvailable() {
+        return sizeAvailable;
+    }
+
+    public void setSizeAvailable(int sizeAvailable) {
+        this.sizeAvailable = sizeAvailable;
+    }
+
+    public boolean isReversa() {
+        return reversa;
+    }
+
+    public void setReversa(boolean reversa) {
+        this.reversa = reversa;
+    }
     
     /*
     Insercion de nodos de tipo Bloque
@@ -100,6 +117,7 @@ public class SD {
     }
     
     //se le pasaria el parametro sizeList que será la cantidad de bloque que tendra el SD, inicialmente lo definiremos como 10
+    //todo los bloques se crearan con el 
     public void crearSD(int sizeList){
         String archivo = "vacio";
         for (int i = 0; i < sizeList; i++) {

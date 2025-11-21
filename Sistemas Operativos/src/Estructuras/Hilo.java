@@ -9,22 +9,18 @@ import main.*;
  * @author pjroj
  */
 public class Hilo extends Thread {
-    private String nombreProceso;
-    private int MARProceso;
     private int tiempoSimulado;
 
-    public Hilo(String nombreProceso,int MARProceso, int tiempoSimulado) {
-        this.nombreProceso = nombreProceso;
-        this.MARProceso = MARProceso;
+    public Hilo( int tiempoSimulado) {
         this.tiempoSimulado = tiempoSimulado;
     }
 
     @Override
-    //necesito luego de cada thread aumenta un contador de instrucciiones que se han llevado actualmente, verificar si el procesos es IO que ocurra una
-    //una interrumpcion para eso requiero el reloj en global
+    //necesito luego de cada thread aumenta un contador de instrucciOnes que se han llevado actualmente
     public void run() {
         try {
-            System.out.println("Proceso " + nombreProceso + " EJECUTANDO INSTRUCCION: " + MARProceso);
+            //System.out.println("Proceso " + nombreProceso + " EJECUTANDO BLOQUE: " + MARProceso);
+            System.out.println("Ejecutando hilo");
             Thread.sleep(tiempoSimulado);
         } catch (InterruptedException e) {
                 e.printStackTrace();

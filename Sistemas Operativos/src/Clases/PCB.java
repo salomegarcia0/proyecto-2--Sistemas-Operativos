@@ -24,7 +24,7 @@ public class PCB {
     Será una especie de copia de lista de bloques del archivo, de tal forma de que sea mas facil a la hora de ordenar dicha lista en el caso de politicas SSTF Y SCAN donde se busca
     */
     private ListaEnlazada listaBloques;
-    private int PC;
+    //private int PC;
     private int MAR;
     
     /*
@@ -38,9 +38,11 @@ public class PCB {
         this.procesoNombre = procesoNombre;
         this.archivo = archivo;
         this.tipoProceso = tipoProceso;
-        this.PC = PC;
-        this.MAR = MAR;
-        this.tiempoEnCPU = tiempoEnCPU;
+        //this.PC = PC;
+        //este valor ira aumentando de tal forma que podemos saber cuando bloques se han leido hasta el momento del archivo completo, importante
+        //sobretodo para saber en las operaciones de insercion cuandos bloques faltan insertar en SD
+        this.MAR = 0; //numero de lectura de bloques actuales por asi decirlo
+        this.tiempoEnCPU = 0;
         this.tipoProceso = tipoProceso;
     }
     
@@ -71,10 +73,6 @@ public class PCB {
 
     public EstadoProceso getEstadoActual() {
         return estadoActual;
-    }
-
-    public int getPC() {
-        return PC;
     }
 
     public int getMAR() {
