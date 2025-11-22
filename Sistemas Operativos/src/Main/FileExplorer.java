@@ -5,6 +5,7 @@
 package Main;
 import Clases.*;
 import Estructuras.*;
+import Tipos_de_Datos.*;
 
 /**
  *
@@ -21,10 +22,7 @@ public class FileExplorer {
     /*
     Variables booleanas para saber la politica que esta activa;
     */
-    private static boolean FIFO = true; //inicialmente será FIFO la politica con la que iniciara
-    private static boolean SSTF = false;
-    private static boolean SCAN = false;
-    private static boolean C_SCAN = false;
+    private static TipoPolitica politica = TipoPolitica.FIFO ; //inicialmente sera fifo
     
     //para definir el tiempo que dura una lectura en ms (queremos inicialmente 1000ms = 1seg)
     private static int ciclo_reloj = 1000;
@@ -89,7 +87,13 @@ public class FileExplorer {
     public static void setProcesoBloqueado(boolean procesoBloqueado) {
         FileExplorer.procesoBloqueado = procesoBloqueado;
     }
-    
-    
+
+    public static TipoPolitica getPolitica() {
+        return politica;
+    }
+
+    public static void setPolitica(TipoPolitica politica) {
+        FileExplorer.politica = politica;
+    }
     
 }
