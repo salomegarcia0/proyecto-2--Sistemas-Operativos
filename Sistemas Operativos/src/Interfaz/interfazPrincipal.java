@@ -9,24 +9,31 @@ import Clases.CargadorSistema;
 import Clases.Directorio;
 import Clases.SistemaArchivos;
 import Estructuras.Nodo;
+import javax.swing.JTable;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author salom
  */
 public class interfazPrincipal extends javax.swing.JFrame {
-
+    private SistemaArchivos sistema;
+    private DefaultTableModel modeloTablaArchivos;
+    
     /**
      * Creates new form interfazPrincipal
      */
-    public interfazPrincipal() {
+    public interfazPrincipal(){
         initComponents();
         cargarArbol();
+        
+        cargarTablaArchivos();
+        
     }
     
     private void cargarArbol(){
-        SistemaArchivos sistema = CargadorSistema.cargarSistema(); //ojo aca que solo acepta el archivo con este nombre, revisar solo prueba
+        sistema = CargadorSistema.cargarSistema(); //ojo aca que solo acepta el archivo con este nombre, revisar solo prueba
         
         if (sistema == null){
             sistema = CargadorSistema.cargarSistemaVacio();
@@ -57,7 +64,74 @@ public class interfazPrincipal extends javax.swing.JFrame {
         
         return nodo;
     }
-
+    
+    private void cargarTablaArchivos(){
+        modeloTablaArchivos = new DefaultTableModel(new Object[]{"Nombre", "Tamaño", "Bloques", "Usuario"}, 0);
+        if (tablaArchivos == null){
+            return;
+        }
+        
+        tablaArchivos.setModel(modeloTablaArchivos);
+        if (sistema != null && sistema.getRoot() != null){
+            llenarTablaJson(sistema.getRoot(), modeloTablaArchivos);
+        } else {
+            System.out.println("error llenando tabla");
+        }
+    }
+    
+    private void llenarTablaJson(Directorio dir, DefaultTableModel modelo){
+        if (dir == null || dir.getElementos() == null){
+            return;
+        }
+        
+        Nodo aux = dir.getElementos().getHead();
+        
+        while(aux != null){
+            Object elemento = aux.getElement();
+            
+            if (elemento instanceof Directorio){
+                llenarTablaJson((Directorio) elemento, modelo);
+            } else if (elemento instanceof Archivo){
+                Archivo archivo = (Archivo) elemento;
+                modelo.addRow(new Object[]{
+                    archivo.getName(),
+                    archivo.getSize(),
+                    obtenerListaBloques(archivo),
+                    archivo.getUsuario().getName(),
+                });
+                System.out.println("Archivo "+archivo.getName()+" agregado");
+            }
+            
+            aux = aux.getNext();
+        }
+    }
+    
+    
+    private String obtenerListaBloques(Archivo archivo){
+        if (archivo.getBlockList() == null || archivo.getBlockList().getHead() != null){
+            return "[]";
+        }
+        StringBuilder listaBloques = new StringBuilder();
+        Nodo nodoActual = archivo.getBlockList().getHead();
+        
+        while (nodoActual != null){
+            if (nodoActual.getElement() instanceof Integer){
+                int bloque = (Integer) nodoActual.getElement();
+                listaBloques.append(bloque);
+                
+                if(nodoActual.getNext() != null){
+                    listaBloques.append(" , ");
+                }
+            }
+            nodoActual = nodoActual.getNext();
+        }
+        
+        listaBloques.append("]");
+        return listaBloques.toString();
+    }
+    
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -92,7 +166,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jLabel8 = new javax.swing.JLabel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
+        tablaArchivos = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -210,7 +284,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jLabel8.setText("Explorador de Archivos");
         panel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 160, 20));
 
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+        tablaArchivos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -221,7 +295,9 @@ public class interfazPrincipal extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane3.setViewportView(jTable2);
+        tablaArchivos.setEnabled(false);
+        tablaArchivos.setRowSelectionAllowed(false);
+        jScrollPane3.setViewportView(tablaArchivos);
 
         jTabbedPane1.addTab("Tabla de Archivos", jScrollPane3);
 
@@ -292,7 +368,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTable jTable2;
     private java.awt.Panel panel1;
+    private javax.swing.JTable tablaArchivos;
     // End of variables declaration//GEN-END:variables
 }
