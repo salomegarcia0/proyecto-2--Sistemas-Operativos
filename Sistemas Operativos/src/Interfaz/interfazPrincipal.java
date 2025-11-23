@@ -27,7 +27,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
     public interfazPrincipal(){
         initComponents();
         cargarArbol();
-        
         cargarTablaArchivos();
         
     }
@@ -108,11 +107,13 @@ public class interfazPrincipal extends javax.swing.JFrame {
     
     
     private String obtenerListaBloques(Archivo archivo){
-        if (archivo.getBlockList() == null || archivo.getBlockList().getHead() != null){
+        if (archivo.getBlockList() == null || archivo.getBlockList().getHead() == null){
             return "[]";
         }
         StringBuilder listaBloques = new StringBuilder();
         Nodo nodoActual = archivo.getBlockList().getHead();
+        
+        listaBloques.append("[");
         
         while (nodoActual != null){
             if (nodoActual.getElement() instanceof Integer){
@@ -127,11 +128,10 @@ public class interfazPrincipal extends javax.swing.JFrame {
         }
         
         listaBloques.append("]");
-        return listaBloques.toString();
+        String resultado = listaBloques.toString();
+        return resultado;
     }
-    
-    
-    
+     
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
