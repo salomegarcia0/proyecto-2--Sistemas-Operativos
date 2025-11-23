@@ -179,7 +179,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jPanel6 = new javax.swing.JPanel();
         Modificar_btn = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
-        Aplicar_btn = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
@@ -188,6 +188,8 @@ public class interfazPrincipal extends javax.swing.JFrame {
         tablaArchivos = new javax.swing.JTable();
         comboUsuarios = new javax.swing.JComboBox<>();
         jComboBox2 = new javax.swing.JComboBox<>();
+        jPanel8 = new javax.swing.JPanel();
+        Aplicar_btn = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -211,7 +213,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(51, 51, 51));
         jLabel4.setText("Política:");
-        panel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 530, 60, 20));
+        panel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 540, 60, 20));
         panel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 580, 790, 10));
         panel1.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 460, 720, 10));
 
@@ -273,14 +275,13 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jPanel7.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
         jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        Aplicar_btn.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        Aplicar_btn.setForeground(new java.awt.Color(51, 51, 51));
-        Aplicar_btn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Aplicar_btn.setText("Aplicar");
-        Aplicar_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jPanel7.add(Aplicar_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
+        jLabel5.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel5.setText("Agregar U");
+        jPanel7.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
 
-        panel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 520, 110, 30));
+        panel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 490, 110, 30));
 
         jPanel1.setBackground(new java.awt.Color(243, 243, 243));
 
@@ -318,16 +319,47 @@ public class interfazPrincipal extends javax.swing.JFrame {
 
         comboUsuarios.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         comboUsuarios.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        panel1.add(comboUsuarios, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 490, 180, -1));
+        comboUsuarios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboUsuariosActionPerformed(evt);
+            }
+        });
+        panel1.add(comboUsuarios, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 490, 180, -1));
 
         jComboBox2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        panel1.add(jComboBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 530, 180, -1));
+        jComboBox2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox2ActionPerformed(evt);
+            }
+        });
+        panel1.add(jComboBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 540, 180, -1));
+
+        jPanel8.setBackground(new java.awt.Color(238, 238, 238));
+        jPanel8.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
+        jPanel8.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        Aplicar_btn.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        Aplicar_btn.setForeground(new java.awt.Color(51, 51, 51));
+        Aplicar_btn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Aplicar_btn.setText("Aplicar");
+        Aplicar_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jPanel8.add(Aplicar_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
+
+        panel1.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 530, 110, 30));
 
         getContentPane().add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 860, 600));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBox2ActionPerformed
+
+    private void comboUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboUsuariosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_comboUsuariosActionPerformed
 
     /**
      * @param args the command line arguments
@@ -377,6 +409,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
@@ -384,6 +417,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSeparator jSeparator1;
