@@ -70,6 +70,29 @@ public class interfazPrincipal extends javax.swing.JFrame {
         panel1 = new java.awt.Panel();
         jScrollPane1 = new javax.swing.JScrollPane();
         arbolSistema = new javax.swing.JTree();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        jSeparator2 = new javax.swing.JSeparator();
+        choiceUsuario = new java.awt.Choice();
+        choicePolitica = new java.awt.Choice();
+        jPanel3 = new javax.swing.JPanel();
+        crear_btn = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        Eliminar_btn = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        Leer_btn = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
+        Modificar_btn = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        Aplicar_btn = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTable2 = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -78,9 +101,133 @@ public class interfazPrincipal extends javax.swing.JFrame {
 
         jScrollPane1.setViewportView(arbolSistema);
 
-        panel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 160, -1));
+        panel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 70, 270, -1));
 
-        getContentPane().add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 680, 440));
+        jLabel1.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel1.setText("Controles");
+        panel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 450, -1, -1));
+
+        jLabel2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel2.setText("Usuario:");
+        panel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 497, -1, 20));
+
+        jLabel4.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel4.setText("Política:");
+        panel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 530, 60, 20));
+        panel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 580, 790, 10));
+        panel1.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 460, 720, 10));
+
+        choiceUsuario.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        choiceUsuario.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        panel1.add(choiceUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 490, 180, 30));
+
+        choicePolitica.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        choicePolitica.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        panel1.add(choicePolitica, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 530, 180, -1));
+
+        jPanel3.setBackground(new java.awt.Color(238, 238, 238));
+        jPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
+        jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        crear_btn.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        crear_btn.setForeground(new java.awt.Color(51, 51, 51));
+        crear_btn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        crear_btn.setText("Crear");
+        crear_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jPanel3.add(crear_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
+
+        panel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 490, 110, 30));
+
+        jPanel4.setBackground(new java.awt.Color(238, 238, 238));
+        jPanel4.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
+        jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        Eliminar_btn.setBackground(new java.awt.Color(51, 51, 51));
+        Eliminar_btn.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        Eliminar_btn.setForeground(new java.awt.Color(51, 51, 51));
+        Eliminar_btn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Eliminar_btn.setText("Eliminar");
+        Eliminar_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jPanel4.add(Eliminar_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
+
+        panel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 490, 110, 30));
+
+        jPanel5.setBackground(new java.awt.Color(238, 238, 238));
+        jPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
+        jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        Leer_btn.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        Leer_btn.setForeground(new java.awt.Color(51, 51, 51));
+        Leer_btn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Leer_btn.setText("Leer");
+        Leer_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jPanel5.add(Leer_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
+
+        panel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 490, 110, 30));
+
+        jPanel6.setBackground(new java.awt.Color(238, 238, 238));
+        jPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
+        jPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        Modificar_btn.setBackground(new java.awt.Color(51, 51, 51));
+        Modificar_btn.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        Modificar_btn.setForeground(new java.awt.Color(51, 51, 51));
+        Modificar_btn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Modificar_btn.setText("Modificar");
+        Modificar_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jPanel6.add(Modificar_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
+
+        panel1.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 530, 110, 30));
+
+        jPanel7.setBackground(new java.awt.Color(238, 238, 238));
+        jPanel7.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
+        jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        Aplicar_btn.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        Aplicar_btn.setForeground(new java.awt.Color(51, 51, 51));
+        Aplicar_btn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Aplicar_btn.setText("Aplicar");
+        Aplicar_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jPanel7.add(Aplicar_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
+
+        panel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 520, 110, 30));
+
+        jPanel1.setBackground(new java.awt.Color(243, 243, 243));
+
+        jLabel3.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel3.setText("Simulador de Sistema de Archivos");
+        jPanel1.add(jLabel3);
+
+        panel1.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 860, 30));
+
+        jLabel8.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel8.setText("Explorador de Archivos");
+        panel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 160, 20));
+
+        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane3.setViewportView(jTable2);
+
+        jTabbedPane1.addTab("Tabla de Archivos", jScrollPane3);
+
+        panel1.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 40, 490, 390));
+
+        getContentPane().add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 860, 600));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -121,8 +268,31 @@ public class interfazPrincipal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel Aplicar_btn;
+    private javax.swing.JLabel Eliminar_btn;
+    private javax.swing.JLabel Leer_btn;
+    private javax.swing.JLabel Modificar_btn;
     private javax.swing.JTree arbolSistema;
+    private java.awt.Choice choicePolitica;
+    private java.awt.Choice choiceUsuario;
+    private javax.swing.JLabel crear_btn;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTable jTable2;
     private java.awt.Panel panel1;
     // End of variables declaration//GEN-END:variables
 }
