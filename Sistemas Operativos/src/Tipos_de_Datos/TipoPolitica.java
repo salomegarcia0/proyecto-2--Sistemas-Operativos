@@ -10,7 +10,7 @@ package Tipos_de_Datos;
  */
 public enum TipoPolitica {
     FIFO,
-    SSTF,
+    LIFO,
     SCAN,
     C_SCAN,
             

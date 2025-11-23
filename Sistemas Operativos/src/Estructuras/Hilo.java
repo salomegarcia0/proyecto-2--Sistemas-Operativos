@@ -11,7 +11,7 @@ import Main.*;
 public class Hilo extends Thread {
     private int tiempoSimulado;
 
-    public Hilo( int tiempoSimulado) {
+    public Hilo(int tiempoSimulado) {
         this.tiempoSimulado = tiempoSimulado;
     }
 
@@ -20,7 +20,7 @@ public class Hilo extends Thread {
     public void run() {
         try {
             //System.out.println("Proceso " + nombreProceso + " EJECUTANDO BLOQUE: " + MARProceso);
-            System.out.println("Ejecutando hilo");
+            System.out.println("Ejecutando lectura (hilo)");
             Thread.sleep(tiempoSimulado);
         } catch (InterruptedException e) {
                 e.printStackTrace();
