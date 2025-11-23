@@ -8,6 +8,7 @@ import Clases.Archivo;
 import Clases.CargadorSistema;
 import Clases.Directorio;
 import Clases.SistemaArchivos;
+import Clases.Usuario;
 import Estructuras.Nodo;
 import javax.swing.JTable;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -28,7 +29,27 @@ public class interfazPrincipal extends javax.swing.JFrame {
         initComponents();
         cargarArbol();
         cargarTablaArchivos();
+        actualizarComboUsuarios();
         
+    }
+    
+    private void actualizarComboUsuarios(){
+        String seleccionAnterior = (String) comboUsuarios.getSelectedItem();
+        comboUsuarios.removeAllItems();
+        
+        if (sistema != null && sistema.getUsuarios() != null){
+            for (Usuario usuario : sistema.getUsuarios()){
+                String item = usuario.getName() + " (" + (usuario.getType().name().equals("ADMIN")? "Administrador" : "Usuario") + ")";
+                comboUsuarios.addItem(item);
+            }
+        }
+        
+        if (seleccionAnterior != null){
+            comboUsuarios.setSelectedItem(seleccionAnterior);
+        } else if (comboUsuarios.getItemCount() > 0){
+            comboUsuarios.setSelectedIndex(0);
+        }
+   
     }
     
     private void cargarArbol(){
@@ -149,8 +170,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
-        choiceUsuario = new java.awt.Choice();
-        choicePolitica = new java.awt.Choice();
         jPanel3 = new javax.swing.JPanel();
         crear_btn = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
@@ -167,6 +186,8 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         tablaArchivos = new javax.swing.JTable();
+        comboUsuarios = new javax.swing.JComboBox<>();
+        jComboBox2 = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -193,14 +214,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
         panel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 530, 60, 20));
         panel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 580, 790, 10));
         panel1.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 460, 720, 10));
-
-        choiceUsuario.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        choiceUsuario.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        panel1.add(choiceUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 490, 180, 30));
-
-        choicePolitica.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        choicePolitica.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        panel1.add(choicePolitica, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 530, 180, -1));
 
         jPanel3.setBackground(new java.awt.Color(238, 238, 238));
         jPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
@@ -303,6 +316,14 @@ public class interfazPrincipal extends javax.swing.JFrame {
 
         panel1.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 40, 490, 390));
 
+        comboUsuarios.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        comboUsuarios.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        panel1.add(comboUsuarios, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 490, 180, -1));
+
+        jComboBox2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        panel1.add(jComboBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 530, 180, -1));
+
         getContentPane().add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 860, 600));
 
         pack();
@@ -349,9 +370,9 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel Leer_btn;
     private javax.swing.JLabel Modificar_btn;
     private javax.swing.JTree arbolSistema;
-    private java.awt.Choice choicePolitica;
-    private java.awt.Choice choiceUsuario;
+    private javax.swing.JComboBox<String> comboUsuarios;
     private javax.swing.JLabel crear_btn;
+    private javax.swing.JComboBox<String> jComboBox2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
