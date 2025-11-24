@@ -11,6 +11,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Clase para leer el json y poder cargar el sistema
@@ -18,10 +20,21 @@ import java.io.FileReader;
  */
 public class CargadorSistema {
     
-    public static SistemaArchivos cargarSistema(String rutaArchivo){
-        try{
+    public static SistemaArchivos cargarSistema(){
+       return cargarDesdeRecursos();
+    }
+    
+    private static SistemaArchivos cargarDesdeRecursos(){
+         try{
+             
+            InputStream inputStream = CargadorSistema.class.getResourceAsStream("/recursos/sistema_Archivos.json");
+            
+            if (inputStream == null){
+                return cargarSistemaVacio();
+            }
+             
             Gson gson = new Gson();
-            JsonObject json = gson.fromJson(new FileReader(rutaArchivo), JsonObject.class); //esto va a abrir el archivo
+            JsonObject json = gson.fromJson(new InputStreamReader(inputStream), JsonObject.class); //esto va a abrir el archivo
             
             //leer usuarios
             JsonArray arrayUsuarios = json.getAsJsonArray("usuarios");
@@ -37,14 +50,18 @@ public class CargadorSistema {
         }
     }
     
-    private static Usuario buscarAdmin(Usuario[] usuarios) {
-        for (Usuario u : usuarios)
-            if(u.getType() == TipoUsuario.ADMIN)
-                return u;
-        return usuarios[0];
+    //este metodo es para cuando no carga el archivo o json o en su defecto no existe ninguno, se inicializa el sistema vacio
+    public static SistemaArchivos cargarSistemaVacio(){
+        Usuario admin = new Usuario("admin", TipoUsuario.ADMIN);
+        Usuario user1 = new Usuario("user1", TipoUsuario.USER);
+        Usuario user2 = new Usuario("user2", TipoUsuario.USER);
+        
+        Usuario[] usuarios = {admin, user1, user2};
+        
+        Directorio root = new Directorio("root", admin, 0, 0, 0, true);
+        
+        return new SistemaArchivos(root, usuarios, usuarios.length);
     }
-    
-
     
     private static Usuario[] cargarUsuarios(JsonArray arrayUsuarios){
         Usuario [] usuarios = new Usuario[arrayUsuarios.size()];

@@ -12,6 +12,8 @@ public class SistemaArchivos {
     private Directorio root;
     private Usuario[] usuarios;
     private int totalUsuarios;
+    
+    
 
     public SistemaArchivos(Directorio root, Usuario[] usuarios, int totalUsuarios) {
         this.root = root;
@@ -27,8 +29,37 @@ public class SistemaArchivos {
         }
         return usuarios[0];
     }
-    
-    
+   
+    public boolean agregarUsuario(Usuario nuevo){
+        if (nuevo == null){
+            System.out.println("Error, usuario null");
+            return false;
+        }
+        
+        for (Usuario usuario : usuarios){
+            if (usuario.getName().equals(nuevo.getName())){
+                System.out.println("Error, el usuario ya exite");
+                return false;
+            }
+        }
+        
+        try{
+            Usuario[] nuevosUsuarios = new Usuario[usuarios.length + 1];
+            System.arraycopy(usuarios, 0, nuevosUsuarios, 0, usuarios.length);
+            nuevosUsuarios[usuarios.length] = nuevo;
+            
+            this.usuarios = nuevosUsuarios;
+            this.totalUsuarios = usuarios.length;
+            
+            System.out.println("Usuario Agregado: " + nuevo.getName());
+            
+            return true;
+            
+        } catch (Exception e){
+            System.out.print(e.getMessage());
+            return false;
+        }
+    }
     
     public Directorio getRoot() {
         return root;
