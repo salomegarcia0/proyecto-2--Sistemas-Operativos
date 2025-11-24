@@ -5,14 +5,23 @@
 package Interfaz;
 
 import Clases.Archivo;
+import Clases.Bloque;
 import Clases.CargadorSistema;
 import Clases.Directorio;
 import Clases.SistemaArchivos;
 import Clases.Usuario;
 import Estructuras.Nodo;
+import Estructuras.NodoBloque;
+import Estructuras.SD;
+import Main.FileExplorer;
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.table.DefaultTableModel;
 
@@ -34,6 +43,8 @@ public class interfazPrincipal extends javax.swing.JFrame {
         cargarTablaArchivos();
         actualizarComboUsuarios();
         actualizarComboPoliticas();
+        
+        
     }
     
     private void actualizarComboUsuarios(){
@@ -99,6 +110,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         return nodo;
     }
     
+    //PRIMERA PARTE DEL TABBED PANE DONDE ESTÁ LA TABLA
     private void cargarTablaArchivos(){
         modeloTablaArchivos = new DefaultTableModel(new Object[]{"Nombre", "Tamaño", "Bloques", "Usuario"}, 0);
         if (tablaArchivos == null){
@@ -294,8 +306,11 @@ public class interfazPrincipal extends javax.swing.JFrame {
         
         cargarTablaArchivosFiltrada();
         
+        generarBloquesSD();
+        
     }
     
+    //POLITICASSSS
     private void aplicarPoliticaEnSistema(String politica){
         // aca es dodnde voy a escribir el codigo para las politicas
         // hablar con andrea para hacerlo juntas !!!!!!
@@ -313,7 +328,149 @@ public class interfazPrincipal extends javax.swing.JFrame {
         
         aplicarPoliticaEnSistema(politicaSeleccionada);
     }
-     
+    
+    private void cargarDatosEnSD(){
+        SD disco = FileExplorer.getSD();
+        if (disco == null){
+            System.out.println("Fallo cargando SD, SD null, VERIFICR CARGAR DATOS SD");
+            return;
+        }
+        
+        if (sistema != null && sistema.getRoot() != null){
+            asignarBloquesArchivos(sistema.getRoot());
+        }
+        
+        generarBloquesSD();
+    }
+     //esta funcion recorre los archivos y asigna recursivamente los bloques
+    private void asignarBloquesArchivos(Directorio dir){
+        if (dir == null || dir.getElementos() == null) return;
+        
+        Nodo aux = dir.getElementos().getHead();
+        
+        while (aux != null){
+            Object elemento = aux.getElement();
+            
+            if (elemento instanceof Directorio){
+                asignarBloquesArchivos((Directorio) elemento);
+            } else if (elemento instanceof Archivo) {
+                Archivo archivo = (Archivo) elemento;
+                asignarBloquesArchivo(archivo);
+            }
+            aux = aux.getNext();
+        }
+    }
+    
+    //asigna bloques para un solo archivo especiffico
+    private void asignarBloquesArchivo(Archivo archivo){
+        SD disco = FileExplorer.getSD();
+        if(disco == null || archivo.getBlockList() == null) return;
+        
+        Nodo nodoBloque = archivo.getBlockList().getHead();
+        
+        while(nodoBloque != null){
+            if (nodoBloque.getElement() instanceof Integer){
+                int numeroBloque = (Integer) nodoBloque.getElement();
+                
+                NodoBloque nodoSD = disco.getHead();
+                
+                int contador = 0;
+                
+                while (nodoSD != null && contador <= numeroBloque){
+                    if (contador == numeroBloque){
+                        Bloque bloque = nodoSD.getElement();
+                        bloque.setAvailable(false);
+                        bloque.setNameArchivo(archivo.getName());
+                        bloque.setNameArchivo(archivo.getName());
+                        
+                        System.out.println("Bloque: " + numeroBloque + " asignado a: " + archivo.getName());
+                        break;
+                    }
+                    
+                    nodoSD = nodoSD.getNext();
+                    contador++;
+                }
+            }
+            
+            nodoBloque = nodoBloque.getNext();
+        }
+    }
+    
+    //2DA PESTAÑA DEL TABBED PANE, SD, ACÁ SERÁN VISIBLES LOS BLOQUES
+    private void generarBloquesSD(){
+        panelDisco.removeAll();
+        panelDisco.setLayout(null);
+        
+        int width = 70;
+        int height = 70;
+        int separacion = 10;
+        
+        int x = 20;
+        int y = 20;
+        
+        SD disco = FileExplorer.getSD();
+        if (disco == null){
+            System.out.println("error, no se inicio SD");
+            return;
+        }
+        
+        NodoBloque nodoActual = disco.getHead();
+        int contador = 0;
+        int maxBloques = disco.getSize();
+        
+        while (nodoActual != null && contador < maxBloques){
+            Bloque bloqueReal = nodoActual.getElement();
+            JPanel panelBloque = new JPanel();
+            panelBloque.setLayout(new BorderLayout());
+            
+            if (bloqueReal.isAvailable()){
+                panelBloque.setBackground(Color.GREEN);
+            } else {
+                panelBloque.setBackground(Color.RED);
+            }
+            
+            panelBloque.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+            panelBloque.setBounds(x, y, width, height);
+            
+            JLabel labelNum = new JLabel(String.valueOf(contador), SwingConstants.CENTER);
+            labelNum.setFont(new Font("Arial", Font.PLAIN, 16));
+            panelBloque.add(labelNum, BorderLayout.CENTER);
+            
+            //mostrar el nombre del archivo en el bloque pero esto capaz lo quite pq pa q    
+            if (!bloqueReal.isAvailable()){
+                String nombreArchivo = bloqueReal.getNameArchivo();
+                
+                if (nombreArchivo.length() > 8){
+                    nombreArchivo = nombreArchivo.substring(0,6)+"...";
+                }
+                
+                JLabel lblArchivo = new JLabel(nombreArchivo, SwingConstants.CENTER);
+                lblArchivo.setFont(new Font("Arial", Font.PLAIN, 9));
+                lblArchivo.setForeground(Color.WHITE);
+                panelBloque.add(lblArchivo, BorderLayout.SOUTH);
+            }
+            
+            String tooltip = "Bloque" + contador + " - " + (bloqueReal.isAvailable() ? "LIBRE" : "OCUPADO POR: " + bloqueReal.getNameArchivo());
+            panelBloque.setToolTipText(tooltip);
+            
+            panelDisco.add(panelBloque);
+            
+            if (contador == 7){
+                
+                x = 20;
+                y += height + separacion + 10;
+            } else {
+                x += width + separacion;
+            }
+            
+            nodoActual = nodoActual.getNext();
+            contador++;
+        }
+        
+        panelDisco.repaint();
+        panelDisco.revalidate();
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -578,7 +735,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         lblbloquesLibres.setText("jLabel9");
         panelSDStats.add(lblbloquesLibres, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 70, -1, -1));
 
-        jPanel2.add(panelSDStats, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 170, 330, 180));
+        jPanel2.add(panelSDStats, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 210, 520, 150));
 
         panelDisco.setBackground(new java.awt.Color(255, 255, 255));
         panelDisco.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -793,7 +950,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
 
         panelDisco.add(jPanel24, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 70, 60, -1));
 
-        jPanel2.add(panelDisco, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 530, 160));
+        jPanel2.add(panelDisco, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 520, 210));
 
         panelSD.addTab("SD", jPanel2);
         panelSD.addTab("Procesos", jPanel7);
