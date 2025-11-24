@@ -10,6 +10,8 @@ import Clases.Directorio;
 import Clases.SistemaArchivos;
 import Clases.Usuario;
 import Estructuras.Nodo;
+import java.awt.Color;
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.table.DefaultTableModel;
@@ -257,6 +259,24 @@ public class interfazPrincipal extends javax.swing.JFrame {
         }
     }
     
+    private void actualizarLabelUsuario(){
+        if (usuarioActual == null){
+            usuarioEnUso.setText("No seleccionado");
+            return;
+        }
+        
+        String textoUsuario = usuarioActual.getName();
+        
+        if (usuarioActual.getType().name().equals("ADMIN")){
+            textoUsuario += (" (Administrador)");
+            usuarioEnUso.setForeground(Color.RED);
+        } else {
+            textoUsuario += (" (Usuario)");
+            usuarioEnUso.setForeground(Color.BLUE);
+        }
+        
+        usuarioEnUso.setText(textoUsuario);
+    }
     
     private void actualizarInterfazCompleta(){
         cargarArbolFiltrado();
@@ -297,7 +317,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         tablaArchivos = new javax.swing.JTable();
         comboUsuarios = new javax.swing.JComboBox<>();
-        jComboBox2 = new javax.swing.JComboBox<>();
+        comboPoliticas = new javax.swing.JComboBox<>();
         jPanel8 = new javax.swing.JPanel();
         Aplicar_btn = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
@@ -426,14 +446,14 @@ public class interfazPrincipal extends javax.swing.JFrame {
         });
         panel1.add(comboUsuarios, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 500, 180, -1));
 
-        jComboBox2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jComboBox2.addActionListener(new java.awt.event.ActionListener() {
+        comboPoliticas.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        comboPoliticas.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboPoliticas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox2ActionPerformed(evt);
+                comboPoliticasActionPerformed(evt);
             }
         });
-        panel1.add(jComboBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 550, 180, -1));
+        panel1.add(comboPoliticas, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 550, 180, -1));
 
         jPanel8.setBackground(new java.awt.Color(238, 238, 238));
         jPanel8.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
@@ -457,16 +477,16 @@ public class interfazPrincipal extends javax.swing.JFrame {
         usuarioEnUso.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         usuarioEnUso.setForeground(new java.awt.Color(51, 51, 51));
         usuarioEnUso.setText("jLabel6");
-        panel1.add(usuarioEnUso, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 40, 100, -1));
+        panel1.add(usuarioEnUso, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 40, 180, -1));
 
         getContentPane().add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 850, 620));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox2ActionPerformed
+    private void comboPoliticasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboPoliticasActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox2ActionPerformed
+    }//GEN-LAST:event_comboPoliticasActionPerformed
 
     private void comboUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboUsuariosActionPerformed
         String seleccion = (String) comboUsuarios.getSelectedItem();
@@ -479,6 +499,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
                     
                     System.out.println("Usuario " + usuarioActual.getName() + " agregado existosamente");
                     
+                    actualizarLabelUsuario();
                     actualizarInterfazCompleta();
                     break;
                 }
@@ -527,9 +548,9 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel Leer_btn;
     private javax.swing.JLabel Modificar_btn;
     private javax.swing.JTree arbolSistema;
+    private javax.swing.JComboBox<String> comboPoliticas;
     private javax.swing.JComboBox<String> comboUsuarios;
     private javax.swing.JLabel crear_btn;
-    private javax.swing.JComboBox<String> jComboBox2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
