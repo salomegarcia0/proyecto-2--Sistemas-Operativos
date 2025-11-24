@@ -33,7 +33,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         cargarArbol();
         cargarTablaArchivos();
         actualizarComboUsuarios();
-        
+        actualizarComboPoliticas();
     }
     
     private void actualizarComboUsuarios(){
@@ -53,6 +53,17 @@ public class interfazPrincipal extends javax.swing.JFrame {
             comboUsuarios.setSelectedIndex(0);
         }
    
+    }
+    
+    private void actualizarComboPoliticas(){
+        comboPoliticas.removeAllItems();
+        comboPoliticas.addItem("FIFO");
+        comboPoliticas.addItem("LIFO");
+        comboPoliticas.addItem("C-SCAN");
+        comboPoliticas.addItem("SCAN");
+        comboPoliticas.addItem("SSTF");
+        
+        comboPoliticas.setSelectedItem("FIFO");
     }
     
     private void cargarArbol(){
@@ -284,6 +295,24 @@ public class interfazPrincipal extends javax.swing.JFrame {
         cargarTablaArchivosFiltrada();
         
     }
+    
+    private void aplicarPoliticaEnSistema(String politica){
+        // aca es dodnde voy a escribir el codigo para las politicas
+        // hablar con andrea para hacerlo juntas !!!!!!
+        
+        System.out.println("Aplicando Politicaaaaaaaaaaaaaa");
+    }
+    
+    private void aplicarPoliticaSeleccionada(){
+        String politicaSeleccionada = (String) comboPoliticas.getSelectedItem();
+        
+        if (politicaSeleccionada == null){
+            System.out.println("No se selecciono ninguna politica");
+            return;
+        }
+        
+        aplicarPoliticaEnSistema(politicaSeleccionada);
+    }
      
     /**
      * This method is called from within the constructor to initialize the form.
@@ -464,6 +493,11 @@ public class interfazPrincipal extends javax.swing.JFrame {
         Aplicar_btn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Aplicar_btn.setText("Aplicar");
         Aplicar_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        Aplicar_btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                Aplicar_btnMouseClicked(evt);
+            }
+        });
         jPanel8.add(Aplicar_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
 
         panel1.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 540, 110, 30));
@@ -506,6 +540,10 @@ public class interfazPrincipal extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_comboUsuariosActionPerformed
+
+    private void Aplicar_btnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Aplicar_btnMouseClicked
+        aplicarPoliticaSeleccionada();
+    }//GEN-LAST:event_Aplicar_btnMouseClicked
 
     /**
      * @param args the command line arguments
