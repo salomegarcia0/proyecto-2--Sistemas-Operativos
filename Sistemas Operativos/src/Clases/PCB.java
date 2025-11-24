@@ -39,7 +39,7 @@ public class PCB {
     String nombreArchivo (se cambia para la operacion modificar, de resto sera el mismo nombre)
     int bloque (se coloca -1 cuando cuando se hace la operacion de insertar ya que es el unico caso donde no se puede tener un bloque asignado)
     */
-    public PCB(int procesoID, String procesoNombre, String nombreArchivo, int bloque, Archivo archivo, TipoProceso tipoProceso) {
+    public PCB(int procesoID, String procesoNombre, String nombreArchivo, Archivo archivo, TipoProceso tipoProceso) {
         this.procesoID = procesoID;
         this.procesoNombre = procesoNombre;
         this.nombreArchivo = nombreArchivo;

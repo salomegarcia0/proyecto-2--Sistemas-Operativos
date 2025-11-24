@@ -180,15 +180,12 @@ public class SD {
             } else if ((int)nlista.getElement() == (size-1)){
                 insertDataFinal(archivo.getName());
             } else {
-                if (((int)nlista.getElement() > (int)((size-1)/2))) {
+                if (((int)nlista.getElement() > (int)((size)/2))) {
                     NodoBloque pointer = getTail();
-                    int end = size - (int)nlista.getElement();
-                    int aux = 0;    
-                    while (aux < end) {
+                    while((int)pointer.getElement().getIndex() != (int)nlista.getElement()){
                         pointer = pointer.getPrevious();
                         //para ubicar al cabezal en esta posicion
                         setLector(pointer);
-                        aux++;
                     }
                     //se inserta la informacion en el bloque y se cambia su estado a false (que esta ocupado)
                     pointer.getElement().setNameArchivo(archivo.getName());
@@ -196,13 +193,12 @@ public class SD {
                     //se le resta uno a sizeAvailable ya que ahora un bloque estará ocupado
                     sizeAvailable--;
                 } else {
-                    int aux = 1; 
+                    //int aux = 1; 
                     NodoBloque pointer = getHead();
-                    while (aux < (int)nlista.getElement()) {
+                    while((int)pointer.getElement().getIndex() != (int)nlista.getElement()){
                         pointer = pointer.getNext();
                         //para ubicar al cabezal en esta posicion
                         setLector(pointer);
-                        aux++;
                     }
                     //se inserta la informacion en el bloque y se cambia su estado a false (que esta ocupado)
                     pointer.getElement().setNameArchivo(archivo.getName());
@@ -274,11 +270,13 @@ public class SD {
     
     public void print() {
         NodoBloque pointer = getHead();
-        int count = 1; //simplemente para la posicion del bloque
         while (pointer != null) {
-            System.out.println("[ " + count + " - " + pointer.getElement().getNameArchivo() + " ]");
+            String estado = "ocupado";
+            if(pointer.getElement().isAvailable() == true){
+                estado = "desocupado";
+            }
+            System.out.println("[ " + pointer.getElement().getIndex() + " - " + pointer.getElement().getNameArchivo() + " - " + estado + " ]");
             pointer = pointer.getNext();
-            count = count + 1;
         }
     }
     
