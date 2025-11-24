@@ -8,7 +8,7 @@ import Clases.*;
 import Estructuras.*;
 import Main.FileExplorer;
 /**
- * La lectura con la clase CabezalNormal es desde el inicio hasta el final del SD y una vez que llegue al final el cabezal vuelve
+ * La lectura con la clase CabezalReversa es tanto para adelante como para atras dependiendo de la ubicacion del bloque.
  * @author pjroj
  */
 public class CabezalReversa {
@@ -138,7 +138,7 @@ public class CabezalReversa {
     
     */
     public boolean eliminarInfo(int index, Archivo archivo){
-        System.out.println("CRUD: Eliminar (normal)");
+        System.out.println("CRUD: Eliminar (reversa)");
         //se pide el SD del FileExplorer (que es la clase Global), donde permanence los datos
         SD SD = FileExplorer.getSD();
         //el nodo cabezal
@@ -188,6 +188,9 @@ public class CabezalReversa {
                 //se insertaria siempre el nuevo bloque al final de la lsita
                 list.deleteInIndex(bloque.getIndex());
                 archivo.setBlockList(list);
+                
+                //se reduce la cantidad de bloques en las que esta dividido el archivo
+                //archivo.setSize(archivo.getSize()-1);
                 
                 //se le cambia el estado del bloque de ocupado a desocupado para que se puedan guardar en el futuro 
                 bloque.setAvailable(true);
@@ -263,7 +266,7 @@ public class CabezalReversa {
     }
     
     public boolean leerInfo(int index){
-        System.out.println("CRUD: Leer (normal)");
+        System.out.println("CRUD: Leer (reversa)");
         //se pide el SD del FileExplorer (que es la clase Global), donde permanence los datos
         SD SD = FileExplorer.getSD();
         //el nodo cabezal
@@ -372,7 +375,7 @@ public class CabezalReversa {
     }
     
     public boolean insertInfo(Archivo archivo){
-    System.out.println("CRUD: Insertar (normal)");        
+    System.out.println("CRUD: Insertar (reversa)");        
         //se pide el SD del FileExplorer (que es la clase Global), donde permanence los datos
         SD SD = FileExplorer.getSD();
         //el nodo cabezal

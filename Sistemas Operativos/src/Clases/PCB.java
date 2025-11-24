@@ -4,6 +4,7 @@
  */
 package Clases;
 import Lector.CabezalReversa;
+import Lector.CabezalReversaCompleto;
 import Lector.CabezalNormal;
 import javax.swing.JOptionPane;
 import Tipos_de_Datos.*;
@@ -51,6 +52,7 @@ public class PCB {
     public void ejecutar(){
         CabezalNormal cabezalNormal = new CabezalNormal();
         CabezalReversa cabezalReversa = new CabezalReversa();
+        CabezalReversaCompleto cabezalReversaCompleto = new CabezalReversaCompleto();
         
         if (tipoProceso == TipoProceso.CREAR){
             System.out.println("CREAR");
@@ -58,8 +60,13 @@ public class PCB {
             //true = indica que el proceso ya realizo la operacion
             //false = indica que el proceso no realizo la operacion
             boolean operacionCompletada = false;
+            //para C_SCAN
             if(FileExplorer.getPolitica() == TipoPolitica.C_SCAN){
                 operacionCompletada = cabezalNormal.insertInfo(archivo);
+            //para SCAN
+            } else if (FileExplorer.getPolitica() == TipoPolitica.SCAN){
+                operacionCompletada = cabezalReversaCompleto.insertInfo(archivo);
+            //para FIFO,LIFO Y SSTF
             } else {
                 operacionCompletada = cabezalReversa.insertInfo(archivo);
             }
@@ -111,9 +118,14 @@ public class PCB {
             long inicio = System.currentTimeMillis();
             //true = indica que el proceso ya realizo la operacion
             //false = indica que el proceso no realizo la operacion
-            boolean operacionCompletada = false;
+            boolean operacionCompletada = false;            
+            //para C_SCAN
             if(FileExplorer.getPolitica() == TipoPolitica.C_SCAN){
                 operacionCompletada = cabezalNormal.eliminarInfo(bloque,archivo);
+            //para SCAN
+            } else if (FileExplorer.getPolitica() == TipoPolitica.SCAN){
+                operacionCompletada = cabezalReversaCompleto.eliminarInfo(bloque,archivo);
+            //para FIFO,LIFO Y SSTF
             } else {
                 operacionCompletada = cabezalReversa.eliminarInfo(bloque,archivo);
             }
@@ -162,12 +174,17 @@ public class PCB {
             long inicio = System.currentTimeMillis();
             //true = indica que el proceso ya realizo la operacion
             //false = indica que el proceso no realizo la operacion
-            boolean operacionCompletada = false;
+            boolean operacionCompletada = false;        
+            //para C_SCAN
             if(FileExplorer.getPolitica() == TipoPolitica.C_SCAN){
                 operacionCompletada = cabezalNormal.leerInfo(bloque);
+            //para SCAN
+            } else if (FileExplorer.getPolitica() == TipoPolitica.SCAN){
+                operacionCompletada = cabezalReversaCompleto.leerInfo(bloque);
+            //para FIFO,LIFO Y SSTF
             } else {
                 operacionCompletada = cabezalReversa.leerInfo(bloque);
-            }    
+            }
             
             long fin = System.currentTimeMillis();
             long tiempoSimulado = (int)(fin - inicio);//tiempo simulado
@@ -215,11 +232,17 @@ public class PCB {
             //true = indica que el proceso ya realizo la operacion
             //false = indica que el proceso no realizo la operacion
             boolean operacionCompletada = false;
+            //para C_SCAN
             if(FileExplorer.getPolitica() == TipoPolitica.C_SCAN){
                 operacionCompletada = cabezalNormal.modificarInfo(bloque, nombreArchivo);
+            //para SCAN
+            } else if (FileExplorer.getPolitica() == TipoPolitica.SCAN){
+                operacionCompletada = cabezalReversaCompleto.modificarInfo(bloque, nombreArchivo);
+            //para FIFO,LIFO Y SSTF
             } else {
                 operacionCompletada = cabezalReversa.modificarInfo(bloque, nombreArchivo);
-            }            
+            }
+            
             long fin = System.currentTimeMillis();
             long tiempoSimulado = (int)(fin - inicio);//tiempo simulado
                     

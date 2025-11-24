@@ -7,25 +7,22 @@ import Clases.*;
 import Estructuras.*;
 import Main.FileExplorer;
 /**
- * La lectura con la clase CabezalNormal es desde el inicio hasta el final del SD y una vez que llegue al final el cabezal vuelve
- * al inicio sin realizar ninguna lectura en el camino de regreso
+ * La lectura con la clase CabezalNormal es desde el inicio hasta el final del SD y una vez que llegue al final el cabezal empieza a ir
+ * en reversa hasta llegar al inicio y volver de regreso y asi sucesivamente.
  * @author pjroj
  */
-public class CabezalNormal {
+public class CabezalReversaCompleto {
 
-    public CabezalNormal() {
+    public CabezalReversaCompleto() {
     }
     
     //NECESITO DOS VARIABLES BOOLEANAS, 1 PARA SABER SI SE INSCRIBIO EL EN BLOQUE O SIMPLEMENTE NO SE REALIZO NINGUN AVANCE DEBIDO A UN BLOQUEO
     
     public boolean modificarInfo(int index, String nameArchivo){
-        System.out.println("CRUD: Modificar (normal)");        
+        System.out.println("CRUD: Modificar (reversa completo)");        
         //se pide el SD del FileExplorer (que es la clase Global), donde permanence los datos
         SD SD = FileExplorer.getSD();
-        //nos aseguramos que el cabezal (el lector) no esta en reversa, aqui eso no afecta porque esta hecho solo para lectura normal pero
-        //cuando se haga un cambio de politica hay que asegurarnos de que cuando termina o se cambia una politica de lectura reversa a una normal
-        //el lector no este en reversa, ya que eso despues puede afectar la forma que que inicie las politicas en reversa
-        SD.setReversa(false);
+        
         NodoBloque cabezal = SD.getLector();
         //para obtener el valor que dura cada lectura
         int tiempoSimulado = FileExplorer.getCiclo_reloj();
@@ -81,24 +78,28 @@ public class CabezalNormal {
                 stopRead = true;
             }
             
-            //se toma el siguiente nodo para luego setearlo como el nuevo cabezal
-            cabezal = cabezal.getNext();
+            //dependiendo del sentido del lector se selecciona como el nuevo cabezal el siguiente o el anterior 
+            if(SD.isReversa()){
+                //se toma el nodo previo para luego setearlo como el nuevo cabezal
+                cabezal = cabezal.getPrevious();
+            } else {
+                //se toma el siguiente nodo para luego setearlo como el nuevo cabezal
+                cabezal = cabezal.getNext();
+            }
+            
+            //si el cabezal es null
             if (cabezal == null){
-                System.out.println("El cabezal llego al final, moviendolo de regreso a inicio (primer bloque)");
-                //simularemos que el cabezal tardara la mitad del tamaño del SD (sin agregar este tiempo al countLecturas del FileExplorer ya
-                //que de regreso no lee
-                //VERIFICAR SI ESTO ES MEJOR EN PCB YA QUE ESTE TIEMPO SE LE SUMARA AL TIEMPO DE CPU DEL PROCESO,
-                //AUNQUE SERA MAS COMPLICADO, PORQUE SE NECESITARIA OTRA VERIFICACION Y NO SE COMO SE RETORNARIA.
-                Thread thread2 = new Thread(new Hilo((int) ((SD.getSize()*tiempoSimulado)/2)));
-                thread2.start();
-                try {
-                    thread2.join(); // espera a que el hilo termine antes de continuar
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if(SD.isReversa()){
+                    System.out.println("El cabezal llego al inicio, invirtiendo orden de lectura");
+                    SD.setReversa(false);
+                    //como estaba en reversa el ultimo era la cabeza
+                    SD.setLector(SD.getHead());
+                } else {
+                    System.out.println("El cabezal llego al final, invirtiendo orden de lectura");
+                    //como estaba en sentido normal el ultimo era la cola
+                    SD.setReversa(true);
+                    SD.setLector(SD.getTail());
                 }
-                //Se setea finalmente el cabezal en la cabeza del SD, es decir al inicio
-                SD.setLector(SD.getHead());
-                
             } else {
                 SD.setLector(cabezal);
             }
@@ -128,14 +129,10 @@ public class CabezalNormal {
     
     */
     public boolean eliminarInfo(int index, Archivo archivo){
-        System.out.println("CRUD: Eliminar (normal)");
+        System.out.println("CRUD: Eliminar (reversa completo)");
         //se pide el SD del FileExplorer (que es la clase Global), donde permanence los datos
         SD SD = FileExplorer.getSD();
         NodoBloque cabezal = SD.getLector();
-        //nos aseguramos que el cabezal (el lector) no esta en reversa, aqui eso no afecta porque esta hecho solo para lectura normal pero
-        //cuando se haga un cambio de politica hay que asegurarnos de que cuando termina o se cambia una politica de lectura reversa a una normal
-        //el lector no este en reversa, ya que eso despues puede afectar la forma que que inicie las politicas en reversa
-        SD.setReversa(false);
         //para obtener el valor que dura cada lectura
         int tiempoSimulado = FileExplorer.getCiclo_reloj();
         //Booleano para detener la lectura
@@ -207,23 +204,28 @@ public class CabezalNormal {
                 stopRead = true;
             }
             
-            //se toma el siguiente nodo para luego setearlo como el nuevo cabezal
-            cabezal = cabezal.getNext();
+            //dependiendo del sentido del lector se selecciona como el nuevo cabezal el siguiente o el anterior 
+            if(SD.isReversa()){
+                //se toma el nodo previo para luego setearlo como el nuevo cabezal
+                cabezal = cabezal.getPrevious();
+            } else {
+                //se toma el siguiente nodo para luego setearlo como el nuevo cabezal
+                cabezal = cabezal.getNext();
+            }
+            
+            //si el cabezal es null
             if (cabezal == null){
-                System.out.println("El cabezal llego al final, moviendolo de regreso a inicio (primer bloque)");
-                //simularemos que el cabezal tardara la mitad del tamaño del SD (sin agregar este tiempo al countLecturas del FileExplorer ya
-                //que de regreso no lee
-                //VERIFICAR SI ESTO ES MEJOR EN PCB YA QUE ESTE TIEMPO SE LE SUMARA AL TIEMPO DE CPU DEL PROCESO,
-                //AUNQUE SERA MAS COMPLICADO, PORQUE SE NECESITARIA OTRA VERIFICACION Y NO SE COMO SE RETORNARIA.
-                Thread thread2 = new Thread(new Hilo((int) ((SD.getSize()*tiempoSimulado)/2)));
-                thread2.start();
-                try {
-                    thread2.join(); // espera a que el hilo termine antes de continuar
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if(SD.isReversa()){
+                    System.out.println("El cabezal llego al inicio, invirtiendo orden de lectura");
+                    SD.setReversa(false);
+                    //como estaba en reversa el ultimo era la cabeza
+                    SD.setLector(SD.getHead());
+                } else {
+                    System.out.println("El cabezal llego al final, invirtiendo orden de lectura");
+                    //como estaba en sentido normal el ultimo era la cola
+                    SD.setReversa(true);
+                    SD.setLector(SD.getTail());
                 }
-                SD.setLector(SD.getHead());
-                
             } else {
                 SD.setLector(cabezal);
             }
@@ -245,14 +247,10 @@ public class CabezalNormal {
     }
     
     public boolean leerInfo(int index){
-        System.out.println("CRUD: Leer (normal)");
+        System.out.println("CRUD: Leer (reversa completo)");
         //se pide el SD del FileExplorer (que es la clase Global), donde permanence los datos
         SD SD = FileExplorer.getSD();
         NodoBloque cabezal = SD.getLector();
-        //nos aseguramos que el cabezal (el lector) no esta en reversa, aqui eso no afecta porque esta hecho solo para lectura normal pero
-        //cuando se haga un cambio de politica hay que asegurarnos de que cuando termina o se cambia una politica de lectura reversa a una normal
-        //el lector no este en reversa, ya que eso despues puede afectar la forma que que inicie las politicas en reversa
-        SD.setReversa(false);
         //para obtener el valor que dura cada lectura
         int tiempoSimulado = FileExplorer.getCiclo_reloj();
         //Booleano para detener la lectura
@@ -305,23 +303,28 @@ public class CabezalNormal {
                 stopRead = true;
             }
             
-            //se toma el siguiente nodo para luego setearlo como el nuevo cabezal
-            cabezal = cabezal.getNext();
+            //dependiendo del sentido del lector se selecciona como el nuevo cabezal el siguiente o el anterior 
+            if(SD.isReversa()){
+                //se toma el nodo previo para luego setearlo como el nuevo cabezal
+                cabezal = cabezal.getPrevious();
+            } else {
+                //se toma el siguiente nodo para luego setearlo como el nuevo cabezal
+                cabezal = cabezal.getNext();
+            }
+            
+            //si el cabezal es null
             if (cabezal == null){
-                System.out.println("El cabezal llego al final, moviendolo de regreso a inicio (primer bloque)");
-                //simularemos que el cabezal tardara la mitad del tamaño del SD (sin agregar este tiempo al countLecturas del FileExplorer ya
-                //que de regreso no lee
-                //VERIFICAR SI ESTO ES MEJOR EN PCB YA QUE ESTE TIEMPO SE LE SUMARA AL TIEMPO DE CPU DEL PROCESO,
-                //AUNQUE SERA MAS COMPLICADO, PORQUE SE NECESITARIA OTRA VERIFICACION Y NO SE COMO SE RETORNARIA.
-                Thread thread2 = new Thread(new Hilo((int) ((SD.getSize()*tiempoSimulado)/2)));
-                thread2.start();
-                try {
-                    thread2.join(); // espera a que el hilo termine antes de continuar
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if(SD.isReversa()){
+                    System.out.println("El cabezal llego al inicio, invirtiendo orden de lectura");
+                    SD.setReversa(false);
+                    //como estaba en reversa el ultimo era la cabeza
+                    SD.setLector(SD.getHead());
+                } else {
+                    System.out.println("El cabezal llego al final, invirtiendo orden de lectura");
+                    //como estaba en sentido normal el ultimo era la cola
+                    SD.setReversa(true);
+                    SD.setLector(SD.getTail());
                 }
-                SD.setLector(SD.getHead());
-                
             } else {
                 SD.setLector(cabezal);
             }
@@ -343,13 +346,9 @@ public class CabezalNormal {
     }
     
     public boolean insertInfo(Archivo archivo){
-    System.out.println("CRUD: Insertar (normal)");        
+    System.out.println("CRUD: Insertar (reversa completo)");        
         //se pide el SD del FileExplorer (que es la clase Global), donde permanence los datos
         SD SD = FileExplorer.getSD();
-        //nos aseguramos que el cabezal (el lector) no esta en reversa, aqui eso no afecta porque esta hecho solo para lectura normal pero
-        //cuando se haga un cambio de politica hay que asegurarnos de que cuando termina o se cambia una politica de lectura reversa a una normal
-        //el lector no este en reversa, ya que eso despues puede afectar la forma que que inicie las politicas en reversa
-        SD.setReversa(false);
         NodoBloque cabezal = SD.getLector();
         //para obtener el valor que dura cada lectura
         int tiempoSimulado = FileExplorer.getCiclo_reloj();
@@ -382,6 +381,7 @@ public class CabezalNormal {
                 //se insertaria siempre el nuevo bloque al final de la lsita
                 list.insertFinal(bloque.getIndex());
                 archivo.setBlockList(list);
+                
                 //se le setea el nombre del archivo
                 bloque.setNameArchivo(archivo.getName());
                 //se le cambia el estado del bloque de desocupado a ocupado para que no se pueda usar en el futuro 
@@ -415,24 +415,28 @@ public class CabezalNormal {
                 stopRead = true;
             }
             
-            //se toma el siguiente nodo para luego setearlo como el nuevo cabezal
-            cabezal = cabezal.getNext();
+            //dependiendo del sentido del lector se selecciona como el nuevo cabezal el siguiente o el anterior 
+            if(SD.isReversa()){
+                //se toma el nodo previo para luego setearlo como el nuevo cabezal
+                cabezal = cabezal.getPrevious();
+            } else {
+                //se toma el siguiente nodo para luego setearlo como el nuevo cabezal
+                cabezal = cabezal.getNext();
+            }
+            
+            //si el cabezal es null
             if (cabezal == null){
-                System.out.println("El cabezal llego al final, moviendolo de regreso a inicio (primer bloque)");
-                //simularemos que el cabezal tardara la mitad del tamaño del SD (sin agregar este tiempo al countLecturas del FileExplorer ya
-                //que de regreso no lee
-                //VERIFICAR SI ESTO ES MEJOR EN PCB YA QUE ESTE TIEMPO SE LE SUMARA AL TIEMPO DE CPU DEL PROCESO,
-                //AUNQUE SERA MAS COMPLICADO, PORQUE SE NECESITARIA OTRA VERIFICACION Y NO SE COMO SE RETORNARIA.
-                Thread thread2 = new Thread(new Hilo((int) ((SD.getSize()*tiempoSimulado)/2)));
-                thread2.start();
-                try {
-                    thread2.join(); // espera a que el hilo termine antes de continuar
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if(SD.isReversa()){
+                    System.out.println("El cabezal llego al inicio, invirtiendo orden de lectura");
+                    SD.setReversa(false);
+                    //como estaba en reversa el ultimo era la cabeza
+                    SD.setLector(SD.getHead());
+                } else {
+                    System.out.println("El cabezal llego al final, invirtiendo orden de lectura");
+                    //como estaba en sentido normal el ultimo era la cola
+                    SD.setReversa(true);
+                    SD.setLector(SD.getTail());
                 }
-                //Se setea finalmente el cabezal en la cabeza del SD, es decir al inicio
-                SD.setLector(SD.getHead());
-                
             } else {
                 SD.setLector(cabezal);
             }
