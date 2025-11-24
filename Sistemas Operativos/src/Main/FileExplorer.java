@@ -72,6 +72,14 @@ public class FileExplorer {
         FileExplorer.ioCompletionTime = ioCompletionTime;
     }
 
+    public static int getIoExceptionCycle() {
+        return ioExceptionCycle;
+    }
+
+    public static void setIoExceptionCycle(int ioExceptionCycle) {
+        FileExplorer.ioExceptionCycle = ioExceptionCycle;
+    }
+    
     public static SD getSD() {
         return SD;
     }

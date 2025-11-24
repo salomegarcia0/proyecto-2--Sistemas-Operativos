@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Politicas;
+package Lector;
 import Clases.*;
 import Estructuras.*;
 import Main.FileExplorer;
@@ -11,6 +11,9 @@ import Main.FileExplorer;
  * @author pjroj
  */
 public class CabezalNormal {
+
+    public CabezalNormal() {
+    }
     
     //NECESITO DOS VARIABLES BOOLEANAS, 1 PARA SABER SI SE INSCRIBIO EL EN BLOQUE O SIMPLEMENTE NO SE REALIZO NINGUN AVANCE DEBIDO A UN BLOQUEO
     
@@ -45,7 +48,8 @@ public class CabezalNormal {
             
             //al contador de lecturas se le suma una lectura 
             FileExplorer.setCountLecturas(FileExplorer.getCountLecturas()+1);
-            
+            System.out.println("Lecturas realizadas: " + FileExplorer.getCountLecturas());
+                
             //Se modifica el nombre del archivo por el nuevo
             if (bloque.getIndex() == index){
                 System.out.println("Bloque " + index + " modificado");
@@ -55,7 +59,7 @@ public class CabezalNormal {
                 operacionRealizada = true; 
                 //si el contador de lecturas es igual a valor de nuestro IoCompletionTime, se cambia el valor del booleano a true, que indica
                 // que proceso se debe bloquear
-                if (FileExplorer.getCountLecturas() == FileExplorer.getIoCompletionTime()){
+                if (FileExplorer.getCountLecturas() == FileExplorer.getIoExceptionCycle()){
                     //como el proceso a sido bloqueado se cambia el estado de true en el FileExplorer para indicar que el proceso se bloqueara
                     FileExplorer.setProcesoBloqueado(true);
                     //se resetea el contador de Lecturas a 0
@@ -67,7 +71,7 @@ public class CabezalNormal {
             
             //si el contador de lecturas es igual a valor de nuestro IoCompletionTime, se cambia el valor del booleano a true, que indica
             // que proceso se debe bloquear
-            if (FileExplorer.getCountLecturas() == FileExplorer.getIoCompletionTime()){
+            if (FileExplorer.getCountLecturas() == FileExplorer.getIoExceptionCycle()){
                 //como el proceso a sido bloqueado se cambia el estado de true en el FileExplorer para indicar que el proceso se bloqueara
                 FileExplorer.setProcesoBloqueado(true);
                 //se resetea el contador de Lecturas a 0
@@ -122,7 +126,7 @@ public class CabezalNormal {
     o modificacion para dicho archivo dará erro porque el archivo ya no existira.
     
     */
-    public boolean eliminarInfo(int index){
+    public boolean eliminarInfo(int index, Archivo archivo){
         System.out.println("CRUD: Eliminar (normal)");
         //se pide el SD del FileExplorer (que es la clase Global), donde permanence los datos
         SD SD = FileExplorer.getSD();
@@ -153,21 +157,32 @@ public class CabezalNormal {
             
              //al contador de lecturas se le suma una lectura 
             FileExplorer.setCountLecturas(FileExplorer.getCountLecturas()+1);
+            System.out.println("Lecturas realizadas: " + FileExplorer.getCountLecturas());
+                
             
             //Se modifica el nombre del archivo por el nuevo
             if (bloque.getIndex() == index){
-                System.out.println("Bloque " + index + " eliminado");
+                System.out.println("Eliminando parte del archivo en el bloque " + index + " eliminado");
                 //se le setea el nombre del archivo a "vacio", lo que indica que se elimino el archivo
                 bloque.setNameArchivo("vacio");
+                
+                //se elimina la ubicacion del bloque de la lista de bloques del archivo
+                ListaEnlazada list = archivo.getBlockList();
+                //se insertaria siempre el nuevo bloque al final de la lsita
+                list.deleteInIndex(bloque.getIndex());
+                archivo.setBlockList(list);
+                
                 //se le cambia el estado del bloque de ocupado a desocupado para que se puedan guardar en el futuro 
                 bloque.setAvailable(true);
+                
+                System.out.println("Bloque " + bloque.getIndex() + " desocupado");
                 //se aumenta la cantidad de bloques disponibles en SD
                 SD.setSizeDisponible(SD.getSizeDisponible()+1);
                 //Como ya se realizo la respectiva operacion CRUD en el bloque se cambia a true
                 operacionRealizada = true; 
                 //si el contador de lecturas es igual a valor de nuestro IoCompletionTime, se cambia el valor del booleano a true, que indica
                 // que proceso se debe bloquear
-                if (FileExplorer.getCountLecturas() == FileExplorer.getIoCompletionTime()){
+                if (FileExplorer.getCountLecturas() == FileExplorer.getIoExceptionCycle()){
                     //como el proceso a sido bloqueado se cambia el estado de true en el FileExplorer para indicar que el proceso se bloqueara
                     FileExplorer.setProcesoBloqueado(true);
                     //se resetea el contador de Lecturas a 0
@@ -179,7 +194,7 @@ public class CabezalNormal {
             
             //si el contador de lecturas es igual a valor de nuestro IoCompletionTime, se cambia el valor del booleano a true, que indica
             // que proceso se debe bloquear
-            if (FileExplorer.getCountLecturas() == FileExplorer.getIoCompletionTime()){
+            if (FileExplorer.getCountLecturas() == FileExplorer.getIoExceptionCycle()){
                 //como el proceso a sido bloqueado se cambia el estado de true en el FileExplorer para indicar que el proceso se bloqueara
                 FileExplorer.setProcesoBloqueado(true);
                 //se resetea el contador de Lecturas a 0
@@ -257,7 +272,7 @@ public class CabezalNormal {
             
             //al contador de lecturas se le suma una lectura 
             FileExplorer.setCountLecturas(FileExplorer.getCountLecturas()+1);
-            
+            System.out.println("Lecturas realizadas: " + FileExplorer.getCountLecturas());
             //Se modifica el nombre del archivo por el nuevo
             if (bloque.getIndex() == index){
                 System.out.println("Bloque " + index + " leido");
@@ -265,7 +280,7 @@ public class CabezalNormal {
                 operacionRealizada = true; 
                 //si el contador de lecturas es igual a valor de nuestro IoCompletionTime, se cambia el valor del booleano a true, que indica
                 // que proceso se debe bloquear
-                if (FileExplorer.getCountLecturas() == FileExplorer.getIoCompletionTime()){
+                if (FileExplorer.getCountLecturas() == FileExplorer.getIoExceptionCycle()){
                     //como el proceso a sido bloqueado se cambia el estado de true en el FileExplorer para indicar que el proceso se bloqueara
                     FileExplorer.setProcesoBloqueado(true);
                     //se resetea el contador de Lecturas a 0
@@ -277,7 +292,7 @@ public class CabezalNormal {
             
             //si el contador de lecturas es igual a valor de nuestro IoCompletionTime, se cambia el valor del booleano a true, que indica
             // que proceso se debe bloquear
-            if (FileExplorer.getCountLecturas() == FileExplorer.getIoCompletionTime()){
+            if (FileExplorer.getCountLecturas() == FileExplorer.getIoExceptionCycle()){
                 //como el proceso a sido bloqueado se cambia el estado de true en el FileExplorer para indicar que el proceso se bloqueara
                 FileExplorer.setProcesoBloqueado(true);
                 //se resetea el contador de Lecturas a 0
@@ -354,7 +369,7 @@ public class CabezalNormal {
             
             //al contador de lecturas se le suma una lectura 
             FileExplorer.setCountLecturas(FileExplorer.getCountLecturas()+1);
-            
+            System.out.println("Lecturas realizadas: " + FileExplorer.getCountLecturas());
             //Condicion para saber si hay un espacio disponible, si encuentra un espacio disponible se realiza la insercion de la info
             if (bloque.isAvailable() == true){
                 System.out.println("Insertando parte del archivo en el bloque " + bloque.getIndex() );
@@ -365,11 +380,16 @@ public class CabezalNormal {
                 archivo.setBlockList(list);
                 //se le setea el nombre del archivo
                 bloque.setNameArchivo(archivo.getName());
+                //se le cambia el estado del bloque de desocupado a ocupado para que no se pueda usar en el futuro 
+                bloque.setAvailable(false);
+                System.out.println("Bloque " + bloque.getIndex() + " ocupado");
+                //se disminuye la cantidad de bloques disponibles en SD
+                SD.setSizeDisponible(SD.getSizeDisponible()-1);
                 //Como ya se realizo la respectiva operacion CRUD en el bloque se cambia a true
                 operacionRealizada = true; 
                 //si el contador de lecturas es igual a valor de nuestro IoCompletionTime, se cambia el valor del booleano a true, que indica
                 // que proceso se debe bloquear
-                if (FileExplorer.getCountLecturas() == FileExplorer.getIoCompletionTime()){
+                if (FileExplorer.getCountLecturas() == FileExplorer.getIoExceptionCycle()){
                     //como el proceso a sido bloqueado se cambia el estado de true en el FileExplorer para indicar que el proceso se bloqueara
                     FileExplorer.setProcesoBloqueado(true);
                     //se resetea el contador de Lecturas a 0
@@ -382,7 +402,7 @@ public class CabezalNormal {
             
             //si el contador de lecturas es igual a valor de nuestro IoCompletionTime, se cambia el valor del booleano a true, que indica
             // que proceso se debe bloquear
-            if (FileExplorer.getCountLecturas() == FileExplorer.getIoCompletionTime()){
+            if (FileExplorer.getCountLecturas() == FileExplorer.getIoExceptionCycle()){
                 //como el proceso a sido bloqueado se cambia el estado de true en el FileExplorer para indicar que el proceso se bloqueara
                 FileExplorer.setProcesoBloqueado(true);
                 //se resetea el contador de Lecturas a 0
