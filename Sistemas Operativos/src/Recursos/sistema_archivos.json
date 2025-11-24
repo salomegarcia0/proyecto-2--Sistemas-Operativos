@@ -17,7 +17,7 @@
     "nombre": "root",
     "tipo": "DIRECTORIO",
     "usuario": "admin",
-    "size": 18,
+    "size": 13,
     "cantidadArchivos": 4,
     "cantidadSubDir": 4,
     "esPublico": true,
@@ -72,7 +72,7 @@
         "nombre": "home",
         "tipo": "DIRECTORIO",
         "usuario": "admin",
-        "size": 10,
+        "size": 5,
         "cantidadArchivos": 2,
         "cantidadSubDir": 2,
         "esPublico": false,
@@ -81,7 +81,7 @@
             "nombre": "user1",
             "tipo": "DIRECTORIO",
             "usuario": "user1",
-            "size": 10,
+            "size": 5,
             "cantidadArchivos": 2,
             "cantidadSubDir": 1,
             "esPublico": false,
@@ -90,7 +90,7 @@
                 "nombre": "documentos",
                 "tipo": "DIRECTORIO",
                 "usuario": "user1",
-                "size": 10,
+                "size": 5,
                 "cantidadArchivos": 2,
                 "cantidadSubDir": 0,
                 "esPublico": false,
@@ -99,26 +99,21 @@
                     "name": "tarea.pdf",
                     "tipo": "ARCHIVO",
                     "usuario": "user1",
-                    "size": 5,
+                    "size": 3,
                     "blockList": [
-                      10,
-                      11,
-                      12,
-                      13,
-                      14
+                      8,
+                      9,
+                      10
                     ]
                   },
                   {
                     "name": "notas.txt",
                     "tipo": "ARCHIVO",
                     "usuario": "user1",
-                    "size": 5,
+                    "size": 2,
                     "blockList": [
-                      18,
-                      19,
-                      20,
-                      21,
-                      22
+                      11,
+                      12
                     ]
                   }
                 ]

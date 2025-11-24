@@ -47,6 +47,8 @@ public class interfazPrincipal extends javax.swing.JFrame {
         
         initComponents();
         cargarArbol();
+        
+        cargarDatosEnSD();
         cargarTablaArchivos();
         actualizarComboUsuarios();
         actualizarComboPoliticas();
@@ -408,9 +410,9 @@ public class interfazPrincipal extends javax.swing.JFrame {
         panelDisco.removeAll();
         panelDisco.setLayout(null);
         
-        int width = 70;
-        int height = 70;
-        int separacion = 10;
+        int width = 60;
+        int height = 60;
+        int separacion = 1;
         
         int x = 20;
         int y = 20;
@@ -465,7 +467,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
             if (contador == 7){
                 
                 x = 20;
-                y += height + separacion + 10;
+                y += height + separacion + 1;
             } else {
                 x += width + separacion;
             }
@@ -477,7 +479,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         panelDisco.repaint();
         panelDisco.revalidate();
     }
-    
+      
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
