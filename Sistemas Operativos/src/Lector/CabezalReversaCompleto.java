@@ -178,7 +178,7 @@ public class CabezalReversaCompleto {
                 
                 System.out.println("Bloque " + bloque.getIndex() + " desocupado");
                 //se aumenta la cantidad de bloques disponibles en SD
-                SD.setSizeDisponible(SD.getSizeDisponible()+1);
+                SD.setSizeAvailable(SD.getSizeAvailable()+1);
                 //Como ya se realizo la respectiva operacion CRUD en el bloque se cambia a true
                 operacionRealizada = true; 
                 //si el contador de lecturas es igual a valor de nuestro IoCompletionTime, se cambia el valor del booleano a true, que indica
@@ -388,7 +388,7 @@ public class CabezalReversaCompleto {
                 bloque.setAvailable(false);
                 System.out.println("Bloque " + bloque.getIndex() + " ocupado");
                 //se disminuye la cantidad de bloques disponibles en SD
-                SD.setSizeDisponible(SD.getSizeDisponible()-1);
+                SD.setSizeAvailable(SD.getSizeAvailable()-1);
                 //Como ya se realizo la respectiva operacion CRUD en el bloque se cambia a true
                 operacionRealizada = true; 
                 //si el contador de lecturas es igual a valor de nuestro IoCompletionTime, se cambia el valor del booleano a true, que indica

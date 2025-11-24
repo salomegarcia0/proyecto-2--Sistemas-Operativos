@@ -57,14 +57,6 @@ public class SD {
         this.lector = lector;
     }
 
-    public int getSizeDisponible() {
-        return sizeAvailable;
-    }
-
-    public void setSizeDisponible(int sizeAvailable) {
-        this.sizeAvailable = sizeAvailable;
-    }
-
     public int getSizeAvailable() {
         return sizeAvailable;
     }

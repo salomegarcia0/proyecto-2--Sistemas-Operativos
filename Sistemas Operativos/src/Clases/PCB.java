@@ -30,6 +30,13 @@ public class PCB {
     //CRUD
     private TipoProceso tipoProceso;  
     /*
+    SOLO APLICA PARA ELIMINAR, MODIFICAR Y LEER
+    Será una especie de copia de lista de bloques del archivo, de tal forma de que sea mas facil a la hora de ordenar dicha lista en el caso de politicas SSTF Y SCAN donde se busca
+    */
+    private ListaEnlazada listaBloques;
+    //Un booleano para solo realiza la copia de la lista una vez.
+    private boolean copiaRealizada;
+    /*
     será la cantidad de tiempo que ha pasado en ejecucion, se iran sumando
     los tiempos del ciclo de reloj para ello, todo en ms
     */
@@ -54,61 +61,102 @@ public class PCB {
         CabezalReversa cabezalReversa = new CabezalReversa();
         CabezalReversaCompleto cabezalReversaCompleto = new CabezalReversaCompleto();
         
-        if (tipoProceso == TipoProceso.CREAR){
-            System.out.println("CREAR");
-            long inicio = System.currentTimeMillis();
-            //true = indica que el proceso ya realizo la operacion
-            //false = indica que el proceso no realizo la operacion
-            boolean operacionCompletada = false;
-            //para C_SCAN
-            if(FileExplorer.getPolitica() == TipoPolitica.C_SCAN){
-                operacionCompletada = cabezalNormal.insertInfo(archivo);
-            //para SCAN
-            } else if (FileExplorer.getPolitica() == TipoPolitica.SCAN){
-                operacionCompletada = cabezalReversaCompleto.insertInfo(archivo);
-            //para FIFO,LIFO Y SSTF
-            } else {
-                operacionCompletada = cabezalReversa.insertInfo(archivo);
+        //Primero se verifica la lista de bloques del archivo fue copiada )solo para las operaciones que no sean de CREAR=
+        if(copiaRealizada == false && tipoProceso != TipoProceso.CREAR){
+            ListaEnlazada copia = new ListaEnlazada();
+            Nodo nodoOriginal = archivo.getBlockList().getHead();
+            while (nodoOriginal != null){
+                copia.insertFinal(nodoOriginal.getElement());
+                nodoOriginal = nodoOriginal.getNext();
             }
-                    
-            long fin = System.currentTimeMillis();
-            long tiempoSimulado = (int)(fin - inicio);//tiempo simulado
-                    
-            //se le suma al tiempoEnCPU el tiempo en ms del ciclo completado
-            tiempoEnCPU = tiempoEnCPU + tiempoSimulado;
-            
-            /*
-            -si el operacionRealiza = true y procesoBloqueado = true (de FileExplorer) el proceso realizo su operacion por completo y pero se debe bloquear
-            acontinuacion
-            -si el operacionRealiza = false y procesoBloqueado = true (de FileExplorer) el proceso no se realizo su operacion y se bloqueo
-            -si el operacionRealiza = true y procesoBloqueado = false (de FileExplorer) el proceso realizo su operacion por completo y no se realizo bloqueo
-            -(CASO IMPOSIBLE) si el operacionRealiza = false y procesoBloqueado = false (de FileExplorer)
-            */
-            if (FileExplorer.isProcesoBloqueado() == true ){
-                if(operacionCompletada == true){
-                    System.out.println("Ya pasaron " + FileExplorer.getIoExceptionCycle() + " lecturas, pero el proceso ya termino");
-                    System.out.println("Proceso " + procesoNombre + " a TERMINADO");
-                    System.out.println("Insersion de bloque nuevo completada");
-                    //se setea el ProcesoBloqeuado a false
-                    FileExplorer.setProcesoBloqueado(false);
-                    //se cambia el estado actual del proceso a Bloqueado
-                    estadoActual = EstadoProceso.TERMINADO;
-                } else if (operacionCompletada == false) {
-                    System.out.println("Ya pasaron " + FileExplorer.getIoExceptionCycle() + " lecturas, inicia bloqueo");
-                    System.out.println("Proceso " + procesoNombre + " se a BLOQUEADO");
-                    //se setea el ProcesoBloqeuado a false
-                    FileExplorer.setProcesoBloqueado(false);
-                    //se cambia el estado actual del proceso a Bloqueado
-                    estadoActual = EstadoProceso.BLOQUEADO;
-                    
+            setListaBloques(copia);
+        }
+        
+        if (tipoProceso == TipoProceso.CREAR){
+            boolean stop = false;
+            while(stop != true){
+                System.out.println("CREAR");
+                long inicio = System.currentTimeMillis();
+                //true = indica que el proceso ya realizo la operacion
+                //false = indica que el proceso no realizo la operacion
+                boolean operacionCompletada = false;
+
+                //para C_SCAN
+                if(FileExplorer.getPolitica() == TipoPolitica.C_SCAN){
+                    operacionCompletada = cabezalNormal.insertInfo(archivo);
+                //para SCAN
+                } else if (FileExplorer.getPolitica() == TipoPolitica.SCAN){
+                    operacionCompletada = cabezalReversaCompleto.insertInfo(archivo);
+                //para FIFO,LIFO Y SSTF
+                } else {
+                    operacionCompletada = cabezalReversa.insertInfo(archivo);
                 }
-            } else if (FileExplorer.isProcesoBloqueado() == false ){
-                if(operacionCompletada == true){
-                    System.out.println("Proceso " + procesoNombre + " a TERMINADO");
-                    System.out.println("Insersion de bloque nuevo completada");
-                    estadoActual = EstadoProceso.TERMINADO;
-                } else if (operacionCompletada == false){
-                    System.out.println("a llorar 1");
+
+                long fin = System.currentTimeMillis();
+                long tiempoSimulado = (int)(fin - inicio);//tiempo simulado
+
+                //se le suma al tiempoEnCPU el tiempo en ms del ciclo completado
+                tiempoEnCPU = tiempoEnCPU + tiempoSimulado;
+
+                /*
+                -si el operacionRealiza = true y procesoBloqueado = true (de FileExplorer) el proceso realizo su operacion por completo y pero se debe bloquear
+                acontinuacion
+                -si el operacionRealiza = false y procesoBloqueado = true (de FileExplorer) el proceso no se realizo su operacion y se bloqueo
+                -si el operacionRealiza = true y procesoBloqueado = false (de FileExplorer) el proceso realizo su operacion por completo y no se realizo bloqueo
+                -(CASO IMPOSIBLE) si el operacionRealiza = false y procesoBloqueado = false (de FileExplorer)
+                */
+                if (FileExplorer.isProcesoBloqueado() == true ){
+                    if(operacionCompletada == true){
+                        System.out.println("Insersion de bloque nuevo completada");
+                        //se setea el ProcesoBloqeuado a false
+                        FileExplorer.setProcesoBloqueado(false);
+                        //se verifica si es tamaño de bloques del archivo coincide con el tamaño de la lista de bloques del archivos
+                        if(archivo.getSize() == archivo.getBlockList().getSize()){
+                            System.out.println("Ya pasaron " + FileExplorer.getIoExceptionCycle() + " lecturas, pero el proceso ya termino");
+                            System.out.println("Proceso " + procesoNombre + " a TERMINADO");
+                            //se muestra un mensaje de que se completo la creacion
+                            archivo.aplicarCreacion();
+                            //se cambia el estado actual del proceso a Bloqueado
+                            estadoActual = EstadoProceso.TERMINADO;
+                            //se termina el PCB ya que se completo la insercion por completo de los archivo en el SD
+                            stop = true;
+                        //si es tamaño de bloques del archivo no coincide con el tamaño de la lista de bloques del archivos se bloquea
+                        } else {
+                            System.out.println("Ya pasaron " + FileExplorer.getIoExceptionCycle() + " lecturas, inicia bloqueo");
+                            System.out.println("Proceso " + procesoNombre + " se a BLOQUEADO");
+                            //se cambia el estado actual del proceso a Bloqueado
+                            estadoActual = EstadoProceso.BLOQUEADO;
+                            //se termina el PCB ya que se completo la insercion por completo de los archivo en el SD
+                            stop = true;
+                        }
+
+                    } else if (operacionCompletada == false) {
+                        System.out.println("Ya pasaron " + FileExplorer.getIoExceptionCycle() + " lecturas, inicia bloqueo");
+                        System.out.println("Proceso " + procesoNombre + " se a BLOQUEADO");
+                        //se setea el ProcesoBloqeuado a false
+                        FileExplorer.setProcesoBloqueado(false);
+                        //se cambia el estado actual del proceso a Bloqueado
+                        estadoActual = EstadoProceso.BLOQUEADO;
+                        stop = true;
+
+                    }
+                } else if (FileExplorer.isProcesoBloqueado() == false ){
+                    if(operacionCompletada == true){
+                        //se verifica si es tamaño de bloques del archivo coincide con el tamaño de la lista de bloques del archivos
+                        if(archivo.getSize() == archivo.getBlockList().getSize()){
+                            System.out.println("Proceso " + procesoNombre + " a TERMINADO");
+                            System.out.println("Insersion de bloque nuevo completada");
+                            //se muestra un mensaje de que se completo la creacion
+                            archivo.aplicarCreacion();
+                            //se cambia el estado actual del proceso a Bloqueado
+                            estadoActual = EstadoProceso.TERMINADO;
+                            //se termina el PCB ya que se completo la insercion por completo de los archivo en el SD
+                            stop = true;
+                        //si es tamaño de bloques del archivo no coincide con el tamaño de la lista de bloques del archivos se bloquea
+                        }
+                    } else if (operacionCompletada == false){
+                        System.out.println("a llorar 1");
+                    }
                 }
             }
             
@@ -344,4 +392,21 @@ public class PCB {
         this.archivo = archivo;
     }
 
+    public String getNombreArchivo() {
+        return nombreArchivo;
+    }
+
+    public void setNombreArchivo(String nombreArchivo) {
+        this.nombreArchivo = nombreArchivo;
+    }
+
+    public ListaEnlazada getListaBloques() {
+        return listaBloques;
+    }
+
+    public void setListaBloques(ListaEnlazada listaBloques) {
+        this.listaBloques = listaBloques;
+    }
+
+    
 }
