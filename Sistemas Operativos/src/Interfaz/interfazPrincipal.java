@@ -38,6 +38,13 @@ public class interfazPrincipal extends javax.swing.JFrame {
      * Creates new form interfazPrincipal
      */
     public interfazPrincipal(){
+        
+        if(FileExplorer.getSD() == null){
+            SD disco = new SD();
+            disco.crearSD(15);
+            FileExplorer.setSD(disco);
+        }
+        
         initComponents();
         cargarArbol();
         cargarTablaArchivos();
