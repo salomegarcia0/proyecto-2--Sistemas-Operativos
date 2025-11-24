@@ -26,6 +26,8 @@ public class main {
         }
         
         interfazPrincipal v1 = new interfazPrincipal();
+        v1.setResizable(false);
+        v1.setLocationRelativeTo(null);
         v1.setVisible(true);
     }
     

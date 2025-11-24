@@ -21,6 +21,7 @@ import javax.swing.table.DefaultTableModel;
 public class interfazPrincipal extends javax.swing.JFrame {
     private SistemaArchivos sistema;
     private DefaultTableModel modeloTablaArchivos;
+    private Usuario usuarioActual;
     
     /**
      * Creates new form interfazPrincipal
@@ -152,6 +153,117 @@ public class interfazPrincipal extends javax.swing.JFrame {
         String resultado = listaBloques.toString();
         return resultado;
     }
+    
+    // Las siguientes dos funciones verifican que es lo que cada usuario puede ver
+    //admin puede ver todo
+    //otro usuarios solo pueden ver archivos publicos, admin y archivos propios
+    private boolean puedeVerDirectorio(Directorio directorio){
+        if (usuarioActual == null ) return false;
+        
+        if (usuarioActual.getType().name().equals("ADMIN")){
+           return true; 
+        }
+        
+        return directorio.isEsPublico() || directorio.getUsuario().getName().equals(usuarioActual.getName()) 
+                || directorio.getUsuario().getName().equals("admin");  
+    }
+    
+    private boolean puedeVerArchivo(Archivo archivo){
+        if (usuarioActual == null ) return false;
+        
+        if (usuarioActual.getType().name().equals("ADMIN")){
+            return true;
+        }
+        
+        return archivo.getUsuario().getName().equals(usuarioActual.getName()) 
+                || archivo.getUsuario().getName().equals("admin"); 
+        
+    }
+    
+    private DefaultMutableTreeNode construirNodoArbolFiltrado(Directorio dir){
+        DefaultMutableTreeNode nodo = new DefaultMutableTreeNode(dir.getName());
+        
+        Nodo aux = dir.getElementos().getHead();
+        
+        while (aux != null){
+            Object elemento = aux.getElement();
+            
+            if (elemento instanceof Directorio){
+                Directorio subDir = (Directorio) elemento;
+                
+                if (puedeVerDirectorio(subDir)){
+                    DefaultMutableTreeNode subNodo = construirNodoArbolFiltrado(subDir);
+                    
+                    if (subNodo.getChildCount() > 0 || subDir.getElementos().getSize() == 0){
+                        nodo.add(subNodo);
+                    }
+                }
+            } else if (elemento instanceof Archivo){
+                Archivo archivo = (Archivo) elemento;
+                
+                if (puedeVerArchivo(archivo)){
+                    DefaultMutableTreeNode nodoArchivo = new DefaultMutableTreeNode(archivo.getName()+ " " + archivo.getSize());
+                    nodoArchivo.setUserObject(archivo);
+                    nodo.add(nodoArchivo);
+                }
+            }
+            aux = aux.getNext();
+        }
+        
+        return nodo;
+    }
+ 
+    
+    private void cargarArbolFiltrado(){
+        DefaultMutableTreeNode nodoRoot = construirNodoArbolFiltrado(sistema.getRoot());
+        arbolSistema.setModel(new javax.swing.tree.DefaultTreeModel(nodoRoot));
+    }
+    
+    private void llenarTablaFiltrada(Directorio dir, DefaultTableModel modelo){
+        if (dir == null || dir.getElementos() == null) return;
+        
+        Nodo aux = dir.getElementos().getHead();
+        
+        while(aux != null){
+            Object elemento = aux.getElement();
+            
+            if (elemento instanceof Directorio){
+                if(puedeVerDirectorio((Directorio) elemento)){
+                    llenarTablaFiltrada((Directorio) elemento, modelo);
+                }
+            } else if (elemento instanceof Archivo){
+                Archivo archivo = (Archivo) elemento;
+                
+                if (puedeVerArchivo(archivo)){
+                    modelo.addRow(new Object[]{
+                        archivo.getName(),
+                        archivo.getSize(),
+                        obtenerListaBloques(archivo),
+                        archivo.getUsuario().getName()
+                    });
+                }
+            }
+            aux = aux.getNext();
+        }
+    }
+    
+    private void cargarTablaArchivosFiltrada(){
+        modeloTablaArchivos = new DefaultTableModel(new Object[]{"Nombre", "Tamaño", "Bloques", "Color"}, 0);
+        
+        tablaArchivos.setModel(modeloTablaArchivos);
+        
+        if (sistema != null && sistema.getRoot() != null){
+            llenarTablaFiltrada(sistema.getRoot(), modeloTablaArchivos);
+        }
+    }
+    
+    
+    private void actualizarInterfazCompleta(){
+        cargarArbolFiltrado();
+        
+        cargarTablaArchivosFiltrada();
+        
+    }
      
     /**
      * This method is called from within the constructor to initialize the form.
@@ -178,8 +290,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
         Leer_btn = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         Modificar_btn = new javax.swing.JLabel();
-        jPanel7 = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
@@ -190,6 +300,8 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jComboBox2 = new javax.swing.JComboBox<>();
         jPanel8 = new javax.swing.JPanel();
         Aplicar_btn = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        usuarioEnUso = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -198,24 +310,24 @@ public class interfazPrincipal extends javax.swing.JFrame {
 
         jScrollPane1.setViewportView(arbolSistema);
 
-        panel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 70, 270, -1));
+        panel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, 270, -1));
 
         jLabel1.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(51, 51, 51));
         jLabel1.setText("Controles");
-        panel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 450, -1, -1));
+        panel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 470, -1, -1));
 
         jLabel2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(51, 51, 51));
         jLabel2.setText("Usuario:");
-        panel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 497, -1, 20));
+        panel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 510, -1, 20));
 
         jLabel4.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(51, 51, 51));
         jLabel4.setText("Política:");
-        panel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 540, 60, 20));
-        panel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 580, 790, 10));
-        panel1.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 460, 720, 10));
+        panel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 550, 60, 20));
+        panel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 600, 790, 10));
+        panel1.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 480, 710, 10));
 
         jPanel3.setBackground(new java.awt.Color(238, 238, 238));
         jPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
@@ -228,7 +340,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         crear_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jPanel3.add(crear_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
 
-        panel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 490, 110, 30));
+        panel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 500, 110, 30));
 
         jPanel4.setBackground(new java.awt.Color(238, 238, 238));
         jPanel4.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
@@ -242,7 +354,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         Eliminar_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jPanel4.add(Eliminar_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
 
-        panel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 490, 110, 30));
+        panel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 500, 110, 30));
 
         jPanel5.setBackground(new java.awt.Color(238, 238, 238));
         jPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
@@ -255,7 +367,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         Leer_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jPanel5.add(Leer_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
 
-        panel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 490, 110, 30));
+        panel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 500, 110, 30));
 
         jPanel6.setBackground(new java.awt.Color(238, 238, 238));
         jPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
@@ -269,19 +381,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         Modificar_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jPanel6.add(Modificar_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
 
-        panel1.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 530, 110, 30));
-
-        jPanel7.setBackground(new java.awt.Color(238, 238, 238));
-        jPanel7.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
-        jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel5.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setText("Agregar U");
-        jPanel7.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
-
-        panel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 490, 110, 30));
+        panel1.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 550, 110, 30));
 
         jPanel1.setBackground(new java.awt.Color(243, 243, 243));
 
@@ -296,7 +396,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jLabel8.setForeground(new java.awt.Color(51, 51, 51));
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel8.setText("Explorador de Archivos");
-        panel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 160, 20));
+        panel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 150, 20));
 
         tablaArchivos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -315,7 +415,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Tabla de Archivos", jScrollPane3);
 
-        panel1.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 40, 490, 390));
+        panel1.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 60, 490, 390));
 
         comboUsuarios.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         comboUsuarios.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -324,7 +424,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
                 comboUsuariosActionPerformed(evt);
             }
         });
-        panel1.add(comboUsuarios, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 490, 180, -1));
+        panel1.add(comboUsuarios, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 500, 180, -1));
 
         jComboBox2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -333,7 +433,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
                 jComboBox2ActionPerformed(evt);
             }
         });
-        panel1.add(jComboBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 540, 180, -1));
+        panel1.add(jComboBox2, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 550, 180, -1));
 
         jPanel8.setBackground(new java.awt.Color(238, 238, 238));
         jPanel8.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
@@ -346,9 +446,20 @@ public class interfazPrincipal extends javax.swing.JFrame {
         Aplicar_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jPanel8.add(Aplicar_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
 
-        panel1.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 530, 110, 30));
+        panel1.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 540, 110, 30));
 
-        getContentPane().add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 860, 600));
+        jLabel5.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel5.setText("Usuario:");
+        panel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 40, -1, -1));
+
+        usuarioEnUso.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        usuarioEnUso.setForeground(new java.awt.Color(51, 51, 51));
+        usuarioEnUso.setText("jLabel6");
+        panel1.add(usuarioEnUso, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 40, 100, -1));
+
+        getContentPane().add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 850, 620));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -358,7 +469,21 @@ public class interfazPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jComboBox2ActionPerformed
 
     private void comboUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboUsuariosActionPerformed
-        // TODO add your handling code here:
+        String seleccion = (String) comboUsuarios.getSelectedItem();
+        if (seleccion != null && sistema != null && sistema.getUsuarios() != null){
+            String nombreUsuario = seleccion.split(" ")[0];
+            
+            for (Usuario usuario : sistema.getUsuarios()){
+                if (usuario.getName().equals(nombreUsuario)){
+                    usuarioActual = usuario;
+                    
+                    System.out.println("Usuario " + usuarioActual.getName() + " agregado existosamente");
+                    
+                    actualizarInterfazCompleta();
+                    break;
+                }
+            }
+        }
     }//GEN-LAST:event_comboUsuariosActionPerformed
 
     /**
@@ -416,7 +541,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
@@ -425,5 +549,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JTabbedPane jTabbedPane1;
     private java.awt.Panel panel1;
     private javax.swing.JTable tablaArchivos;
+    private javax.swing.JLabel usuarioEnUso;
     // End of variables declaration//GEN-END:variables
 }
