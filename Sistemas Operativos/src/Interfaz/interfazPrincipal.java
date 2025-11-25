@@ -48,7 +48,10 @@ public class interfazPrincipal extends javax.swing.JFrame {
         initComponents();
         cargarArbol();
         
+        debugSDCompleto();
         cargarDatosEnSD();
+        debugSDCompleto();
+        
         cargarTablaArchivos();
         actualizarComboUsuarios();
         actualizarComboPoliticas();
@@ -121,7 +124,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
     
     //PRIMERA PARTE DEL TABBED PANE DONDE ESTÁ LA TABLA
     private void cargarTablaArchivos(){
-        modeloTablaArchivos = new DefaultTableModel(new Object[]{"Nombre", "Tamaño", "Bloques", "Usuario"}, 0);
+        modeloTablaArchivos = new DefaultTableModel(new Object[]{"Nombre", "Tamaño", "Primer Bloque", "Bloques", "Usuario"}, 0);
         if (tablaArchivos == null){
             return;
         }
@@ -151,6 +154,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
                 modelo.addRow(new Object[]{
                     archivo.getName(),
                     archivo.getSize(),
+                    obtenerPrimerBloque(archivo),
                     obtenerListaBloques(archivo),
                     archivo.getUsuario().getName(),
                 });
@@ -186,6 +190,19 @@ public class interfazPrincipal extends javax.swing.JFrame {
         listaBloques.append("]");
         String resultado = listaBloques.toString();
         return resultado;
+    }
+    
+    private int obtenerPrimerBloque(Archivo archivo){
+        if (archivo.getBlockList() == null || archivo.getBlockList().getHead() == null){
+            return -1;
+        }
+        
+        Nodo primerNodo = archivo.getBlockList().getHead();
+        if (primerNodo.getElement() instanceof Integer){
+            return (Integer) primerNodo.getElement();
+        }
+        
+        return -1;
     }
     
     // Las siguientes dos funciones verifican que es lo que cada usuario puede ver
@@ -272,6 +289,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
                     modelo.addRow(new Object[]{
                         archivo.getName(),
                         archivo.getSize(),
+                        obtenerPrimerBloque(archivo),
                         obtenerListaBloques(archivo),
                         archivo.getUsuario().getName()
                     });
@@ -282,7 +300,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
     }
     
     private void cargarTablaArchivosFiltrada(){
-        modeloTablaArchivos = new DefaultTableModel(new Object[]{"Nombre", "Tamaño", "Bloques", "Color"}, 0);
+        modeloTablaArchivos = new DefaultTableModel(new Object[]{"Nombre", "Tamaño", "Primer Bloque", "Bloques", "Color"}, 0);
         
         tablaArchivos.setModel(modeloTablaArchivos);
         
@@ -349,6 +367,8 @@ public class interfazPrincipal extends javax.swing.JFrame {
             asignarBloquesArchivos(sistema.getRoot());
         }
         
+        actualizarEstadisticasSD();
+        
         generarBloquesSD();
     }
      //esta funcion recorre los archivos y asigna recursivamente los bloques
@@ -412,7 +432,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         
         int width = 60;
         int height = 60;
-        int separacion = 1;
+        int separacion = 0;
         
         int x = 20;
         int y = 20;
@@ -467,7 +487,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
             if (contador == 7){
                 
                 x = 20;
-                y += height + separacion + 1;
+                y += height + separacion + 0;
             } else {
                 x += width + separacion;
             }
@@ -478,7 +498,139 @@ public class interfazPrincipal extends javax.swing.JFrame {
         
         panelDisco.repaint();
         panelDisco.revalidate();
+        
+        actualizarEstadisticasSD();
     }
+    
+    private void actualizarEstadisticasSD(){
+        SD disco = FileExplorer.getSD();
+        if (disco == null){
+            return;
+        }
+
+        int totalBloques = disco.getSize();
+        int bloquesOcupados = contarBloquesOcupadosManual(disco);
+        int bloquesLibres = totalBloques - bloquesOcupados;
+        
+        if(lblBloquesTotales != null){
+           lblBloquesTotales.setText(String.valueOf(totalBloques));
+        }
+        
+        if(lblBloquesOcupados != null){
+           lblBloquesOcupados.setText(String.valueOf(bloquesOcupados));
+        }
+        
+        if(lblbloquesLibres != null){
+           lblbloquesLibres.setText(String.valueOf(bloquesLibres));
+        }
+    }
+    
+    // con este metodo voy a tratar de arreglar el problema con el contador en SD para no tocar alla
+    private int contarBloquesOcupadosManual(SD disco){
+        int ocupados = 0;
+        NodoBloque actual = disco.getHead();
+        
+        while(actual != null){
+            if (!actual.getElement().isAvailable()){
+                ocupados++;
+            }
+            
+            actual = actual.getNext();
+        }
+        return ocupados;
+    }
+    
+    
+    
+    
+    //DEBUG BORRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
+    
+    private void debugSDCompleto() {
+        System.out.println("\n===  DEBUG COMPLETO SD ===");
+
+        // verificar SD
+        SD disco = FileExplorer.getSD();
+        if (disco == null) {
+            System.out.println("SD es null en FileExplorer");
+            return;
+        }
+
+        System.out.println("SD basico:");
+        System.out.println("   - disco.getSize(): " + disco.getSize());
+        System.out.println("   - disco.getSizeDisponible(): " + disco.getSizeDisponible());
+        System.out.println("   - disco.getHead(): " + (disco.getHead() != null ? "EXISTE" : "NULL"));
+
+        // verifica si los datos se cargaron del JSON
+        System.out.println("\n VERIFICANDO CARGA DE DATOS:");
+        if (sistema != null && sistema.getRoot() != null) {
+            verificarArchivosCargados(sistema.getRoot());
+        } else {
+            System.out.println(" Sistema o root es null");
+        }
+
+        //estado real de cada bloque en el SD
+        System.out.println("\nESTADO REAL DE BLOQUES:");
+        NodoBloque actual = disco.getHead();
+        int contador = 0;
+        int ocupadosReales = 0;
+
+        while (actual != null && contador < disco.getSize()) {
+            Bloque bloque = actual.getElement();
+            String estado = bloque.isAvailable() ? "LIBRE" : "OCUPADO";
+            String archivo = bloque.isAvailable() ? "" : " por '" + bloque.getNameArchivo() + "'";
+
+            System.out.println("   Bloque " + contador + ": " + estado + archivo);
+
+            if (!bloque.isAvailable()) {
+                ocupadosReales++;
+            }
+
+            actual = actual.getNext();
+            contador++;
+        }
+
+        // compara con lo que deberia estar ocupado segun JSON
+        System.out.println(" COMPARACIoN:");
+        System.out.println("   - Bloques ocupados (reales): " + ocupadosReales);
+        System.out.println("   - Bloques libres (reales): " + (disco.getSize() - ocupadosReales));
+        System.out.println("   - SizeDisponible(): " + disco.getSizeDisponible());
+        System.out.println("   - Diferencia: " + (ocupadosReales - (disco.getSize() - disco.getSizeDisponible())));
+
+        System.out.println("=== FIN DEBUG ===\n");
+    }
+
+    private void verificarArchivosCargados(Directorio dir) {
+        if (dir == null || dir.getElementos() == null) return;
+
+        Nodo aux = dir.getElementos().getHead();
+        int archivosConBloques = 0;
+        int archivosSinBloques = 0;
+
+        while (aux != null) {
+            Object elemento = aux.getElement();
+
+            if (elemento instanceof Directorio) {
+                verificarArchivosCargados((Directorio) elemento);
+            } else if (elemento instanceof Archivo) {
+                Archivo archivo = (Archivo) elemento;
+                if (archivo.getBlockList() != null && archivo.getBlockList().getHead() != null) {
+                    archivosConBloques++;
+                    System.out.println(archivo.getName() + " - Bloques: " + obtenerListaBloques(archivo));
+                } else {
+                    archivosSinBloques++;
+                    System.out.println(archivo.getName() + " - SIN bloques asignados");
+                }
+            }
+
+            aux = aux.getNext();
+        }
+
+        if (archivosConBloques + archivosSinBloques > 0) {
+            System.out.println(" Resumen: " + archivosConBloques + " con bloques, " + archivosSinBloques + " sin bloques");
+        }
+    }
+
+
       
     /**
      * This method is called from within the constructor to initialize the form.
@@ -519,7 +671,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
         tablaArchivos = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
         panelSDStats = new javax.swing.JPanel();
-        jLabel10 = new javax.swing.JLabel();
         lbl1 = new javax.swing.JLabel();
         lbl2 = new javax.swing.JLabel();
         lbl3 = new javax.swing.JLabel();
@@ -722,9 +873,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         panelSDStats.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel10.setText("jLabel10");
-        panelSDStats.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, -1, -1));
 
         lbl1.setText("Bloques Totales:");
         panelSDStats.add(lbl1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, -1, -1));
@@ -1043,7 +1191,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> comboUsuarios;
     private javax.swing.JLabel crear_btn;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel14;
