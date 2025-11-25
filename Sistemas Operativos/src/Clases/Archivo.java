@@ -39,14 +39,18 @@ public class Archivo {
             String nombreViejo = name;
             name = nombreArchivo;
             System.out.println("Se completo el cambio del nombre del archivo '" + nombreViejo + "' a " + name + "'");
+            countModificar = 0;
         }
+        
     }
     
     public void aplicarLectura(){
         if(countLectura == size){
             System.out.println("Se completo la solicitud de lectura del archivo " + name);
             System.out.println("ME LEISTE FELICIDADES :D");
+            countLectura = 0;
         }
+        
     }
     
     public void aplicarCreacion(){
@@ -95,6 +99,30 @@ public class Archivo {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public int getCountLectura() {
+        return countLectura;
+    }
+
+    public void setCountLectura(int countLectura) {
+        this.countLectura = countLectura;
+    }
+    
+    public boolean completeLectura(){
+        return countLectura == size;
+    }
+
+    public int getCountModificar() {
+        return countModificar;
+    }
+
+    public void setCountModificar(int countModificar) {
+        this.countModificar = countModificar;
+    }
+    
+    public boolean completeModificar(){
+        return countModificar == size;
     }
         
     
