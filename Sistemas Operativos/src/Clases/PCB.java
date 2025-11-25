@@ -34,8 +34,6 @@ public class PCB {
     Será una especie de copia de lista de bloques del archivo, de tal forma de que sea mas facil a la hora de ordenar dicha lista en el caso de politicas SSTF Y SCAN donde se busca
     */
     private ListaEnlazada listaBloques;
-    //Un booleano para solo realiza la copia de la lista una vez.
-    private boolean copiaRealizada;
     /*
     será la cantidad de tiempo que ha pasado en ejecucion, se iran sumando
     los tiempos del ciclo de reloj para ello, todo en ms
@@ -59,16 +57,6 @@ public class PCB {
         CabezalReversa cabezalReversa = new CabezalReversa();
         CabezalReversaCompleto cabezalReversaCompleto = new CabezalReversaCompleto();
         
-        //Primero se verifica la lista de bloques del archivo fue copiada )solo para las operaciones que no sean de CREAR=
-        if(copiaRealizada == false && tipoProceso != TipoProceso.CREAR){
-            ListaEnlazada copia = new ListaEnlazada();
-            Nodo nodoOriginal = archivo.getBlockList().getHead();
-            while (nodoOriginal != null){
-                copia.insertFinal(nodoOriginal.getElement());
-                nodoOriginal = nodoOriginal.getNext();
-            }
-            setListaBloques(copia);
-        }
         
         if (tipoProceso == TipoProceso.CREAR){
             
@@ -508,13 +496,25 @@ public class PCB {
         }
     }  
     
-//    public boolean haTerminadoCrear(){
-//        return archivo.getSize() == archivo.getBlockList().getSize();
-//    }
-//    
-//    public boolean haTerminado(){
-//        return listaBloques.isEmpty();
-//    }
+    
+    /*
+    Esto es para crear la copia de la lista de bloques del archivo al que se le realizara la operacion CRUD
+    nota: no se crea una lista copia para las operaciones CRUD de CREAR
+    */
+    public void creaListaCopia(){
+                
+        //Primero se verifica la lista de bloques del archivo fue copiada )solo para las operaciones que no sean de CREAR=
+        //if(copiaRealizada == false && tipoProceso != TipoProceso.CREAR){
+        if(tipoProceso != TipoProceso.CREAR){
+            ListaEnlazada copia = new ListaEnlazada();
+            Nodo nodoOriginal = archivo.getBlockList().getHead();
+            while (nodoOriginal != null){
+                copia.insertFinal(nodoOriginal.getElement());
+                nodoOriginal = nodoOriginal.getNext();
+            }
+            setListaBloques(copia);
+        }
+    }
     
     public void bloquear(){
         if (estadoActual == EstadoProceso.LISTO){

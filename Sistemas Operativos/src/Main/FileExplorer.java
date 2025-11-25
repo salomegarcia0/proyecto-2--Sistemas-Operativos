@@ -82,11 +82,52 @@ public class FileExplorer {
                 //el proceso que este en esa posicion para ser el nuevo proceso en ejecutar
                 FileExplorer.setProcesoEnEjecucion(colaListos.desColarIntermedio(numero));
                 
-                
+            /*
+               este busca el bloque mas cercano al cabezal 
+            */ 
             } else if (politica == TipoPolitica.SSTF){
+                //obtengo el la ubicacion del bloque en el que se encuentra el cabezal
+                int ubicacion = SD.getLector().getElement().getIndex();
                 
+                //para saber la ubicacion del bloque disponible
+                int index = 0;
+                
+                //Es para guardar el index de la distancia mas corta
+                int indexDistancia = 0;
+                // para el calculos de las distancias
+                int distancia = 0;
+                
+                //obtengo la cabeza de la cola de listos
+                NodoProceso nodoProceso = colaListos.getHead();
+                
+                //recorreremos la lista en busqueda del 
+                while (nodoProceso != null ){
+                    PCB proceso = nodoProceso.getProceso();
+                    if(proceso.getTipoProceso() != TipoProceso.CREAR){
+                        /*
+                        la distancia va a ser igual a el index de la ubicacion del lector (ubicacion) menos el index
+                        del primer valor en la lista de
+                        */
+                        distancia = Math.abs(ubicacion - (int) proceso.getListaBloques().getHead().getElement());
+                    
+                    } else {
+                        
+                    }
+                    
+                    //se para al siguiente
+                    nodoProceso = nodoProceso.getNext();
+                }
+                
+        
+        
+            /*
+            
+            */    
             } else if (politica == TipoPolitica.SCAN){
+            
+            /*
                 
+            */
             } else if (politica == TipoPolitica.C_SCAN){
                 
             }
@@ -97,7 +138,67 @@ public class FileExplorer {
             FileExplorer.setProcesoEnEjecucion(null);
         }
     }
+    
+    /*
+    Esto es solo para los caso de un PCB con operacion CREAR para la conseguir el bloque libre mas
+    cercano al cabezal
+    */
+    public static int bloqueDespejadoCercano(){
+         //el nodo cabezal
+        NodoBloque cabezal = SD.getLector();
+        //obtengo el la ubicacion del bloque en el que se encuentra el cabezal
+        int ubicacion = cabezal.getElement().getIndex();
+        //para saber la ubicacion del bloque disponible
+        int index = 0;
+        int distanciaDer;
+        int distanciaIzq;
+        //Nodos para conseguir el index mas cercano
+        NodoBloque nodoDer = SD.getLector();
+        NodoBloque nodoIzq = SD.getLector();
         
+        //para IZQUIERDA
+        while(nodoIzq != null && nodoIzq.getElement().isAvailable() == false){
+            nodoIzq = nodoIzq.getPrevious();
+        }
+        if(nodoIzq != null){
+            distanciaIzq = nodoIzq.getElement().getIndex();
+        } else {
+            distanciaIzq = -1;
+        }
+        
+        //para DERECHA
+        while(nodoDer != null && nodoDer.getElement().isAvailable() == false){
+            nodoDer = nodoDer.getNext();
+        }
+        if(nodoDer != null){
+            distanciaDer = nodoDer.getElement().getIndex();
+        } else {
+            distanciaDer = -1;
+        }
+        
+        //solo hay espacio del lado derecho
+        if(distanciaIzq == -1){
+            index = distanciaDer;
+        //solo hay espacio del lado izquierdo
+        } else if (distanciaDer == -1){
+            index = distanciaIzq;
+        //la distancia es la misma, se hará de forma random la seleccion de la ubicacion entre estas dos index de distancias
+        } else if(Math.abs(ubicacion - distanciaIzq) == Math.abs(ubicacion - distanciaDer)){
+            Random rand = new Random();
+            boolean valor = rand.nextBoolean();
+            if (valor == true){
+                index = distanciaDer;
+            } else {
+                index = distanciaIzq;
+            }
+        } else if(Math.abs(ubicacion - distanciaIzq) < Math.abs(ubicacion - distanciaDer)){
+            index = distanciaIzq;
+        } else if(Math.abs(ubicacion - distanciaIzq) > Math.abs(ubicacion - distanciaDer)){
+            index = distanciaDer;
+        }
+        
+        return index;
+    }        
 
     public static int getSizeBloque() {
         return sizeBloque;
