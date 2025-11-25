@@ -557,7 +557,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
 
         System.out.println("SD basico:");
         System.out.println("   - disco.getSize(): " + disco.getSize());
-        System.out.println("   - disco.getSizeDisponible(): " + disco.getSizeDisponible());
+        System.out.println("   - disco.getSizeAvailable(): " + disco.getSizeAvailable());
         System.out.println("   - disco.getHead(): " + (disco.getHead() != null ? "EXISTE" : "NULL"));
 
         // verifica si los datos se cargaron del JSON
@@ -593,8 +593,8 @@ public class interfazPrincipal extends javax.swing.JFrame {
         System.out.println(" COMPARACIoN:");
         System.out.println("   - Bloques ocupados (reales): " + ocupadosReales);
         System.out.println("   - Bloques libres (reales): " + (disco.getSize() - ocupadosReales));
-        System.out.println("   - SizeDisponible(): " + disco.getSizeDisponible());
-        System.out.println("   - Diferencia: " + (ocupadosReales - (disco.getSize() - disco.getSizeDisponible())));
+        System.out.println("   - SizeAvailable(): " + disco.getSizeAvailable());
+        System.out.println("   - Diferencia: " + (ocupadosReales - (disco.getSize() - disco.getSizeAvailable())));
 
         System.out.println("=== FIN DEBUG ===\n");
     }

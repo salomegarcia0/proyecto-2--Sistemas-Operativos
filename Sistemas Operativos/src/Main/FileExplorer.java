@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Main;
+import java.util.Random;
 import Clases.*;
 import Estructuras.*;
 import Tipos_de_Datos.*;
@@ -39,6 +40,64 @@ public class FileExplorer {
     private static int ioCompletionTime = 5;
     //Reloj global del sistema
     private static long reloj_global;
+    
+    /*
+    Una vez creado un proceso se encola a la cola de listos y se le coloca el estado LISTO
+    */
+    public static void agregarProcesoListo(PCB proceso){
+        //Primero se cambia el estado del proceso a 
+        proceso.setEstadoActual(EstadoProceso.LISTO);
+        colaListos.enColar(proceso);
+        
+    }
+    
+    /*
+    Se seleccionaria un proceso
+    */
+    public static void seleccionarProceso(){
+        //si la cola de listos no esta vacio se selecciona un proceso en base a la politica
+        if(!colaListos.isEmpty()){
+            
+            /*
+            El primer proceso en entrar es el primero en ser atendido
+            */
+            if (politica == TipoPolitica.FIFO){
+                FileExplorer.setProcesoEnEjecucion(colaListos.desColarInicio());
+                
+            /*
+            El ultimo proceso en entrar es el primero en ser atendido    
+            */    
+            } else if (politica == TipoPolitica.LIFO){
+                //se desencola el ultimo proceso que llego
+                FileExplorer.setProcesoEnEjecucion(colaListos.desColarFinal());
+                
+            /*
+            Esta politica elige un proceso de la cola de Listos aleatoriamente  
+            */   
+            } else if (politica == TipoPolitica.PA){
+                Random rand = new Random();
+                //genera un valor random entre 0 y el tamaño de la lista menos 1
+                int numero = rand.nextInt(colaListos.getSize());
+                //se busca por index del numero que obtuvimos anteriormente y desencolamos de la cola de listos
+                //el proceso que este en esa posicion para ser el nuevo proceso en ejecutar
+                FileExplorer.setProcesoEnEjecucion(colaListos.desColarIntermedio(numero));
+                
+                
+            } else if (politica == TipoPolitica.SSTF){
+                
+            } else if (politica == TipoPolitica.SCAN){
+                
+            } else if (politica == TipoPolitica.C_SCAN){
+                
+            }
+            
+            procesoEnEjecucion.setEstadoActual(EstadoProceso.EJECUTANDO);
+
+        } else {
+            FileExplorer.setProcesoEnEjecucion(null);
+        }
+    }
+        
 
     public static int getSizeBloque() {
         return sizeBloque;

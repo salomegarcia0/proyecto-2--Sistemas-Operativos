@@ -75,6 +75,7 @@ public class PCB {
             boolean stop = false;
             while(stop != true){
                 System.out.println("CREAR");
+                
                 long inicio = System.currentTimeMillis();
                 //true = indica que el proceso ya realizo la operacion
                 //false = indica que el proceso no realizo la operacion
@@ -125,7 +126,7 @@ public class PCB {
                             System.out.println("Proceso " + procesoNombre + " se a BLOQUEADO");
                             //se cambia el estado actual del proceso a Bloqueado
                             estadoActual = EstadoProceso.BLOQUEADO;
-                            //se detiene el PCB ya que no se completo la lectura por completo de la lista de bloques del archivo
+                            //se detiene el PCB ya que no se completo la insercion por completo de la lista de bloques del archivo
                             stop = true;
                         }
 
@@ -136,6 +137,7 @@ public class PCB {
                         FileExplorer.setProcesoBloqueado(false);
                         //se cambia el estado actual del proceso a Bloqueado
                         estadoActual = EstadoProceso.BLOQUEADO;
+                        //se detiene el PCB ya que no se completo la insercion por completo de la lista de bloques del archivo
                         stop = true;
 
                     }
@@ -153,8 +155,8 @@ public class PCB {
                             estadoActual = EstadoProceso.TERMINADO;
                             //se termina el PCB ya que se completo la insercion por completo de los archivo en el SD
                             stop = true;
-                        //si es tamaño de bloques del archivo no coincide con el tamaño de la lista de bloques del archivos se bloquea
                         }
+                        
                     } else if (operacionCompletada == false){
                         System.out.println("a llorar 1");
                     }
@@ -174,7 +176,8 @@ public class PCB {
                 long inicio = System.currentTimeMillis();
                 //true = indica que el proceso ya realizo la operacion
                 //false = indica que el proceso no realizo la operacion
-                boolean operacionCompletada = false;            
+                boolean operacionCompletada = false;          
+                
                 //para C_SCAN
                 if(FileExplorer.getPolitica() == TipoPolitica.C_SCAN){
                     operacionCompletada = cabezalNormal.eliminarInfo(index,archivo);
@@ -221,6 +224,7 @@ public class PCB {
                             estadoActual = EstadoProceso.TERMINADO;
                             //termina el PCB porque completo la eliminacion
                             stop = true;
+                            
                         } else{
                             System.out.println("Ya pasaron " + FileExplorer.getIoExceptionCycle() + " lecturas, inicia bloqueo");
                             System.out.println("Proceso " + procesoNombre + " se a BLOQUEADO");
@@ -261,6 +265,7 @@ public class PCB {
                             estadoActual = EstadoProceso.TERMINADO;
                             stop = true;
                         }
+                        
                     } else if (operacionCompletada == false){
                         System.out.println("a llorar 2");
                     }
@@ -309,9 +314,11 @@ public class PCB {
                         System.out.println("Lectura de bloque completada");
                         //se setea el ProcesoBloqeuado a false
                         FileExplorer.setProcesoBloqueado(false);
+                        
                         //se aumenta el contador de bloques leidos del archivo
                         archivo.setCountLectura(archivo.getCountLectura()+1);
                         //se elimina la cabeza de la lista copia de bloques
+                        
                         listaBloques.deleteBegin();
                         System.out.println("Bloques que faltan por leer");
                         listaBloques.print();
@@ -368,10 +375,10 @@ public class PCB {
                             archivo.aplicarLectura();
                             //se cambia el estado actual del proceso a Bloqueado
                             estadoActual = EstadoProceso.TERMINADO;
-                            //se termina el PCB ya que se completo la insercion por completo de los archivo en el SD
+                            //se termina el PCB ya que se completo la lectura por completo de los archivo en el SD
                             stop = true;
-                        //si es tamaño de bloques del archivo no coincide con el tamaño de la lista de bloques del archivos se bloquea
                         }
+                        
                     } else if (operacionCompletada == false){
                         System.out.println("a llorar 3");
                     }
@@ -479,7 +486,7 @@ public class PCB {
                         
                         //se verifica si el contador de bloques modificados es igual al tamaño total de bloques en los que esta divido el archivo
                         if(archivo.completeModificar() == true){
-                            System.out.println("El proceos ya termino por completo");
+                            System.out.println("El proceso ya termino por completo");
                             System.out.println("Proceso " + procesoNombre + " a TERMINADO");
                             //se muestra el mensaje de que se completo la modificacion
                             archivo.aplicarCambios(nombreArchivo);
@@ -492,7 +499,6 @@ public class PCB {
                             stop = true;
                        
                         }
-                        
                         
                     } else if (operacionCompletada == false){
                         System.out.println("a llorar 4");
@@ -536,6 +542,10 @@ public class PCB {
 
     public EstadoProceso getEstadoActual() {
         return estadoActual;
+    }
+
+    public void setEstadoActual(EstadoProceso estadoActual) {
+        this.estadoActual = estadoActual;
     }
 
     public TipoProceso getTipoProceso() {

@@ -135,6 +135,7 @@ public class SD {
             //se cambia el estado del bloque a desocupado
             nodo.getElement().setAvailable(false);
             //se le resta uno a sizeAvailable ya que ahora un bloque estará ocupado
+            //setSizeAvailable(getSizeAvailable()-1);
             sizeAvailable--;
         }
     }
@@ -151,6 +152,7 @@ public class SD {
             //se cambia el estado del bloque a desocupado
             nodo.getElement().setAvailable(false);
             //se le resta uno a sizeAvailable ya que ahora un bloque estará ocupado
+            //setSizeAvailable(getSizeAvailable()-1);
             sizeAvailable--;
         }
     }
@@ -183,6 +185,7 @@ public class SD {
                     pointer.getElement().setNameArchivo(archivo.getName());
                     pointer.getElement().setAvailable(false);
                     //se le resta uno a sizeAvailable ya que ahora un bloque estará ocupado
+                    //setSizeAvailable(getSizeAvailable()-1);
                     sizeAvailable--;
                 } else {
                     //int aux = 1; 
@@ -196,6 +199,7 @@ public class SD {
                     pointer.getElement().setNameArchivo(archivo.getName());
                     pointer.getElement().setAvailable(false);
                     //se le resta uno a sizeAvailable ya que ahora un bloque estará ocupado
+                    //setSizeAvailable(getSizeAvailable()-1);
                     sizeAvailable--;
                 }
             }

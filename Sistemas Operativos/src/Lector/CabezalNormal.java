@@ -379,9 +379,10 @@ public class CabezalNormal {
                 System.out.println("Insertando parte del archivo en el bloque " + bloque.getIndex() );
                 //se agrega la ubicacion del bloque a la lista de bloques del archivo
                 ListaEnlazada list = archivo.getBlockList();
-                //se insertaria siempre el nuevo bloque al final de la lsita
+                //se insertaria siempre el nuevo bloque al final de la lista
                 list.insertFinal(bloque.getIndex());
                 archivo.setBlockList(list);
+                
                 //se le setea el nombre del archivo
                 bloque.setNameArchivo(archivo.getName());
                 //se le cambia el estado del bloque de desocupado a ocupado para que no se pueda usar en el futuro 

@@ -14,5 +14,6 @@ public enum TipoPolitica {
     LIFO,
     SCAN,
     C_SCAN,
+    PA,
             
 }
