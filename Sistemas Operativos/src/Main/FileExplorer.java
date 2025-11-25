@@ -103,5 +103,54 @@ public class FileExplorer {
     public static void setPolitica(TipoPolitica politica) {
         FileExplorer.politica = politica;
     }
+
+    public static Cola getListo() {
+        return listo;
+    }
+
+    public static void setListo(Cola listo) {
+        FileExplorer.listo = listo;
+    }
+
+    public static Cola getColaListos() {
+        return colaListos;
+    }
+
+    public static void setColaListos(Cola colaListos) {
+        FileExplorer.colaListos = colaListos;
+    }
+
+    public static PCB getProcesoEnEjecucion() {
+        return procesoEnEjecucion;
+    }
+
+    public static void setProcesoEnEjecucion(PCB procesoEnEjecucion) {
+        FileExplorer.procesoEnEjecucion = procesoEnEjecucion;
+    }
+
+    public static Cola getColaBloqueados() {
+        return colaBloqueados;
+    }
+
+    public static void setColaBloqueados(Cola colaBloqueados) {
+        FileExplorer.colaBloqueados = colaBloqueados;
+    }
+
+    public static Cola getColaTerminado() {
+        return colaTerminado;
+    }
+
+    public static void setColaTerminado(Cola colaTerminado) {
+        FileExplorer.colaTerminado = colaTerminado;
+    }
+
+    public static long getReloj_global() {
+        return reloj_global;
+    }
+
+    public static void setReloj_global(long reloj_global) {
+        FileExplorer.reloj_global = reloj_global;
+    }
+    
     
 }

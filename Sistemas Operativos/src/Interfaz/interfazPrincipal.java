@@ -708,7 +708,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jLabel22 = new javax.swing.JLabel();
         jPanel24 = new javax.swing.JPanel();
         jLabel23 = new javax.swing.JLabel();
-        jPanel7 = new javax.swing.JPanel();
+        panelProcesos = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -1110,7 +1110,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jPanel2.add(panelDisco, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 520, 210));
 
         panelSD.addTab("SD", jPanel2);
-        panelSD.addTab("Procesos", jPanel7);
+        panelSD.addTab("Procesos", panelProcesos);
 
         panel1.add(panelSD, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 60, 520, 390));
 
@@ -1231,7 +1231,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
@@ -1246,6 +1245,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel lblbloquesLibres;
     private java.awt.Panel panel1;
     private javax.swing.JPanel panelDisco;
+    private javax.swing.JPanel panelProcesos;
     private javax.swing.JTabbedPane panelSD;
     private javax.swing.JPanel panelSDStats;
     private javax.swing.JTable tablaArchivos;
