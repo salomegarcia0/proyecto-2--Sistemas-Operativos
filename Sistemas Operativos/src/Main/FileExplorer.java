@@ -52,7 +52,7 @@ public class FileExplorer {
     }
     
     /*
-    Se seleccionaria un proceso
+    Se seleccionaria un proceso de la cola de listos segun la politica aplicada
     */
     public static void seleccionarProceso(){
         //si la cola de listos no esta vacio se selecciona un proceso en base a la politica
@@ -62,12 +62,14 @@ public class FileExplorer {
             El primer proceso en entrar es el primero en ser atendido
             */
             if (politica == TipoPolitica.FIFO){
+                System.out.println("Politica FIFO");
                 FileExplorer.setProcesoEnEjecucion(colaListos.desColarInicio());
                 
             /*
             El ultimo proceso en entrar es el primero en ser atendido    
             */    
             } else if (politica == TipoPolitica.LIFO){
+                System.out.println("Politica LIFO");
                 //se desencola el ultimo proceso que llego
                 FileExplorer.setProcesoEnEjecucion(colaListos.desColarFinal());
                 
@@ -75,6 +77,7 @@ public class FileExplorer {
             Esta politica elige un proceso de la cola de Listos aleatoriamente  
             */   
             } else if (politica == TipoPolitica.PA){
+                System.out.println("Politica PA");
                 Random rand = new Random();
                 //genera un valor random entre 0 y el tamaño de la lista menos 1
                 int numero = rand.nextInt(colaListos.getSize());
@@ -86,37 +89,72 @@ public class FileExplorer {
                este busca el bloque mas cercano al cabezal 
             */ 
             } else if (politica == TipoPolitica.SSTF){
+                System.out.println("Politica SSTF");
                 //obtengo el la ubicacion del bloque en el que se encuentra el cabezal
                 int ubicacion = SD.getLector().getElement().getIndex();
                 
-                //para saber la ubicacion del bloque disponible
+                //para saber el index actual en el recorrido
                 int index = 0;
-                
                 //Es para guardar el index de la distancia mas corta
                 int indexDistancia = 0;
+                
+                
                 // para el calculos de las distancias
-                int distancia = 0;
+                int distanciaCalculada = 0;
+                //para definir la distancia mas corta que se a encontrado hasta el momento, esta sera una variables de comparacion
+                //inicialmente tendra el valor más alto que sera el tamaño de SD menos 1
+                int distancia = SD.getSize() - 1;
                 
                 //obtengo la cabeza de la cola de listos
                 NodoProceso nodoProceso = colaListos.getHead();
                 
-                //recorreremos la lista en busqueda del 
+                //recorreremos la lista en busqueda del index mas cercano al cabezal 
                 while (nodoProceso != null ){
                     PCB proceso = nodoProceso.getProceso();
+                    //para los procesos CRUD LEER, MODIFICAR y ELIMINAR (ya que tienen la lista copia de la lista de bloques del archivo)
                     if(proceso.getTipoProceso() != TipoProceso.CREAR){
                         /*
                         la distancia va a ser igual a el index de la ubicacion del lector (ubicacion) menos el index
-                        del primer valor en la lista de
+                        del primer valor en la lista de bloques del PCB (que es una copia de la lista de bloques del archivo).
+                        RETORNA: esto retornara la distancia entre el cabezal y el bloque al que necesitaria acceder
                         */
-                        distancia = Math.abs(ubicacion - (int) proceso.getListaBloques().getHead().getElement());
-                    
-                    } else {
+                        distanciaCalculada = Math.abs(ubicacion - (int) proceso.getListaBloques().getHead().getElement());
                         
+                                            
+                    //para los procesos CRUD CREAR (ya que no hay una lista de bloques del archivo)
+                    } else {
+                        /*
+                        la distancia va a ser igual a el index de la ubicacion del lector (ubicacion) menos el index
+                        del bloque libre disponible.
+                        RETORNA: esto retornara la distancia entre el cabezal y el bloque al que necesitaria acceder
+                        */
+                        distanciaCalculada = Math.abs(ubicacion - bloqueDespejadoCercano());
                     }
                     
-                    //se para al siguiente
+                    //Se verifica si esta distancia calculada es menor a la distancia actual, si lo es la setea como el nuevo valor de distancia
+                    //si la distancia no es menor no tiene sentido que sea el valor a tomar
+                    
+                    if (distanciaCalculada < distancia){
+                        distancia = distanciaCalculada;
+                        indexDistancia = index;
+                    }        
+                    
+                    //si la distancia es cero, ese es el index mas optimo para el lector.
+                    if(distancia == 0){
+                        break;
+                    }
+                    
+                    //se para la siguiente comparacion
                     nodoProceso = nodoProceso.getNext();
+                    indexDistancia = indexDistancia + 1;
                 }
+                
+                System.out.println("Index del proceso seleccionado para SSTF: " + indexDistancia);
+                System.out.println("Distancia del cabezal: " + distancia);
+                
+                //una vez se haya encontrado el indexDistancia de proceso mas cercano al cabezal desencolamos de la cola de listos
+                //el proceso PCB que este en esa posicion para ser el nuevo proceso en ejecutar
+                FileExplorer.setProcesoEnEjecucion(colaListos.desColarIntermedio(indexDistancia));
                 
         
         
@@ -124,11 +162,14 @@ public class FileExplorer {
             
             */    
             } else if (politica == TipoPolitica.SCAN){
-            
+                System.out.println("Politica SCAN");
+                System.out.println("SCAN aun no hecho");
             /*
                 
             */
             } else if (politica == TipoPolitica.C_SCAN){
+                System.out.println("Politica C-SCAN");
+                System.out.println("C-SCAN aun no hecho");
                 
             }
             
@@ -138,6 +179,7 @@ public class FileExplorer {
             FileExplorer.setProcesoEnEjecucion(null);
         }
     }
+    
     
     /*
     Esto es solo para los caso de un PCB con operacion CREAR para la conseguir el bloque libre mas
@@ -197,6 +239,7 @@ public class FileExplorer {
             index = distanciaDer;
         }
         
+        System.out.println("Bloque mas cercano ubicado en el index " + index );
         return index;
     }        
 

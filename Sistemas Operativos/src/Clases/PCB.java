@@ -498,6 +498,7 @@ public class PCB {
     
     
     /*
+    NECESARIO APLICAR ESTA FUNCION LUEGO DE CREAR EL PCB
     Esto es para crear la copia de la lista de bloques del archivo al que se le realizara la operacion CRUD
     nota: no se crea una lista copia para las operaciones CRUD de CREAR
     */

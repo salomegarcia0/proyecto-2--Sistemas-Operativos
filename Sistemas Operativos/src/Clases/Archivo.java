@@ -25,6 +25,11 @@ public class Archivo {
     */
     private int countLectura;
     private int countModificar;
+    
+    /*
+    
+    */
+    private boolean eliminacion;
 
     public Archivo(String name, int size, ListaEnlazada blockList, Usuario usuario) {
         this.name = name;
@@ -32,6 +37,7 @@ public class Archivo {
         this.blockList = blockList;
         this.usuario = usuario;
         this.countLectura = this.countModificar = 0;
+        this.eliminacion =  false;
     }
     
     public void aplicarCambios(String nombreArchivo){
