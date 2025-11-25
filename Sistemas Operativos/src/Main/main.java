@@ -2,6 +2,11 @@ package Main;
 
 import Clases.CargadorSistema;
 import Clases.SistemaArchivos;
+import Clases.Usuario;
+import Clases.Archivo;
+import Estructuras.ListaEnlazada;
+import Estructuras.SD;
+import Tipos_de_Datos.*;
 import Interfaz.interfazPrincipal;
 
 /*
@@ -20,6 +25,27 @@ public class main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        System.out.println("PRUEBA");
+        Usuario user = new Usuario("Andrea",TipoUsuario.USER);
+        ListaEnlazada list = new ListaEnlazada();
+        list.insertFinal(2);
+        list.insertFinal(4);
+        list.insertFinal(8);
+        int size = list.getSize();
+        Archivo prueba = new Archivo("Prueba.txt", size, list, user);
+        
+        SD sd = new SD();
+        sd.crearSD(10);
+        FileExplorer.setSD(sd);
+        
+        SD sd2 = FileExplorer.getSD();
+        sd2.insertDataInIndex(prueba);
+        System.out.println("Bloques disponibles");
+        System.out.println(sd2.getSizeAvailable());
+        sd2.print();
+        
+        System.out.println("FIN DE PRUEBA");
+        
         SistemaArchivos sistema = CargadorSistema.cargarSistema();
         if (sistema == null){
             sistema = CargadorSistema.cargarSistemaVacio();

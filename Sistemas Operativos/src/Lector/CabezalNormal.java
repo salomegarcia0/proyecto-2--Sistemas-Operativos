@@ -8,6 +8,7 @@ import Estructuras.*;
 import Main.FileExplorer;
 /**
  * La lectura con la clase CabezalNormal es desde el inicio hasta el final del SD y una vez que llegue al final el cabezal vuelve
+ * al inicio sin realizar ninguna lectura en el camino de regreso
  * @author pjroj
  */
 public class CabezalNormal {
@@ -172,12 +173,15 @@ public class CabezalNormal {
                 list.deleteInIndex(bloque.getIndex());
                 archivo.setBlockList(list);
                 
+                //se reduce la cantidad de bloques en las que esta dividido el archivo
+                //archivo.setSize(archivo.getSize()-1);
+                
                 //se le cambia el estado del bloque de ocupado a desocupado para que se puedan guardar en el futuro 
                 bloque.setAvailable(true);
                 
                 System.out.println("Bloque " + bloque.getIndex() + " desocupado");
                 //se aumenta la cantidad de bloques disponibles en SD
-                SD.setSizeDisponible(SD.getSizeDisponible()+1);
+                SD.setSizeAvailable(SD.getSizeAvailable()+1);
                 //Como ya se realizo la respectiva operacion CRUD en el bloque se cambia a true
                 operacionRealizada = true; 
                 //si el contador de lecturas es igual a valor de nuestro IoCompletionTime, se cambia el valor del booleano a true, que indica
@@ -384,7 +388,7 @@ public class CabezalNormal {
                 bloque.setAvailable(false);
                 System.out.println("Bloque " + bloque.getIndex() + " ocupado");
                 //se disminuye la cantidad de bloques disponibles en SD
-                SD.setSizeDisponible(SD.getSizeDisponible()-1);
+                SD.setSizeAvailable(SD.getSizeAvailable()-1);
                 //Como ya se realizo la respectiva operacion CRUD en el bloque se cambia a true
                 operacionRealizada = true; 
                 //si el contador de lecturas es igual a valor de nuestro IoCompletionTime, se cambia el valor del booleano a true, que indica

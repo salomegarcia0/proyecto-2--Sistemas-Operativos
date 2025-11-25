@@ -70,8 +70,8 @@ public class Cola {
         size++;
     }
 
-    // Funcion para eliminar un proceso de la cola
-    public PCB desColar() {
+    // Funcion para eliminar un proceso al inicio de la cola 
+    public PCB desColarInicio() {
         if (isEmpty()) {
             System.out.println("La lista esta vacia");
             return null;
@@ -93,6 +93,63 @@ public class Cola {
         }
     }
     
+    // Funcion para eliminar un proceso al final de la cola 
+    public PCB desColarFinal() {
+        if (isEmpty()) {
+            System.out.println("La lista esta vacia");
+            return null;
+        } else {
+            NodoProceso pointer = getHead();
+            //me posiciono en el antepenultimo PCB de la cola
+            while (pointer.getNext() != getTail()){
+                pointer = pointer.getNext();
+            }
+            PCB proceso = getTail().getProceso();
+            if(pointer != getHead()){
+                setTail(pointer);
+                pointer.setNext(null);
+                size--;
+            }else {
+                setHead(null);
+                pointer.setNext(null);
+                setTail(null);
+                size--;
+            }
+            
+            return proceso;
+        }
+    }
+    
+    //index es ubicacion del proceso en la cola iniciado desde 0
+    public PCB desColarIntermedio(int index){
+        if (isEmpty()) {
+            System.out.println("La cola esta vacia");
+        } else {
+            if (index < 0) {
+                System.out.println("Index Error");
+            } else if (index >= size) {
+                System.out.println("Index Error");
+            } else if (index == 0) {
+                return desColarInicio();
+            } else if (index == size-1) {
+                return desColarFinal();
+            } else {
+                NodoProceso pointer = getHead();
+                int aux = 0; 
+                while (pointer.getNext() != null && aux < index - 1) {
+                    pointer = pointer.getNext();
+                    aux++;
+                }
+                NodoProceso pointer2 = pointer.getNext();
+                pointer.setNext(pointer2.getNext());
+                pointer2.setNext(null);
+                size--;
+                return pointer.getProceso();
+            }
+        }
+        return null;
+    }
+        
     public boolean isEmpty() {
         return getHead() == null && getTail() == null;
     }
@@ -108,7 +165,9 @@ public class Cola {
                 tproceso = "ELIMINAR";
             }else if (tipo == TipoProceso.MODIFICAR){
                 tproceso = "MODIFICAR";
-            } 
+            }else if (tipo == TipoProceso.LEER){
+                tproceso = "LEER";
+            }
             System.out.println("[ Id: "+ pointer.getProceso().getProcesoID() + " | Nombre: " + pointer.getProceso().getProcesoNombre()); 
             pointer = pointer.getNext();
         }

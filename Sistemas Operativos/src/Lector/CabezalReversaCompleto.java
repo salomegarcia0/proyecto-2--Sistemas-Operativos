@@ -3,26 +3,26 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Lector;
-import java.util.Random;
 import Clases.*;
 import Estructuras.*;
 import Main.FileExplorer;
 /**
- * La lectura con la clase CabezalReversa es tanto para adelante como para atras dependiendo de la ubicacion del bloque.
+ * La lectura con la clase CabezalNormal es desde el inicio hasta el final del SD y una vez que llegue al final el cabezal empieza a ir
+ * en reversa hasta llegar al inicio y volver de regreso y asi sucesivamente.
  * @author pjroj
  */
-public class CabezalReversa {
+public class CabezalReversaCompleto {
 
-    public CabezalReversa() {
+    public CabezalReversaCompleto() {
     }
     
     //NECESITO DOS VARIABLES BOOLEANAS, 1 PARA SABER SI SE INSCRIBIO EL EN BLOQUE O SIMPLEMENTE NO SE REALIZO NINGUN AVANCE DEBIDO A UN BLOQUEO
     
     public boolean modificarInfo(int index, String nameArchivo){
-        System.out.println("CRUD: Modificar (reversa)");        
+        System.out.println("CRUD: Modificar (reversa completo)");        
         //se pide el SD del FileExplorer (que es la clase Global), donde permanence los datos
         SD SD = FileExplorer.getSD();
-        //el nodo cabezal
+        
         NodoBloque cabezal = SD.getLector();
         //para obtener el valor que dura cada lectura
         int tiempoSimulado = FileExplorer.getCiclo_reloj();
@@ -30,15 +30,6 @@ public class CabezalReversa {
         boolean stopRead = false;
         //Booleano para saber si se realizo la operacion o no (el caso de no es cuando se bloqueo)
         boolean operacionRealizada = false;
-        //obtengo el la ubicacion del bloque ne el que se encuentra el cabezal
-        int ubicacion = cabezal.getElement().getIndex();
-        if (index < ubicacion){
-            //ira de derecha a izquiera
-            SD.setReversa(true);
-        } else if (index > ubicacion){
-            //ira de izquierda a derecha
-            SD.setReversa(false);
-        } 
         
         while (stopRead != false){
             //se pone en marca el hilo para simular el movimiento del cabezal en el disco SD
@@ -138,10 +129,9 @@ public class CabezalReversa {
     
     */
     public boolean eliminarInfo(int index, Archivo archivo){
-        System.out.println("CRUD: Eliminar (reversa)");
+        System.out.println("CRUD: Eliminar (reversa completo)");
         //se pide el SD del FileExplorer (que es la clase Global), donde permanence los datos
         SD SD = FileExplorer.getSD();
-        //el nodo cabezal
         NodoBloque cabezal = SD.getLector();
         //para obtener el valor que dura cada lectura
         int tiempoSimulado = FileExplorer.getCiclo_reloj();
@@ -149,15 +139,6 @@ public class CabezalReversa {
         boolean stopRead = false;
         //Booleano para saber si se realizo la operacion o no (el caso de no es cuando se bloqueo)
         boolean operacionRealizada = false;
-        //obtengo el la ubicacion del bloque ne el que se encuentra el cabezal
-        int ubicacion = cabezal.getElement().getIndex();
-        if (index < ubicacion){
-            //ira de derecha a izquiera
-            SD.setReversa(true);
-        } else if (index > ubicacion){
-            //ira de izquierda a derecha
-            SD.setReversa(false);
-        }
         
         while (stopRead != false){
             //se pone en marca el hilo para simular el movimiento del cabezal en el disco SD
@@ -266,10 +247,9 @@ public class CabezalReversa {
     }
     
     public boolean leerInfo(int index){
-        System.out.println("CRUD: Leer (reversa)");
+        System.out.println("CRUD: Leer (reversa completo)");
         //se pide el SD del FileExplorer (que es la clase Global), donde permanence los datos
         SD SD = FileExplorer.getSD();
-        //el nodo cabezal
         NodoBloque cabezal = SD.getLector();
         //para obtener el valor que dura cada lectura
         int tiempoSimulado = FileExplorer.getCiclo_reloj();
@@ -277,15 +257,6 @@ public class CabezalReversa {
         boolean stopRead = false;
         //Booleano para saber si se realizo la operacion o no (el caso de no es cuando se bloqueo)
         boolean operacionRealizada = false;
-        //obtengo el la ubicacion del bloque ne el que se encuentra el cabezal
-        int ubicacion = cabezal.getElement().getIndex();
-        if (index < ubicacion){
-            //ira de derecha a izquiera
-            SD.setReversa(true);
-        } else if (index > ubicacion){
-            //ira de izquierda a derecha
-            SD.setReversa(false);
-        } 
         
         while (stopRead != false){
             //se pone en marca el hilo para simular el movimiento del cabezal en el disco SD
@@ -375,10 +346,9 @@ public class CabezalReversa {
     }
     
     public boolean insertInfo(Archivo archivo){
-    System.out.println("CRUD: Insertar (reversa)");        
+    System.out.println("CRUD: Insertar (reversa completo)");        
         //se pide el SD del FileExplorer (que es la clase Global), donde permanence los datos
         SD SD = FileExplorer.getSD();
-        //el nodo cabezal
         NodoBloque cabezal = SD.getLector();
         //para obtener el valor que dura cada lectura
         int tiempoSimulado = FileExplorer.getCiclo_reloj();
@@ -386,61 +356,6 @@ public class CabezalReversa {
         boolean stopRead = false;
         //Booleano para saber si se realizo la operacion o no (el caso de no es cuando se bloqueo)
         boolean operacionRealizada = false;
-        //obtengo el la ubicacion del bloque en el que se encuentra el cabezal
-        int ubicacion = cabezal.getElement().getIndex();
-        //para saber la ubicacion del bloque disponible
-        int index = 0;
-        int distanciaDer;
-        int distanciaIzq;
-        //Nodos para conseguir el index mas cercano
-        NodoBloque nodoDer = SD.getLector();
-        NodoBloque nodoIzq = SD.getLector();
-        
-        //para IZQUIERDA
-        while(nodoIzq != null && nodoIzq.getElement().isAvailable() == false){
-            nodoIzq = nodoIzq.getPrevious();
-        }
-        if(nodoIzq != null){
-            distanciaIzq = nodoIzq.getElement().getIndex();
-        } else {
-            distanciaIzq = -1;
-        }
-        
-        //para DERECHA
-        while(nodoDer != null && nodoDer.getElement().isAvailable() == false){
-            nodoDer = nodoDer.getNext();
-        }
-        if(nodoDer != null){
-            distanciaDer = nodoDer.getElement().getIndex();
-        } else {
-            distanciaDer = -1;
-        }
-        
-        //solo hay espacio del lado derecho
-        if(distanciaIzq == -1){
-            index = distanciaDer;
-            SD.setReversa(false);
-        //solo hay espacio del lado izquierdo
-        } else if (distanciaDer == -1){
-            index = distanciaIzq;
-            SD.setReversa(true);
-        //la distancia es la misma, se hará de forma random la seleccion de la ubicacion entre estas dos index de distancias
-        } else if(Math.abs(ubicacion - distanciaIzq) == Math.abs(ubicacion - distanciaDer)){
-            Random rand = new Random();
-            boolean valor = rand.nextBoolean();
-            if (valor == true){
-                index = distanciaDer;
-                SD.setReversa(valor);
-            } else {
-                index = distanciaIzq;
-                SD.setReversa(valor);
-            }
-        } else if(Math.abs(ubicacion - distanciaIzq) < Math.abs(ubicacion - distanciaDer)){
-            index = distanciaIzq;
-        } else if(Math.abs(ubicacion - distanciaIzq) > Math.abs(ubicacion - distanciaDer)){
-            index = distanciaDer;
-        }
-        
         
         while (stopRead != false){
             //se pone en marca el hilo para simular el movimiento del cabezal en el disco SD
@@ -458,14 +373,15 @@ public class CabezalReversa {
             //al contador de lecturas se le suma una lectura 
             FileExplorer.setCountLecturas(FileExplorer.getCountLecturas()+1);
             System.out.println("Lecturas realizadas: " + FileExplorer.getCountLecturas());
-            //Se modifica el nombre del archivo por el nuevo
-            if (bloque.getIndex() == index){
+            //Condicion para saber si hay un espacio disponible, si encuentra un espacio disponible se realiza la insercion de la info
+            if (bloque.isAvailable() == true){
                 System.out.println("Insertando parte del archivo en el bloque " + bloque.getIndex() );
                 //se agrega la ubicacion del bloque a la lista de bloques del archivo
                 ListaEnlazada list = archivo.getBlockList();
                 //se insertaria siempre el nuevo bloque al final de la lsita
                 list.insertFinal(bloque.getIndex());
                 archivo.setBlockList(list);
+                
                 //se le setea el nombre del archivo
                 bloque.setNameArchivo(archivo.getName());
                 //se le cambia el estado del bloque de desocupado a ocupado para que no se pueda usar en el futuro 
