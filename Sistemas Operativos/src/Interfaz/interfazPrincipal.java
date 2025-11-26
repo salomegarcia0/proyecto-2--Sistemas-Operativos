@@ -958,7 +958,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
                     PCB ProcesoCrear = new PCB("crear_" + nombre, nombre, nuevoArchivo, TipoProceso.CREAR);
                     FileExplorer.agregarProcesoListo(ProcesoCrear);
                     //se elimina esa cantidad de bloques del SD
-                    FileExplorer.setBloquesDisponibles(FileExplorer.getBloquesDisponibles()-2);
+                    FileExplorer.setBloquesDisponibles(FileExplorer.getBloquesDisponibles()-size);
                     
 //                    System.out.println("cola listos " + FileExplorer.getColaListos().isEmpty());
 //                    System.out.println("cola bloqueados " + FileExplorer.getColaBloqueados().isEmpty());
@@ -973,7 +973,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
                     
                     //------------------------
                     Thread t1 = new Thread(() -> {
-                        System.out.println("hiloo");   
+                        System.out.println("hiloo modificar");   
                         //espera hasta que el proceso este listo   
                         while(ProcesoCrear.getEstadoActual() != EstadoProceso.TERMINADO){
                             try {
@@ -982,7 +982,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
                                 break;
                             }
                         }
-                        System.out.println("actualiceee");
+                        System.out.println("actualiceee modificar");
                         actualizarInterfazCompleta();
                         JOptionPane.showMessageDialog(this, "Archivo creado Exitosamente", "Exito", JOptionPane.INFORMATION_MESSAGE);
 

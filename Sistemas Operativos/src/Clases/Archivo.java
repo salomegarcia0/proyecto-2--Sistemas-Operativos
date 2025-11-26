@@ -5,6 +5,8 @@
 package Clases;
 
 import Estructuras.ListaEnlazada;
+import Main.FileExplorer;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -73,8 +75,9 @@ public class Archivo {
     public void aplicarEliminar(){
         if(blockList.isEmpty() == true){
             System.out.println("Se completo la eliminacion del archivo " + name);
-            System.out.println("FALTA ELIMINARLO DEL ARBOL PRIMERO Y LUEGO LA CLASE");
-            //AQUI FALTARIA VER COMO HACER PARA ELIMANAR ESTE ARCHIVO, NO COMO TAL LA CLASE SINO DEL ARBOL ANTES DE ELIMAR LA CLASE
+            //se elimina esa cantidad de bloques del SD
+            FileExplorer.setBloquesDisponibles(FileExplorer.getBloquesDisponibles()+size);
+            JOptionPane.showMessageDialog(null, "Archivo " + name + " a sido elimilinado\nBloques disponibles: " + FileExplorer.getBloquesDisponibles() , "Exito", JOptionPane.INFORMATION_MESSAGE);
         }
     }
     
