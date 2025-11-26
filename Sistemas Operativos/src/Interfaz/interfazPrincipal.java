@@ -997,21 +997,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
     }
 
     
-    private int contarBloquesDisponiblesReales(SD disco){
-        if (disco == null) return 0;
-        
-        int disponibles = 0;
-        NodoBloque actual = disco.getHead();
-        
-        while (actual != null){
-            if (actual.getElement().isAvailable()){
-                disponibles++;
-            }
-            actual = actual.getNext();
-        }
-        return disponibles;
-    }
-    
     private void crearDirectorio(DefaultMutableTreeNode parentNode){
 
         JTextField txtNombre = new JTextField();
@@ -1605,6 +1590,124 @@ public class interfazPrincipal extends javax.swing.JFrame {
             actual = actual.getNext();
         }
     }
+    
+    
+    private void leer(){
+        DefaultMutableTreeNode nodoSeleccionado = (DefaultMutableTreeNode) arbolSistema.getLastSelectedPathComponent();
+        if (nodoSeleccionado == null){
+            JOptionPane.showMessageDialog(this, "Seleccione un archivo para leer", "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        Object elemento = buscarElementoEnSistema(nodoSeleccionado);
+        if (elemento == null) {
+            System.out.println("ERROR: No se pudo encontrar el elemento en el sistema");
+            JOptionPane.showMessageDialog(this, "Error: No se pudo encontrar el elemento", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // verifica que sea un archivo 
+        if (!(elemento instanceof Archivo)) {
+            System.out.println("ERROR: Solo se pueden leer archivos");
+            JOptionPane.showMessageDialog(this, 
+                "Solo se pueden leer archivos\n", 
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        //permisos de lectur 
+        Archivo archivo = (Archivo) elemento;
+        if (!tienePermisosLectura(archivo)) {
+            System.out.println("ERROR: Usuario sin permisos para leer este archivo");
+            JOptionPane.showMessageDialog(this, 
+                "No tiene permisos para leer este archivo\n" +
+                "Solo puede leer archivos públicos o sus propios archivos", 
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        leerArchivo(archivo);
+    }
+    
+    private Directorio buscarDirectorioContenedor(Directorio directorioActual, Archivo archivoBuscado) {
+        if (directorioActual == null) return null;
+
+        //verifica si en este directorio etsa el archivo
+        if (directorioActual.getElementos() != null) {
+            Nodo aux = directorioActual.getElementos().getHead();
+            while (aux != null) {
+                Object elemento = aux.getElement();
+
+                if (elemento instanceof Archivo && elemento == archivoBuscado) {
+                    return directorioActual;
+                }
+
+                aux = aux.getNext();
+            }
+        }
+
+        //buscar recursivamente en subdirectorios
+        if (directorioActual.getElementos() != null) {
+            Nodo aux = directorioActual.getElementos().getHead();
+            while (aux != null) {
+                Object elemento = aux.getElement();
+
+                if (elemento instanceof Directorio) {
+                    Directorio encontrado = buscarDirectorioContenedor((Directorio) elemento, archivoBuscado);
+                    if (encontrado != null) {
+                        return encontrado;
+                    }
+                }
+
+                aux = aux.getNext();
+            }
+        }
+
+        return null;
+    }
+    
+    private boolean tienePermisosLectura(Archivo archivo) {
+
+        if (usuarioActual.getType().name().equals("ADMIN")) {
+            System.out.println("✓ ADMIN puede leer cualquier archivo");
+            return true;
+        }
+
+        boolean esPropietario = archivo.getUsuario().getName().equals(usuarioActual.getName());
+        boolean esDelAdmin = archivo.getUsuario().getName().equals("admin");
+
+        if (esPropietario) {
+            return true;
+        }
+
+        if (esDelAdmin) {
+            return true;
+        }
+        return false;
+    }
+    
+    private void leerArchivo(Archivo archivo) {
+
+        try {
+            //crear proceso de lectura
+            PCB procesoLeer = new PCB("leer_" + archivo.getName(), archivo.getName(), archivo, TipoProceso.LEER);
+            FileExplorer.agregarProcesoListo(procesoLeer);
+
+            JOptionPane.showMessageDialog(this, 
+                "Proceso de lectura creado exitosamente\n" +
+                "Archivo: " + archivo.getName() + "\n" +
+                "Tamaño: " + archivo.getSize() + " bloques\n" +
+                "El proceso se ha encolado para ejecución", 
+                "Proceso Creado", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception e) {
+            System.out.println("ERROR al crear proceso de lectura: " + e.getMessage());
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, 
+                "Error al crear proceso de lectura: " + e.getMessage(), 
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -2241,7 +2344,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_crear_btnMouseClicked
 
     private void leer_btnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_leer_btnMouseClicked
-        // TODO add your handling code here:
+        leer();
     }//GEN-LAST:event_leer_btnMouseClicked
 
     private void Modificar_btnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Modificar_btnMouseClicked
