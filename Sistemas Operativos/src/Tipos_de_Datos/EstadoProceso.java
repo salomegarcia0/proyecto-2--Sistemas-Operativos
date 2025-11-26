@@ -5,7 +5,7 @@
 package Tipos_de_Datos;
 
 /**
- *
+ *AHHH
  * @author pjroj
  */
 public enum EstadoProceso {
@@ -13,5 +13,6 @@ public enum EstadoProceso {
     LISTO,
     EJECUTANDO,
     BLOQUEADO,
-    TERMINADO
+    TERMINADO,
+    ERROR,
 }

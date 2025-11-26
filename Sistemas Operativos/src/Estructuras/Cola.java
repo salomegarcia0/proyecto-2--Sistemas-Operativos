@@ -6,6 +6,7 @@ package Estructuras;
 import Clases.PCB;
 import Tipos_de_Datos.*;
 /**
+ * AHHHH
  * Clase para crear colas para organizar los procesos
  * @author salom
  */
@@ -95,29 +96,55 @@ public class Cola {
     
     // Funcion para eliminar un proceso al final de la cola 
     public PCB desColarFinal() {
+//        if (isEmpty()) {
+//            System.out.println("La lista esta vacia");
+//            return null;
+//        } else {
+//            NodoProceso pointer = getHead();
+//            //me posiciono en el antepenultimo PCB de la cola
+//            while (pointer.getNext() != getTail()){
+//                pointer = pointer.getNext();
+//            }
+//            PCB proceso = getTail().getProceso();
+//            if(pointer != getHead()){
+//                setTail(pointer);
+//                pointer.setNext(null);
+//                size--;
+//            }else {
+//                setHead(null);
+//                pointer.setNext(null);
+//                setTail(null);
+//                size--;
+//            }
+//            
+//            return proceso;
+//        }
         if (isEmpty()) {
             System.out.println("La lista esta vacia");
             return null;
-        } else {
+        }
+        // Caso: solo un elemento
+            if (getHead() == getTail()) {
+                PCB proceso = getHead().getProceso();
+                setHead(null);
+                setTail(null);
+                size = 0;
+                return proceso;
+            }
+
+            // Caso: más de un elemento
             NodoProceso pointer = getHead();
-            //me posiciono en el antepenultimo PCB de la cola
-            while (pointer.getNext() != getTail()){
+            while (pointer.getNext() != getTail()) {
                 pointer = pointer.getNext();
             }
+
             PCB proceso = getTail().getProceso();
-            if(pointer != getHead()){
-                setTail(pointer);
-                pointer.setNext(null);
-                size--;
-            }else {
-                setHead(null);
-                pointer.setNext(null);
-                setTail(null);
-                size--;
-            }
-            
+            setTail(pointer);
+            pointer.setNext(null);
+            size--;
+
             return proceso;
-        }
+        
     }
     
     //index es ubicacion del proceso en la cola iniciado desde 0

@@ -14,7 +14,8 @@ public class Archivo {
     private String name;
     private int size; //cantidad de bloques es la que esta dividio o se dividira
     private ListaEnlazada blockList;
-    private Usuario usuario;  
+    private Usuario usuario; 
+    
     //
     
     /*
@@ -25,6 +26,12 @@ public class Archivo {
     */
     private int countLectura;
     private int countModificar;
+    
+    /*
+    
+    */
+    private boolean eliminacion;
+    private boolean crear;
 
     public Archivo(String name, int size, ListaEnlazada blockList, Usuario usuario) {
         this.name = name;
@@ -32,6 +39,7 @@ public class Archivo {
         this.blockList = blockList;
         this.usuario = usuario;
         this.countLectura = this.countModificar = 0;
+        this.eliminacion = this.crear =  false;
     }
     
     public void aplicarCambios(String nombreArchivo){
@@ -58,6 +66,7 @@ public class Archivo {
         if(blockList.getSize() == size){
             System.out.println("Se completo la creacion del archivo " + name);
             blockList.print();
+            crear =  true;
         }
     }
     
@@ -67,6 +76,10 @@ public class Archivo {
             System.out.println("FALTA ELIMINARLO DEL ARBOL PRIMERO Y LUEGO LA CLASE");
             //AQUI FALTARIA VER COMO HACER PARA ELIMANAR ESTE ARCHIVO, NO COMO TAL LA CLASE SINO DEL ARBOL ANTES DE ELIMAR LA CLASE
         }
+    }
+    
+    public boolean isProcesoEliminizacion(){
+        return size > blockList.getSize();
     }
 
     public String getName() {
@@ -123,6 +136,14 @@ public class Archivo {
     
     public boolean completeModificar(){
         return countModificar == size;
+    }
+
+    public boolean isCrear() {
+        return crear;
+    }
+
+    public void setCrear(boolean crear) {
+        this.crear = crear;
     }
         
     public String toString(){

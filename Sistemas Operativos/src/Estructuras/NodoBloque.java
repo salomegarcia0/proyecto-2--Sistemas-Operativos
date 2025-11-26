@@ -6,7 +6,7 @@ package Estructuras;
 import Clases.Bloque;
 
 /**
- *
+ *AHHH
  * @author pjroj
  */
 public class NodoBloque {

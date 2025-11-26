@@ -5,7 +5,7 @@
 package Estructuras;
 import Main.*;
 /**
- *
+ *AAAAA
  * @author pjroj
  */
 public class Hilo extends Thread {

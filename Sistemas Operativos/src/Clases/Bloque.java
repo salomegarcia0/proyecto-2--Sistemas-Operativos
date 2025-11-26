@@ -5,7 +5,7 @@
 package Clases;
 import Main.FileExplorer;
 /**
- *
+ *HOLA
  * @author pjroj
  */
 public class Bloque {

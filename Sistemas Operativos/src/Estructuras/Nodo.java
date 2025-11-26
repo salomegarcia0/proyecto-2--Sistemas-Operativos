@@ -5,7 +5,7 @@
 package Estructuras;
 
 /**
- *
+ *AHHHH
  * @author salom
  */
 public class Nodo {

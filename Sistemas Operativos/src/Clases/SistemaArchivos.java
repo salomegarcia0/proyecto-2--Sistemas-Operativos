@@ -5,7 +5,7 @@
 package Clases;
 
 /**
- *
+ *AHHHH
  * @author salom
  */
 public class SistemaArchivos {

@@ -5,7 +5,7 @@
 package Clases;
 import Tipos_de_Datos.TipoUsuario;
 /**
- *
+ *AHHHH
  * @author pjroj
  */
 public class Usuario {
