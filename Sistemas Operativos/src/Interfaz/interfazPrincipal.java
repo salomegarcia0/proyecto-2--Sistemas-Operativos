@@ -21,6 +21,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -720,7 +721,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
                     return;
                 }
                 
-                System.out.println("6. Creando archivo en memoria...");
+                System.out.println("Creando archivo en memoria");
                 Archivo nuevoArchivo = new Archivo(nombre, size, new ListaEnlazada(), usuarioActual);
                 
                 Directorio directorioPadre = encontrarDirectorioPorNodo(parentNode);
@@ -776,61 +777,137 @@ public class interfazPrincipal extends javax.swing.JFrame {
     }
     
     private void crearDirectorio(DefaultMutableTreeNode parentNode){
+
+        JTextField txtNombre = new JTextField();
+        JCheckBox chkPublico = new JCheckBox("Directorio público", true);
+    
+        Object[] message = {
+            "Nombre del directorio:", txtNombre,
+            chkPublico
+        };
         
-    }
+        int option = JOptionPane.showConfirmDialog(this, message, "Crear Directorio", JOptionPane.OK_CANCEL_OPTION);
+        
+        if(option == JOptionPane.OK_OPTION){
+            String nombre = txtNombre.getText().trim();
+            boolean esPublico = chkPublico.isSelected();
+
+            System.out.println("Datos ingresados - Nombre: '" + nombre + "', Público: " + esPublico);
+
+            if (nombre.isEmpty()){
+                System.out.println("ERROR: Nombre vacío");
+                JOptionPane.showMessageDialog(this, "Ingrese un nombre para el directorio", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try {
+                System.out.println("Creando directorio en memoria");
+                Directorio nuevoDirectorio = new Directorio(nombre, usuarioActual, esPublico);
+                System.out.println("Directorio creado: " + nuevoDirectorio.getName());
+
+                System.out.println("Buscando directorio padre...");
+                Directorio directorioPadre = encontrarDirectorioPorNodo(parentNode);
+
+                if (directorioPadre != null){
+                    System.out.println("Directorio padre encontrado: " + directorioPadre.getName());
+                    System.out.println("gregando directorio al directorio padre...");
+
+                    directorioPadre.agregarElemento(nuevoDirectorio);
+                    System.out.println("directorio agregado exitosamente");
+
+                    // DEBUG: Verificar contenido del directorio padre
+                    System.out.println("Contenido del directorio padre después de agregar:");
+                    Nodo aux = directorioPadre.getElementos().getHead();
+                    int contador = 0;
+                    while (aux != null) {
+                        Object elemento = aux.getElement();
+                        if (elemento instanceof Archivo) {
+                            System.out.println("    - Archivo: " + ((Archivo)elemento).getName());
+                        } else if (elemento instanceof Directorio) {
+                            System.out.println("    - Directorio: " + ((Directorio)elemento).getName());
+                        }
+                        aux = aux.getNext();
+                        contador++;
+                    }
+                    System.out.println("    Total de elementos: " + contador);
+
+                    System.out.println("Actualizando interfaz...");
+                    actualizarInterfazCompleta();
+
+                    //System.out.println("11. Guardando en JSON...");
+                    //guardarSistemaEnJSON();
+
+                    System.out.println("MOSTRANDO MENSAJE DE ÉXITO");
+                    JOptionPane.showMessageDialog(this, 
+                        "Directorio creado exitosamente\n" +
+                        "Nombre: " + nombre + "\n" +
+                        "Tipo: " + (esPublico ? "Público" : "Privado"), 
+                        "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+                } else {
+                    System.out.println("ERROR: directorioPadre es NULL");
+                    JOptionPane.showMessageDialog(this, "Error: No se pudo encontrar el directorio padre", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            
+            } catch (Exception e) {
+                System.out.println("ERROR GENERAL en crearDirectorio: " + e.getMessage());
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error al crear el directorio: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } 
+    }    
     
     private Directorio encontrarDirectorioPorNodo(DefaultMutableTreeNode node) {
     
-    if (node == null) {
-        System.out.println("ERROR: Nodo es null");
-        return null;
-    }
-    
-    String nombreNodo = node.getUserObject().toString();
-    System.out.println("Nombre del nodo: '" + nombreNodo + "'");
-    
-    // Si es el nodo raíz
-    if (nombreNodo.equals("root")) {
-        System.out.println("Es el nodo raíz, retornando sistema.getRoot()");
-        return sistema.getRoot();
-    }
-
-    Directorio resultado = buscarDirectorioRecursivo(sistema.getRoot(), nombreNodo);
-    
-    if (resultado != null) {
-        System.out.println("Directorio encontrado: " + resultado.getName());
-    } else {
-        System.out.println("Directorio NO encontrado: " + nombreNodo);
-        System.out.println("Directorios disponibles:");
-        listarDirectorios(sistema.getRoot(), 0);
-    }
-    
-    return resultado;
-}
-
-private Directorio buscarDirectorioRecursivo(Directorio actual, String nombreBuscado) {
-    if (actual == null) return null;
-    
-    if (actual.getName().equals(nombreBuscado)) {
-        return actual;
-    }
-
-    if (actual.getElementos() != null) {
-        Nodo aux = actual.getElementos().getHead();
-        while (aux != null) {
-            Object elemento = aux.getElement();
-            if (elemento instanceof Directorio) {
-                Directorio subDir = (Directorio) elemento;
-                Directorio encontrado = buscarDirectorioRecursivo(subDir, nombreBuscado);
-                if (encontrado != null) {
-                    return encontrado;
-                }
-            }
-            aux = aux.getNext();
+        if (node == null) {
+            System.out.println("ERROR: Nodo es null");
+            return null;
         }
+
+        String nombreNodo = node.getUserObject().toString();
+        System.out.println("Nombre del nodo: '" + nombreNodo + "'");
+
+        // Si es el nodo raíz
+        if (nombreNodo.equals("root")) {
+            System.out.println("Es el nodo raíz, retornando sistema.getRoot()");
+            return sistema.getRoot();
+        }
+
+        Directorio resultado = buscarDirectorioRecursivo(sistema.getRoot(), nombreNodo);
+
+        if (resultado != null) {
+            System.out.println("Directorio encontrado: " + resultado.getName());
+        } else {
+            System.out.println("Directorio NO encontrado: " + nombreNodo);
+            System.out.println("Directorios disponibles:");
+            listarDirectorios(sistema.getRoot(), 0);
+        }
+
+        return resultado;
     }
-    
-    return null;
+
+    private Directorio buscarDirectorioRecursivo(Directorio actual, String nombreBuscado) {
+        if (actual == null) return null;
+
+        if (actual.getName().equals(nombreBuscado)) {
+            return actual;
+        }
+
+        if (actual.getElementos() != null) {
+            Nodo aux = actual.getElementos().getHead();
+            while (aux != null) {
+                Object elemento = aux.getElement();
+                if (elemento instanceof Directorio) {
+                    Directorio subDir = (Directorio) elemento;
+                    Directorio encontrado = buscarDirectorioRecursivo(subDir, nombreBuscado);
+                    if (encontrado != null) {
+                        return encontrado;
+                    }
+                }
+                aux = aux.getNext();
+            }
+        }
+
+        return null;
     }
     
     private void listarDirectorios(Directorio dir, int nivel) {
