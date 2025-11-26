@@ -125,5 +125,7 @@ public class Archivo {
         return countModificar == size;
     }
         
-    
+    public String toString(){
+        return this.name;
+    }
 }
