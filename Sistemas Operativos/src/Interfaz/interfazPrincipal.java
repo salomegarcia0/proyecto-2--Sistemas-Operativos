@@ -374,6 +374,19 @@ public class interfazPrincipal extends javax.swing.JFrame {
         // hablar con andrea para hacerlo juntas !!!!!!
         
         System.out.println("Aplicando Politicaaaaaaaaaaaaaa");
+        if(politica == "FIFO"){
+            FileExplorer.setPolitica(TipoPolitica.FIFO);
+        } else if(politica == "LIFO"){
+            FileExplorer.setPolitica(TipoPolitica.LIFO);
+        } else if(politica == "SSTF"){
+            FileExplorer.setPolitica(TipoPolitica.SSTF);
+        } else if(politica == "PA"){
+            FileExplorer.setPolitica(TipoPolitica.PA);
+        }
+            System.out.println("FIFO activado " + (FileExplorer.getPolitica() == TipoPolitica.FIFO));
+            System.out.println("LIFO activado " + (FileExplorer.getPolitica() == TipoPolitica.LIFO));
+            System.out.println("SSTF activado " + (FileExplorer.getPolitica() == TipoPolitica.SSTF));
+            System.out.println("PA activado " + (FileExplorer.getPolitica() == TipoPolitica.PA));
     }
     
     private void aplicarPoliticaSeleccionada(){
@@ -960,7 +973,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
                     
                     //------------------------
                     Thread t1 = new Thread(() -> {
-                         System.out.println("hiloo");   
+                        System.out.println("hiloo");   
                         //espera hasta que el proceso este listo   
                         while(ProcesoCrear.getEstadoActual() != EstadoProceso.TERMINADO){
                             try {
