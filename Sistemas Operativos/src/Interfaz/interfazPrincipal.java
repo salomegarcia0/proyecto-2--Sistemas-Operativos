@@ -20,6 +20,10 @@ import Estructuras.SD;
 import Tipos_de_Datos.*;
 import Main.FileExplorer;
 import Tipos_de_Datos.TipoProceso;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -867,6 +871,120 @@ public class interfazPrincipal extends javax.swing.JFrame {
     //===================================================================
     //CRUD ACCCIONES PARA LA INTERFAZ
     
+    
+    private void guardarSistemaEnJSON() {
+
+        try {
+            //crear el objeto JSON principal
+            JsonObject jsonPrincipal = new JsonObject();
+
+            //guardar usuarios
+            JsonArray jsonUsuarios = new JsonArray();
+            if (sistema.getUsuarios() != null) {
+                for (Usuario usuario : sistema.getUsuarios()) {
+                    JsonObject jsonUsuario = new JsonObject();
+                    jsonUsuario.addProperty("nombre", usuario.getName());
+                    jsonUsuario.addProperty("tipo", usuario.getType().name());
+                    jsonUsuarios.add(jsonUsuario);
+                    System.out.println("Usuario guardado: " + usuario.getName() + " - " + usuario.getType().name());
+                }
+            }
+            jsonPrincipal.add("usuarios", jsonUsuarios);
+
+            //guardar sistema de archivos
+            if (sistema.getRoot() != null) {
+                JsonObject jsonSistemaArchivos = construirJSONDirectorio(sistema.getRoot());
+                jsonPrincipal.add("sistemaArchivos", jsonSistemaArchivos);
+                System.out.println("Estructura de archivos guardada");
+            } else {
+                System.out.println("Root es null, no se guardo estructura de archivos");
+            }
+
+            //convertir a string JSON
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String jsonString = gson.toJson(jsonPrincipal);
+
+            //guardar en archivo
+            String filePath = "src/recursos/sistema_Archivos.json";
+            java.nio.file.Path path = java.nio.file.Paths.get(filePath);
+
+            //crear directorios si no existen
+            java.nio.file.Files.createDirectories(path.getParent());
+
+            //escribir archivo
+            java.nio.file.Files.write(path, jsonString.getBytes(), 
+                java.nio.file.StandardOpenOption.CREATE, 
+                java.nio.file.StandardOpenOption.TRUNCATE_EXISTING);
+
+        } catch (Exception e) {
+            System.out.println("ERROR al guardar en JSON: " + e.getMessage());
+            e.printStackTrace();
+
+            JOptionPane.showMessageDialog(this, 
+                "Error al guardar los cambios:\n" + e.getMessage(), 
+                "Error de Guardado", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private JsonObject construirJSONDirectorio(Directorio dir) {
+
+        JsonObject jsonDir = new JsonObject();
+        jsonDir.addProperty("nombre", dir.getName());
+        jsonDir.addProperty("usuario", dir.getUsuario().getName());
+        jsonDir.addProperty("size", dir.getSize());
+        jsonDir.addProperty("cantidadArchivos", dir.getCantidadArchivos());
+        jsonDir.addProperty("cantidadSubDir", dir.getCantidadSubDir());
+        jsonDir.addProperty("esPublico", dir.isEsPublico());
+
+        JsonArray jsonContenido = new JsonArray();
+
+        if (dir.getElementos() != null) {
+            Nodo aux = dir.getElementos().getHead();
+            int contadorElementos = 0;
+
+            while (aux != null) {
+                Object elemento = aux.getElement();
+
+                if (elemento instanceof Directorio) {
+                    JsonObject jsonSubDir = construirJSONDirectorio((Directorio) elemento);
+                    jsonSubDir.addProperty("tipo", "DIRECTORIO");
+                    jsonContenido.add(jsonSubDir);
+                    contadorElementos++;
+
+                } else if (elemento instanceof Archivo) {
+                    Archivo archivo = (Archivo) elemento;
+                    JsonObject jsonArchivo = new JsonObject();
+                    jsonArchivo.addProperty("tipo", "ARCHIVO");
+                    jsonArchivo.addProperty("name", archivo.getName());
+                    jsonArchivo.addProperty("size", archivo.getSize());
+                    jsonArchivo.addProperty("usuario", archivo.getUsuario().getName());
+
+                    //guardar lista de bloques
+                    JsonArray jsonBloques = new JsonArray();
+                    if (archivo.getBlockList() != null && archivo.getBlockList().getHead() != null) {
+                        Nodo nodoBloque = archivo.getBlockList().getHead();
+                        while (nodoBloque != null) {
+                            if (nodoBloque.getElement() instanceof Integer) {
+                                jsonBloques.add((Integer) nodoBloque.getElement());
+                            }
+                            nodoBloque = nodoBloque.getNext();
+                        }
+                    }
+                    jsonArchivo.add("blockList", jsonBloques);
+
+                    jsonContenido.add(jsonArchivo);
+                    contadorElementos++;            
+                }
+
+                aux = aux.getNext();
+            }
+        }
+
+        jsonDir.add("contenido", jsonContenido);
+        return jsonDir;
+    }
+    
+    
     private void crear(){
         
         if (usuarioActual == null || (!usuarioActual.getType().name().equals("ADMIN") && !usuarioActual.getType().name().equals("USER"))){
@@ -985,7 +1103,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
                         System.out.println("actualiceee");
                         actualizarInterfazCompleta();
                         JOptionPane.showMessageDialog(this, "Archivo creado Exitosamente", "Exito", JOptionPane.INFORMATION_MESSAGE);
-
+                        guardarSistemaEnJSON();
                     });
                     t1.start();
 
@@ -1050,8 +1168,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
 
                     actualizarInterfazCompleta();
 
-                    //System.out.println("Guardando en JSON...");
-                    //guardarSistemaEnJSON();
+                    guardarSistemaEnJSON();
 
                     JOptionPane.showMessageDialog(this, 
                         "Directorio creado exitosamente\n" +
@@ -1192,7 +1309,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
                 actualizarInterfazCompleta();
 
                 // guardar en JSON
-                //guardarSistemaEnJSON();
+                guardarSistemaEnJSON();
 
                 System.out.println("Modificacion completada exitosamente");
                 JOptionPane.showMessageDialog(this, 
@@ -1249,7 +1366,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
             actualizarInterfazCompleta();
 
             // Guardar en JSON
-            //guardarSistemaEnJSON();
+            guardarSistemaEnJSON();
 
             System.out.println("Directorio modificado exitosamente");
 
@@ -1465,7 +1582,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
             actualizarInterfazCompleta();
 
             // Guardar en JSON
-            //guardarSistemaEnJSON();
+            guardarSistemaEnJSON();
 
             System.out.println("Eliminación completada exitosamente");
             JOptionPane.showMessageDialog(this, 
@@ -1507,7 +1624,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
             actualizarInterfazCompleta();
 
             // Guardar en JSON
-            //guardarSistemaEnJSON();
+            guardarSistemaEnJSON();
 
             System.out.println("Eliminación de directorio completada exitosamente");
             JOptionPane.showMessageDialog(this, 
