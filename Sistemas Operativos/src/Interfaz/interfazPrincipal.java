@@ -10,18 +10,23 @@ import Clases.CargadorSistema;
 import Clases.Directorio;
 import Clases.SistemaArchivos;
 import Clases.Usuario;
+import Clases.PCB;
 import Estructuras.Nodo;
 import Estructuras.NodoBloque;
+import Estructuras.NodoProceso;
 import Estructuras.SD;
+import Tipos_de_Datos.*;
 import Main.FileExplorer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GridLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.table.DefaultTableModel;
 
@@ -56,6 +61,13 @@ public class interfazPrincipal extends javax.swing.JFrame {
         actualizarComboUsuarios();
         actualizarComboPoliticas();
         
+//        //Cada segundo se estarán actualizando los datos en las colas
+//        Timer timerColas = new Timer(1000, e -> {
+//            ColaListosMostrar();
+//            ColaBloqueadosMostrar();
+//            EjecutadoMostrar();
+//        });
+//        timerColas.start();   
         
     }
     
@@ -82,9 +94,8 @@ public class interfazPrincipal extends javax.swing.JFrame {
         comboPoliticas.removeAllItems();
         comboPoliticas.addItem("FIFO");
         comboPoliticas.addItem("LIFO");
-        comboPoliticas.addItem("C-SCAN");
-        comboPoliticas.addItem("SCAN");
         comboPoliticas.addItem("SSTF");
+        comboPoliticas.addItem("PA");
         
         comboPoliticas.setSelectedItem("FIFO");
     }
@@ -540,7 +551,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         return ocupados;
     }
     
-    
+ 
     
     
     //DEBUG BORRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
@@ -630,7 +641,136 @@ public class interfazPrincipal extends javax.swing.JFrame {
         }
     }
 
+    private void ColaListosMostrar(){
+        NodoProceso pListo = FileExplorer.getColaListos().getHead();
+        //configuraciones del panel de fondo del scrollball
+        JPanel panelScrollbar =  new JPanel ();
+        String tipoProceso = "";
+        panelScrollbar.setBackground(Color.decode("#FFFFFF"));
+        if(!FileExplorer.getColaListos().isEmpty()){
+            while (pListo != null){
+                JPanel p =  new JPanel (new GridLayout(0, 1));
+                //configuraciones de diseño del proceso
+                p.setBackground(Color.decode("#C6DFB9"));
+                p.setSize(150,300);
+                p.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+                //ID del proceso
+                JLabel id = new JLabel(Integer.toString(pListo.getProceso().getProcesoID()));
+                id.setFont(id.getFont().deriveFont(10f));
+                p.add(id,BorderLayout.CENTER);
+                //Nombre del proceso
+                JLabel proceso = new JLabel(pListo.getProceso().getProcesoNombre());
+                proceso.setFont(proceso.getFont().deriveFont(10f));
+                p.add(proceso, BorderLayout.CENTER);
+                //Tipo del proceso
+                if (pListo.getProceso().getTipoProceso() == TipoProceso.CREAR){
+                    tipoProceso = "CREAR";
+                } else if (pListo.getProceso().getTipoProceso() == TipoProceso.MODIFICAR){
+                    tipoProceso = "MODIFICAR";
+                } else if (pListo.getProceso().getTipoProceso() == TipoProceso.LEER){
+                    tipoProceso = "LEER";
+                } else {
+                    tipoProceso = "ELIMINAR";
+                }
+                JLabel tipo = new JLabel(tipoProceso);
+                tipo.setFont(tipo.getFont().deriveFont(10f));
+                p.add(tipo, BorderLayout.CENTER);
+                //PC y MAR
+                JLabel tiempo = new JLabel("Tiempo: " + Long.toString(pListo.getProceso().getTiempoEnCPU()));
+                tiempo.setFont(tiempo.getFont().deriveFont(10f));
+                p.add(tiempo, BorderLayout.CENTER);
 
+                //se agrega al scrollbar
+                panelScrollbar.add(p);
+
+                pListo = pListo.getNext();
+            } 
+            jScrollPaneListo.setViewportView(panelScrollbar);
+        }
+        
+    }
+    
+    private void ColaBloqueadosMostrar(){
+        NodoProceso pListo = FileExplorer.getColaBloqueados().getHead();
+        //configuraciones del panel de fondo del scrollball
+        JPanel panelScrollbar =  new JPanel ();
+        String tipoProceso = "";
+        panelScrollbar.setBackground(Color.decode("#FFFFFF"));
+        if(!FileExplorer.getColaListos().isEmpty()){
+            while (pListo != null){
+                JPanel p =  new JPanel (new GridLayout(0, 1));
+                //configuraciones de diseño del proceso
+                p.setBackground(Color.decode("#C6DFB9"));
+                p.setSize(150,300);
+                p.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+                //ID del proceso
+                JLabel id = new JLabel(Integer.toString(pListo.getProceso().getProcesoID()));
+                id.setFont(id.getFont().deriveFont(10f));
+                p.add(id,BorderLayout.CENTER);
+                //Nombre del proceso
+                JLabel proceso = new JLabel(pListo.getProceso().getProcesoNombre());
+                proceso.setFont(proceso.getFont().deriveFont(10f));
+                p.add(proceso, BorderLayout.CENTER);
+                //Tipo del proceso
+                if (pListo.getProceso().getTipoProceso() == TipoProceso.CREAR){
+                    tipoProceso = "CREAR";
+                } else if (pListo.getProceso().getTipoProceso() == TipoProceso.MODIFICAR){
+                    tipoProceso = "MODIFICAR";
+                } else if (pListo.getProceso().getTipoProceso() == TipoProceso.LEER){
+                    tipoProceso = "LEER";
+                } else {
+                    tipoProceso = "ELIMINAR";
+                }
+                JLabel tipo = new JLabel(tipoProceso);
+                tipo.setFont(tipo.getFont().deriveFont(10f));
+                p.add(tipo, BorderLayout.CENTER);
+                //PC y MAR
+                JLabel tiempo = new JLabel("Tiempo: " + Long.toString(pListo.getProceso().getTiempoEnCPU()));
+                tiempo.setFont(tiempo.getFont().deriveFont(10f));
+                p.add(tiempo, BorderLayout.CENTER);
+
+                //se agrega al scrollbar
+                panelScrollbar.add(p);
+
+                pListo = pListo.getNext();
+            } 
+            jScrollPaneBloqueado.setViewportView(panelScrollbar);
+        }
+        
+    }
+    
+    private void EjecutadoMostrar(){
+        
+        PCB pEjecutado = FileExplorer.getProcesoEnEjecucion();
+        if(pEjecutado != null){
+            //configuraciones para el proceso que se esta ejecutando
+            idProceso.setText(Integer.toString(pEjecutado.getProcesoID()));
+            nombreProceso.setText(pEjecutado.getProcesoNombre());
+
+            TipoProceso tipo = pEjecutado.getTipoProceso();
+            String mensaje = "";
+            //Tipo del proceso
+            if (tipo == TipoProceso.CREAR){
+                mensaje = "CREAR";
+            } else if (tipo == TipoProceso.MODIFICAR){
+                mensaje = "MODIFICAR";
+            } else if (tipo == TipoProceso.LEER){
+                mensaje = "LEER";
+            } else {
+                mensaje = "ELIMINAR";
+            }
+            tipoProceso.setText(mensaje);
+            Tiempo.setText(pEjecutado.getTiempoEnCPU()+" ms");
+            
+            
+        }else if(pEjecutado == null){
+            idProceso.setText("000000");
+            nombreProceso.setText("vacio");
+            tipoProceso.setText("----");
+            Tiempo.setText("00 ms");
+        }
+    }
+        
       
     /**
      * This method is called from within the constructor to initialize the form.
@@ -708,7 +848,23 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jLabel22 = new javax.swing.JLabel();
         jPanel24 = new javax.swing.JPanel();
         jLabel23 = new javax.swing.JLabel();
-        panelProcesos = new javax.swing.JPanel();
+        jScrollPaneProcesos = new javax.swing.JScrollPane();
+        jPanel7 = new javax.swing.JPanel();
+        jScrollPaneCompletado = new javax.swing.JScrollPane();
+        jScrollPaneListo = new javax.swing.JScrollPane();
+        jPanel12 = new javax.swing.JPanel();
+        jLabel10 = new javax.swing.JLabel();
+        idProceso = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        nombreProceso = new javax.swing.JLabel();
+        jLabel24 = new javax.swing.JLabel();
+        tipoProceso = new javax.swing.JLabel();
+        Tiempo = new javax.swing.JLabel();
+        jLabel26 = new javax.swing.JLabel();
+        jLabel25 = new javax.swing.JLabel();
+        jLabel27 = new javax.swing.JLabel();
+        jLabel28 = new javax.swing.JLabel();
+        jScrollPaneBloqueado = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -1110,7 +1266,87 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jPanel2.add(panelDisco, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 520, 210));
 
         panelSD.addTab("SD", jPanel2);
-        panelSD.addTab("Procesos", panelProcesos);
+
+        jScrollPaneProcesos.setBackground(new java.awt.Color(255, 255, 255));
+
+        jPanel7.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jPanel7.add(jScrollPaneCompletado, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 350, 470, 100));
+        jPanel7.add(jScrollPaneListo, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 200, 470, 100));
+
+        jPanel12.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel12.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 4, true));
+        jPanel12.setForeground(new java.awt.Color(0, 0, 0));
+        jPanel12.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel10.setText("ID:");
+        jPanel12.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 20, 30, 20));
+
+        idProceso.setForeground(new java.awt.Color(0, 0, 0));
+        idProceso.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        idProceso.setText("000000");
+        jPanel12.add(idProceso, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 20, 80, 20));
+
+        jLabel13.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel13.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel13.setText("Nombre:");
+        jPanel12.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, 60, 20));
+
+        nombreProceso.setForeground(new java.awt.Color(0, 0, 0));
+        nombreProceso.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        nombreProceso.setText("vacio");
+        jPanel12.add(nombreProceso, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 40, 80, 20));
+
+        jLabel24.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel24.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel24.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel24.setText("Tipo:");
+        jPanel12.add(jLabel24, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 60, 40, 20));
+
+        tipoProceso.setForeground(new java.awt.Color(0, 0, 0));
+        tipoProceso.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        tipoProceso.setText("-----");
+        jPanel12.add(tipoProceso, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 60, 80, 20));
+
+        Tiempo.setForeground(new java.awt.Color(0, 0, 0));
+        Tiempo.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        Tiempo.setText("00 ms");
+        jPanel12.add(Tiempo, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 80, 70, 20));
+
+        jLabel26.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel26.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel26.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel26.setText("Tiempo:");
+        jPanel12.add(jLabel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, 60, 20));
+
+        jPanel7.add(jPanel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 180, 130));
+
+        jLabel25.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel25.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel25.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel25.setText("COLA COMPLETADO");
+        jPanel7.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 320, 140, -1));
+
+        jLabel27.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel27.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel27.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel27.setText("COLA LISTO");
+        jPanel7.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 170, -1, -1));
+
+        jLabel28.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel28.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel28.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel28.setText("COLA BLOQUEADO");
+        jPanel7.add(jLabel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 470, 140, -1));
+        jPanel7.add(jScrollPaneBloqueado, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 500, 470, 100));
+
+        jScrollPaneProcesos.setViewportView(jPanel7);
+
+        panelSD.addTab("Procesos", jScrollPaneProcesos);
 
         panel1.add(panelSD, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 60, 520, 390));
 
@@ -1186,13 +1422,17 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel Eliminar_btn;
     private javax.swing.JLabel Leer_btn;
     private javax.swing.JLabel Modificar_btn;
+    private javax.swing.JLabel Tiempo;
     private javax.swing.JTree arbolSistema;
     private javax.swing.JComboBox<String> comboPoliticas;
     private javax.swing.JComboBox<String> comboUsuarios;
     private javax.swing.JLabel crear_btn;
+    private javax.swing.JLabel idProceso;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
@@ -1204,6 +1444,11 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
+    private javax.swing.JLabel jLabel27;
+    private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -1214,6 +1459,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
@@ -1231,10 +1477,15 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPaneBloqueado;
+    private javax.swing.JScrollPane jScrollPaneCompletado;
+    private javax.swing.JScrollPane jScrollPaneListo;
+    private javax.swing.JScrollPane jScrollPaneProcesos;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JLabel lbl1;
@@ -1243,12 +1494,13 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel lblBloquesOcupados;
     private javax.swing.JLabel lblBloquesTotales;
     private javax.swing.JLabel lblbloquesLibres;
+    private javax.swing.JLabel nombreProceso;
     private java.awt.Panel panel1;
     private javax.swing.JPanel panelDisco;
-    private javax.swing.JPanel panelProcesos;
     private javax.swing.JTabbedPane panelSD;
     private javax.swing.JPanel panelSDStats;
     private javax.swing.JTable tablaArchivos;
+    private javax.swing.JLabel tipoProceso;
     private javax.swing.JLabel usuarioEnUso;
     // End of variables declaration//GEN-END:variables
 }

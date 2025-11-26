@@ -42,9 +42,27 @@ public class FileExplorer {
     private static long reloj_global;
     
     
+    public static void Simulacion(){
+        Thread t1 = new Thread(() -> funcionEjecucion());
+        Thread t2 = new Thread(() -> funcionBloqueados());
+        //inicia ambos en paralelo   
+        t1.start();
+        t2.start();    
+    }
     
     
+    static void funcionEjecucion(){
+        while (colaListos.isEmpty() != true && procesoEnEjecucion != null && colaBloqueados.isEmpty() != true ){
+            seleccionarProceso();
+            ejecutarProceso();
+        }
+    }
     
+    static void funcionBloqueados(){
+        while (colaListos.isEmpty() != true && procesoEnEjecucion != null && colaBloqueados.isEmpty() != true ){
+            moverBloqueadoAListo();
+        }
+    }
     
     
     //----------------------------------------------------------------
@@ -54,6 +72,7 @@ public class FileExplorer {
     public static void agregarProcesoListo(PCB proceso){
         //Primero se cambia el estado del proceso a 
         proceso.setEstadoActual(EstadoProceso.LISTO);
+        proceso.creaListaCopia();
         colaListos.enColar(proceso);
         
     }
@@ -444,6 +463,8 @@ public class FileExplorer {
     */
     public static void moverBloqueadoAListo(){
         if (!colaBloqueados.isEmpty()){
+            //se desencola el proceso de la cola de bloqueados.
+            PCB procesoReanudando = colaBloqueados.desColarInicio();
             //simula el tiempo de bloqueado del proceso PCB
             try {
                 //el tiempo simulado va a ser cuandos ciclos (lecturas) dede pasar el PCB multiplicados por la duracion de cada
@@ -453,8 +474,6 @@ public class FileExplorer {
             } catch (InterruptedException e) {
                     e.printStackTrace();
             }
-            //se desencola el proceso de la cola de bloqueados.
-            PCB procesoReanudando = colaBloqueados.desColarInicio();
             //se le cambia el estado del proceso a LISTO
             procesoReanudando.setEstadoActual(EstadoProceso.LISTO);
             //se encola el proceso de regreso a la cola de listos.
