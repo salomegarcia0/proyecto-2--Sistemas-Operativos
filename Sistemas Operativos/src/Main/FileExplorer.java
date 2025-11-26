@@ -660,4 +660,25 @@ public class FileExplorer {
     }
     
     
+     public static void inicializarColasProcesos() {
+        System.out.println("=== INICIALIZANDO COLAS DE PROCESOS ===");
+        
+        if (colaListos == null) {
+            colaListos = new Cola("Listos");
+            System.out.println("Cola Listos inicializada");
+        }
+        
+        if (colaBloqueados == null) {
+            colaBloqueados = new Cola("Bloqueados");
+            System.out.println("Cola Bloqueados inicializada");
+        }
+        
+        if (colaTerminado == null) {
+            colaTerminado = new Cola("Terminados");
+            System.out.println("Cola Terminados inicializada");
+        }
+        
+    }
+    
+    
 }

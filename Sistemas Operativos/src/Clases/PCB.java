@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import Tipos_de_Datos.*;
 import Estructuras.*;
 import Main.FileExplorer;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Clase para crear los procesos de la simualacion
@@ -39,12 +40,14 @@ public class PCB {
     los tiempos del ciclo de reloj para ello, todo en ms
     */
     private long tiempoEnCPU;     
-
+    
+    private static int contadorID = 1;
+   
     /*
     String nombreArchivo (es el nuevo nombre del archivo,se cambia para la operacion modificar, de resto sera el mismo nombre del archivo)
     */
-    public PCB(int procesoID, String procesoNombre, String nombreArchivo, Archivo archivo, TipoProceso tipoProceso) {
-        this.procesoID = procesoID;
+    public PCB(String procesoNombre, String nombreArchivo, Archivo archivo, TipoProceso tipoProceso) {
+        this.procesoID = contadorID++;
         this.procesoNombre = procesoNombre;
         this.nombreArchivo = nombreArchivo;
         this.archivo = archivo;
@@ -527,6 +530,11 @@ public class PCB {
         if (estadoActual == EstadoProceso.BLOQUEADO){
             estadoActual = EstadoProceso.LISTO;
         }
+    }
+    
+    public int generarIDProceso(){
+        int procesoID = ThreadLocalRandom.current().nextInt(111111, 999999);
+        return procesoID;
     }
     
     public int getProcesoID() {

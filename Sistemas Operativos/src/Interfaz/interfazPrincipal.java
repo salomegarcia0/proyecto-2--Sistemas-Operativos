@@ -8,27 +8,34 @@ import Clases.Archivo;
 import Clases.Bloque;
 import Clases.CargadorSistema;
 import Clases.Directorio;
+import Clases.PCB;
 import Clases.SistemaArchivos;
 import Clases.Usuario;
 import Clases.PCB;
+import Estructuras.ListaEnlazada;
 import Estructuras.Nodo;
 import Estructuras.NodoBloque;
 import Estructuras.NodoProceso;
 import Estructuras.SD;
 import Tipos_de_Datos.*;
 import Main.FileExplorer;
+import Tipos_de_Datos.TipoProceso;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
  *
@@ -49,6 +56,8 @@ public class interfazPrincipal extends javax.swing.JFrame {
             disco.crearSD(15);
             FileExplorer.setSD(disco);
         }
+        
+        FileExplorer.inicializarColasProcesos();
         
         initComponents();
         cargarArbol();
@@ -311,12 +320,15 @@ public class interfazPrincipal extends javax.swing.JFrame {
     }
     
     private void cargarTablaArchivosFiltrada(){
-        modeloTablaArchivos = new DefaultTableModel(new Object[]{"Nombre", "Tamaño", "Primer Bloque", "Bloques", "Color"}, 0);
+        modeloTablaArchivos = new DefaultTableModel(new Object[]{"Nombre", "Tamaño", "Primer Bloque", "Bloques", "Usuario"}, 0);
         
-        tablaArchivos.setModel(modeloTablaArchivos);
-        
-        if (sistema != null && sistema.getRoot() != null){
-            llenarTablaFiltrada(sistema.getRoot(), modeloTablaArchivos);
+        if(tablaArchivos != null){
+            
+            tablaArchivos.setModel(modeloTablaArchivos);
+            
+            if (sistema != null && sistema.getRoot() != null){
+                llenarTablaFiltrada(sistema.getRoot(), modeloTablaArchivos);
+            }
         }
     }
     
@@ -346,7 +358,12 @@ public class interfazPrincipal extends javax.swing.JFrame {
         
         generarBloquesSD();
         
+        repaint();
+        revalidate();
+        
     }
+    
+    //==========================================================================
     
     //POLITICASSSS
     private void aplicarPoliticaEnSistema(String politica){
@@ -366,7 +383,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         
         aplicarPoliticaEnSistema(politicaSeleccionada);
     }
-    
+//=================================================================================================  
     private void cargarDatosEnSD(){
         SD disco = FileExplorer.getSD();
         if (disco == null){
@@ -436,6 +453,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         }
     }
     
+    //==========================================================================
     //2DA PESTAÑA DEL TABBED PANE, SD, ACÁ SERÁN VISIBLES LOS BLOQUES
     private void generarBloquesSD(){
         panelDisco.removeAll();
@@ -553,6 +571,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
     
  
     
+    //==========================================================================
     
     //DEBUG BORRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR
     
@@ -771,6 +790,284 @@ public class interfazPrincipal extends javax.swing.JFrame {
         }
     }
         
+    //===================================================================
+    
+    //COLAS INTERFAZ
+    
+    
+    
+    //FIN COLAS INTERFAZ
+    
+    
+    //===================================================================
+    //CRUD ACCCIONES PARA LA INTERFAZ
+    
+    private void crear(){
+        
+        if (usuarioActual == null || (!usuarioActual.getType().name().equals("ADMIN") && !usuarioActual.getType().name().equals("USER"))){
+            JOptionPane.showMessageDialog(this, "No tiene permisos para crear en este elemento", "Error", JOptionPane.ERROR_MESSAGE );
+            return;
+        }
+        
+        DefaultMutableTreeNode nodoSeleccionado = (DefaultMutableTreeNode) arbolSistema.getLastSelectedPathComponent();
+        if (nodoSeleccionado == null){
+            JOptionPane.showMessageDialog(this, "Seleccione un directorio donde crear el elemento", "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        String[] opciones = {"Archivos", "Directorio"};
+        int choice = JOptionPane.showOptionDialog(this, "¿Qué desea crear?", "Crear Elemento", 
+            JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
+        
+        if (choice == 0){
+            crearArchivo(nodoSeleccionado);
+        } else if (choice == 1) {
+            crearDirectorio(nodoSeleccionado);
+        }
+    }
+    
+    private void crearArchivo(DefaultMutableTreeNode parentNode){
+        
+        JTextField txtNombre = new JTextField();
+        JTextField txtSize = new JTextField();
+        
+        Object[] message = {
+            "Nombre del archivo: ", txtNombre,
+            "Tamano (Bloques): ", txtSize,
+        };
+        
+        int option = JOptionPane.showConfirmDialog(this, message, "Crar Archivo", JOptionPane.OK_CANCEL_OPTION);
+        
+        if(option == JOptionPane.OK_OPTION){
+            String nombre = txtNombre.getText().trim();
+            String sizeStr = txtSize.getText().trim();
+            
+            System.out.println("Datos ingresados - Nombre: '" + nombre + "', Tamaño: '" + sizeStr + "'");
+            
+            if (nombre.isEmpty() || sizeStr.isEmpty()){
+                JOptionPane.showMessageDialog(this, "Complete todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            try{
+                int size = Integer.parseInt(sizeStr);
+                
+                SD disco = FileExplorer.getSD();
+                int espaciosDisponibles = contarBloquesDisponiblesReales(disco);
+                
+                if(espaciosDisponibles < size){
+                    JOptionPane.showMessageDialog(this, 
+                    "No hay suficiente espacio en el disco\n" +
+                    "Espacio disponible: " + espaciosDisponibles + " bloques\n" +
+                    "Espacio requerido: " + size + " bloques", 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                System.out.println("Creando archivo en memoria");
+                Archivo nuevoArchivo = new Archivo(nombre, size, new ListaEnlazada(), usuarioActual);
+                
+                Directorio directorioPadre = encontrarDirectorioPorNodo(parentNode);
+                if (directorioPadre != null){
+                    directorioPadre.agregarElemento(nuevoArchivo);
+                    System.out.println("Archivo agregado al directorio: " + directorioPadre.getName());
+                    
+                    //===============================================================
+                    //Debug
+                    Nodo aux = directorioPadre.getElementos().getHead();
+                    int contador = 0;
+                    while (aux != null) {
+                        Object elemento = aux.getElement();
+                        if (elemento instanceof Archivo) {
+                            System.out.println("    - Archivo: " + ((Archivo)elemento).getName());
+                        } else if (elemento instanceof Directorio) {
+                            System.out.println("    - Directorio: " + ((Directorio)elemento).getName());
+                        }
+                        aux = aux.getNext();
+                        contador++;
+                    }
+                    System.out.println("    Total de elementos: " + contador);
+                    //================================================================
+                    
+                    PCB ProcesoCrear = new PCB("crear_" + nombre, nombre, nuevoArchivo, TipoProceso.CREAR);
+                    FileExplorer.agregarProcesoListo(ProcesoCrear);
+                    
+                    actualizarInterfazCompleta();
+                    
+                    JOptionPane.showMessageDialog(this, "Archivo creado Exitosamente", "Exito", JOptionPane.INFORMATION_MESSAGE);
+
+                }
+            } catch(NumberFormatException e){
+                JOptionPane.showMessageDialog(this, "El tamaño debe ser un número válido", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    
+    private int contarBloquesDisponiblesReales(SD disco){
+        if (disco == null) return 0;
+        
+        int disponibles = 0;
+        NodoBloque actual = disco.getHead();
+        
+        while (actual != null){
+            if (actual.getElement().isAvailable()){
+                disponibles++;
+            }
+            actual = actual.getNext();
+        }
+        return disponibles;
+    }
+    
+    private void crearDirectorio(DefaultMutableTreeNode parentNode){
+
+        JTextField txtNombre = new JTextField();
+        JCheckBox chkPublico = new JCheckBox("Directorio público", true);
+    
+        Object[] message = {
+            "Nombre del directorio:", txtNombre,
+            chkPublico
+        };
+        
+        int option = JOptionPane.showConfirmDialog(this, message, "Crear Directorio", JOptionPane.OK_CANCEL_OPTION);
+        
+        if(option == JOptionPane.OK_OPTION){
+            String nombre = txtNombre.getText().trim();
+            boolean esPublico = chkPublico.isSelected();
+
+            System.out.println("Datos ingresados - Nombre: '" + nombre + "', Público: " + esPublico);
+
+            if (nombre.isEmpty()){
+                System.out.println("ERROR: Nombre vacío");
+                JOptionPane.showMessageDialog(this, "Ingrese un nombre para el directorio", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try {
+                System.out.println("Creando directorio en memoria");
+                Directorio nuevoDirectorio = new Directorio(nombre, usuarioActual, esPublico);
+                System.out.println("Directorio creado: " + nuevoDirectorio.getName());
+
+                System.out.println("Buscando directorio padre...");
+                Directorio directorioPadre = encontrarDirectorioPorNodo(parentNode);
+
+                if (directorioPadre != null){
+                    System.out.println("Directorio padre encontrado: " + directorioPadre.getName());
+                    System.out.println("gregando directorio al directorio padre...");
+
+                    directorioPadre.agregarElemento(nuevoDirectorio);
+                    System.out.println("directorio agregado exitosamente");
+
+                    // DEBUG: Verificar contenido del directorio padre
+                    System.out.println("Contenido del directorio padre después de agregar:");
+                    Nodo aux = directorioPadre.getElementos().getHead();
+                    int contador = 0;
+                    while (aux != null) {
+                        Object elemento = aux.getElement();
+                        if (elemento instanceof Archivo) {
+                            System.out.println("    - Archivo: " + ((Archivo)elemento).getName());
+                        } else if (elemento instanceof Directorio) {
+                            System.out.println("    - Directorio: " + ((Directorio)elemento).getName());
+                        }
+                        aux = aux.getNext();
+                        contador++;
+                    }
+                    System.out.println("    Total de elementos: " + contador);
+
+                    System.out.println("Actualizando interfaz...");
+                    actualizarInterfazCompleta();
+
+                    //System.out.println("11. Guardando en JSON...");
+                    //guardarSistemaEnJSON();
+
+                    System.out.println("MOSTRANDO MENSAJE DE ÉXITO");
+                    JOptionPane.showMessageDialog(this, 
+                        "Directorio creado exitosamente\n" +
+                        "Nombre: " + nombre + "\n" +
+                        "Tipo: " + (esPublico ? "Público" : "Privado"), 
+                        "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+                } else {
+                    System.out.println("ERROR: directorioPadre es NULL");
+                    JOptionPane.showMessageDialog(this, "Error: No se pudo encontrar el directorio padre", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            
+            } catch (Exception e) {
+                System.out.println("ERROR GENERAL en crearDirectorio: " + e.getMessage());
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error al crear el directorio: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } 
+    }    
+    
+    private Directorio encontrarDirectorioPorNodo(DefaultMutableTreeNode node) {
+    
+        if (node == null) {
+            System.out.println("ERROR: Nodo es null");
+            return null;
+        }
+
+        String nombreNodo = node.getUserObject().toString();
+        System.out.println("Nombre del nodo: '" + nombreNodo + "'");
+
+        // Si es el nodo raíz
+        if (nombreNodo.equals("root")) {
+            System.out.println("Es el nodo raíz, retornando sistema.getRoot()");
+            return sistema.getRoot();
+        }
+
+        Directorio resultado = buscarDirectorioRecursivo(sistema.getRoot(), nombreNodo);
+
+        if (resultado != null) {
+            System.out.println("Directorio encontrado: " + resultado.getName());
+        } else {
+            System.out.println("Directorio NO encontrado: " + nombreNodo);
+            System.out.println("Directorios disponibles:");
+            listarDirectorios(sistema.getRoot(), 0);
+        }
+
+        return resultado;
+    }
+
+    private Directorio buscarDirectorioRecursivo(Directorio actual, String nombreBuscado) {
+        if (actual == null) return null;
+
+        if (actual.getName().equals(nombreBuscado)) {
+            return actual;
+        }
+
+        if (actual.getElementos() != null) {
+            Nodo aux = actual.getElementos().getHead();
+            while (aux != null) {
+                Object elemento = aux.getElement();
+                if (elemento instanceof Directorio) {
+                    Directorio subDir = (Directorio) elemento;
+                    Directorio encontrado = buscarDirectorioRecursivo(subDir, nombreBuscado);
+                    if (encontrado != null) {
+                        return encontrado;
+                    }
+                }
+                aux = aux.getNext();
+            }
+        }
+
+        return null;
+    }
+    
+    private void listarDirectorios(Directorio dir, int nivel) {
+    String indent = "  ".repeat(nivel);
+    System.out.println(indent + dir.getName());
+    
+    if (dir.getElementos() != null) {
+        Nodo aux = dir.getElementos().getHead();
+        while (aux != null) {
+            Object elemento = aux.getElement();
+            if (elemento instanceof Directorio) {
+                listarDirectorios((Directorio) elemento, nivel + 1);
+            }
+            aux = aux.getNext();
+        }
+    }
+}
       
     /**
      * This method is called from within the constructor to initialize the form.
@@ -791,12 +1088,10 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jSeparator2 = new javax.swing.JSeparator();
         jPanel3 = new javax.swing.JPanel();
         crear_btn = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
-        Eliminar_btn = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
-        Leer_btn = new javax.swing.JLabel();
-        jPanel6 = new javax.swing.JPanel();
         Modificar_btn = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
+        Eliminar_btn = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
@@ -865,6 +1160,9 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jLabel27 = new javax.swing.JLabel();
         jLabel28 = new javax.swing.JLabel();
         jScrollPaneBloqueado = new javax.swing.JScrollPane();
+        panelProcesos = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        leer_btn = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -901,40 +1199,18 @@ public class interfazPrincipal extends javax.swing.JFrame {
         crear_btn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         crear_btn.setText("Crear");
         crear_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        crear_btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                crear_btnMouseClicked(evt);
+            }
+        });
         jPanel3.add(crear_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
 
         panel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 500, 110, 30));
 
-        jPanel4.setBackground(new java.awt.Color(238, 238, 238));
-        jPanel4.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
-        jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        Eliminar_btn.setBackground(new java.awt.Color(51, 51, 51));
-        Eliminar_btn.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        Eliminar_btn.setForeground(new java.awt.Color(51, 51, 51));
-        Eliminar_btn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Eliminar_btn.setText("Eliminar");
-        Eliminar_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jPanel4.add(Eliminar_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
-
-        panel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 500, 110, 30));
-
         jPanel5.setBackground(new java.awt.Color(238, 238, 238));
         jPanel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
         jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        Leer_btn.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        Leer_btn.setForeground(new java.awt.Color(51, 51, 51));
-        Leer_btn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Leer_btn.setText("Leer");
-        Leer_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jPanel5.add(Leer_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
-
-        panel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 500, 110, 30));
-
-        jPanel6.setBackground(new java.awt.Color(238, 238, 238));
-        jPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
-        jPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         Modificar_btn.setBackground(new java.awt.Color(51, 51, 51));
         Modificar_btn.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
@@ -942,7 +1218,21 @@ public class interfazPrincipal extends javax.swing.JFrame {
         Modificar_btn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Modificar_btn.setText("Modificar");
         Modificar_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jPanel6.add(Modificar_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
+        jPanel5.add(Modificar_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
+
+        panel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 500, 110, 30));
+
+        jPanel6.setBackground(new java.awt.Color(238, 238, 238));
+        jPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
+        jPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        Eliminar_btn.setBackground(new java.awt.Color(51, 51, 51));
+        Eliminar_btn.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        Eliminar_btn.setForeground(new java.awt.Color(51, 51, 51));
+        Eliminar_btn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Eliminar_btn.setText("Eliminar");
+        Eliminar_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jPanel6.add(Eliminar_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
 
         panel1.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 550, 110, 30));
 
@@ -1350,6 +1640,24 @@ public class interfazPrincipal extends javax.swing.JFrame {
 
         panel1.add(panelSD, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 60, 520, 390));
 
+        jPanel7.setBackground(new java.awt.Color(238, 238, 238));
+        jPanel7.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
+        jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        leer_btn.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        leer_btn.setForeground(new java.awt.Color(51, 51, 51));
+        leer_btn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        leer_btn.setText("Leer");
+        leer_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        leer_btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                leer_btnMouseClicked(evt);
+            }
+        });
+        jPanel7.add(leer_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
+
+        panel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 500, 110, 30));
+
         getContentPane().add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 850, 620));
 
         pack();
@@ -1381,6 +1689,14 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private void Aplicar_btnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Aplicar_btnMouseClicked
         aplicarPoliticaSeleccionada();
     }//GEN-LAST:event_Aplicar_btnMouseClicked
+
+    private void crear_btnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_crear_btnMouseClicked
+        crear();
+    }//GEN-LAST:event_crear_btnMouseClicked
+
+    private void leer_btnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_leer_btnMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_leer_btnMouseClicked
 
     /**
      * @param args the command line arguments
@@ -1420,7 +1736,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Aplicar_btn;
     private javax.swing.JLabel Eliminar_btn;
-    private javax.swing.JLabel Leer_btn;
     private javax.swing.JLabel Modificar_btn;
     private javax.swing.JLabel Tiempo;
     private javax.swing.JTree arbolSistema;
@@ -1474,7 +1789,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel24;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
@@ -1495,6 +1809,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel lblBloquesTotales;
     private javax.swing.JLabel lblbloquesLibres;
     private javax.swing.JLabel nombreProceso;
+    private javax.swing.JLabel leer_btn;
     private java.awt.Panel panel1;
     private javax.swing.JPanel panelDisco;
     private javax.swing.JTabbedPane panelSD;
