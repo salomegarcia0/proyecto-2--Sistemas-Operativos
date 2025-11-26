@@ -20,6 +20,10 @@ import Estructuras.SD;
 import Tipos_de_Datos.*;
 import Main.FileExplorer;
 import Tipos_de_Datos.TipoProceso;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -878,6 +882,120 @@ public class interfazPrincipal extends javax.swing.JFrame {
     //===================================================================
     //CRUD ACCCIONES PARA LA INTERFAZ
     
+    
+    private void guardarSistemaEnJSON() {
+
+        try {
+            //crear el objeto JSON principal
+            JsonObject jsonPrincipal = new JsonObject();
+
+            //guardar usuarios
+            JsonArray jsonUsuarios = new JsonArray();
+            if (sistema.getUsuarios() != null) {
+                for (Usuario usuario : sistema.getUsuarios()) {
+                    JsonObject jsonUsuario = new JsonObject();
+                    jsonUsuario.addProperty("nombre", usuario.getName());
+                    jsonUsuario.addProperty("tipo", usuario.getType().name());
+                    jsonUsuarios.add(jsonUsuario);
+                    System.out.println("Usuario guardado: " + usuario.getName() + " - " + usuario.getType().name());
+                }
+            }
+            jsonPrincipal.add("usuarios", jsonUsuarios);
+
+            //guardar sistema de archivos
+            if (sistema.getRoot() != null) {
+                JsonObject jsonSistemaArchivos = construirJSONDirectorio(sistema.getRoot());
+                jsonPrincipal.add("sistemaArchivos", jsonSistemaArchivos);
+                System.out.println("Estructura de archivos guardada");
+            } else {
+                System.out.println("Root es null, no se guardo estructura de archivos");
+            }
+
+            //convertir a string JSON
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String jsonString = gson.toJson(jsonPrincipal);
+
+            //guardar en archivo
+            String filePath = "src/recursos/sistema_Archivos.json";
+            java.nio.file.Path path = java.nio.file.Paths.get(filePath);
+
+            //crear directorios si no existen
+            java.nio.file.Files.createDirectories(path.getParent());
+
+            //escribir archivo
+            java.nio.file.Files.write(path, jsonString.getBytes(), 
+                java.nio.file.StandardOpenOption.CREATE, 
+                java.nio.file.StandardOpenOption.TRUNCATE_EXISTING);
+
+        } catch (Exception e) {
+            System.out.println("ERROR al guardar en JSON: " + e.getMessage());
+            e.printStackTrace();
+
+            JOptionPane.showMessageDialog(this, 
+                "Error al guardar los cambios:\n" + e.getMessage(), 
+                "Error de Guardado", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private JsonObject construirJSONDirectorio(Directorio dir) {
+
+        JsonObject jsonDir = new JsonObject();
+        jsonDir.addProperty("nombre", dir.getName());
+        jsonDir.addProperty("usuario", dir.getUsuario().getName());
+        jsonDir.addProperty("size", dir.getSize());
+        jsonDir.addProperty("cantidadArchivos", dir.getCantidadArchivos());
+        jsonDir.addProperty("cantidadSubDir", dir.getCantidadSubDir());
+        jsonDir.addProperty("esPublico", dir.isEsPublico());
+
+        JsonArray jsonContenido = new JsonArray();
+
+        if (dir.getElementos() != null) {
+            Nodo aux = dir.getElementos().getHead();
+            int contadorElementos = 0;
+
+            while (aux != null) {
+                Object elemento = aux.getElement();
+
+                if (elemento instanceof Directorio) {
+                    JsonObject jsonSubDir = construirJSONDirectorio((Directorio) elemento);
+                    jsonSubDir.addProperty("tipo", "DIRECTORIO");
+                    jsonContenido.add(jsonSubDir);
+                    contadorElementos++;
+
+                } else if (elemento instanceof Archivo) {
+                    Archivo archivo = (Archivo) elemento;
+                    JsonObject jsonArchivo = new JsonObject();
+                    jsonArchivo.addProperty("tipo", "ARCHIVO");
+                    jsonArchivo.addProperty("name", archivo.getName());
+                    jsonArchivo.addProperty("size", archivo.getSize());
+                    jsonArchivo.addProperty("usuario", archivo.getUsuario().getName());
+
+                    //guardar lista de bloques
+                    JsonArray jsonBloques = new JsonArray();
+                    if (archivo.getBlockList() != null && archivo.getBlockList().getHead() != null) {
+                        Nodo nodoBloque = archivo.getBlockList().getHead();
+                        while (nodoBloque != null) {
+                            if (nodoBloque.getElement() instanceof Integer) {
+                                jsonBloques.add((Integer) nodoBloque.getElement());
+                            }
+                            nodoBloque = nodoBloque.getNext();
+                        }
+                    }
+                    jsonArchivo.add("blockList", jsonBloques);
+
+                    jsonContenido.add(jsonArchivo);
+                    contadorElementos++;            
+                }
+
+                aux = aux.getNext();
+            }
+        }
+
+        jsonDir.add("contenido", jsonContenido);
+        return jsonDir;
+    }
+    
+    
     private void crear(){
         
         if (usuarioActual == null || (!usuarioActual.getType().name().equals("ADMIN") && !usuarioActual.getType().name().equals("USER"))){
@@ -996,7 +1114,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
                         System.out.println("actualiceee modificar");
                         actualizarInterfazCompleta();
                         JOptionPane.showMessageDialog(this, "Archivo creado Exitosamente", "Exito", JOptionPane.INFORMATION_MESSAGE);
-
+                        guardarSistemaEnJSON();
                     });
                     t1.start();
 
@@ -1007,21 +1125,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
         }
     }
 
-    
-    private int contarBloquesDisponiblesReales(SD disco){
-        if (disco == null) return 0;
-        
-        int disponibles = 0;
-        NodoBloque actual = disco.getHead();
-        
-        while (actual != null){
-            if (actual.getElement().isAvailable()){
-                disponibles++;
-            }
-            actual = actual.getNext();
-        }
-        return disponibles;
-    }
     
     private void crearDirectorio(DefaultMutableTreeNode parentNode){
 
@@ -1076,8 +1179,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
 
                     actualizarInterfazCompleta();
 
-                    //System.out.println("Guardando en JSON...");
-                    //guardarSistemaEnJSON();
+                    guardarSistemaEnJSON();
 
                     JOptionPane.showMessageDialog(this, 
                         "Directorio creado exitosamente\n" +
@@ -1253,7 +1355,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
                 
 
                 // guardar en JSON
-                //guardarSistemaEnJSON();
+                guardarSistemaEnJSON();
 
             } catch (Exception e) {
                 System.out.println("ERROR al modificar archivo: " + e.getMessage());
@@ -1303,7 +1405,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
             actualizarInterfazCompleta();
 
             // Guardar en JSON
-            //guardarSistemaEnJSON();
+            guardarSistemaEnJSON();
 
             System.out.println("Directorio modificado exitosamente");
 
@@ -1541,14 +1643,14 @@ public class interfazPrincipal extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, 
                     "Archivo eliminado exitosamente\n" +
                     "Nombre: " + archivo.getName(), 
-                    "Éxito", JOptionPane.INFORMATION_MESSAGE);        
+                    "Éxito", JOptionPane.INFORMATION_MESSAGE);     
+
+                // Guardar en JSON
+                guardarSistemaEnJSON();   
 
             });
             t1.start();
             
-            // actualizar interfaz
-            actualizarInterfazCompleta();
-
 
         } catch (Exception e) {
             System.out.println("ERROR al eliminar archivo: " + e.getMessage());
@@ -1584,7 +1686,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
             actualizarInterfazCompleta();
 
             // Guardar en JSON
-            //guardarSistemaEnJSON();
+            guardarSistemaEnJSON();
 
             System.out.println("Eliminación de directorio completada exitosamente");
             JOptionPane.showMessageDialog(this, 
@@ -1697,6 +1799,124 @@ public class interfazPrincipal extends javax.swing.JFrame {
             actual = actual.getNext();
         }
     }
+    
+    
+    private void leer(){
+        DefaultMutableTreeNode nodoSeleccionado = (DefaultMutableTreeNode) arbolSistema.getLastSelectedPathComponent();
+        if (nodoSeleccionado == null){
+            JOptionPane.showMessageDialog(this, "Seleccione un archivo para leer", "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        Object elemento = buscarElementoEnSistema(nodoSeleccionado);
+        if (elemento == null) {
+            System.out.println("ERROR: No se pudo encontrar el elemento en el sistema");
+            JOptionPane.showMessageDialog(this, "Error: No se pudo encontrar el elemento", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // verifica que sea un archivo 
+        if (!(elemento instanceof Archivo)) {
+            System.out.println("ERROR: Solo se pueden leer archivos");
+            JOptionPane.showMessageDialog(this, 
+                "Solo se pueden leer archivos\n", 
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        //permisos de lectur 
+        Archivo archivo = (Archivo) elemento;
+        if (!tienePermisosLectura(archivo)) {
+            System.out.println("ERROR: Usuario sin permisos para leer este archivo");
+            JOptionPane.showMessageDialog(this, 
+                "No tiene permisos para leer este archivo\n" +
+                "Solo puede leer archivos públicos o sus propios archivos", 
+                "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        leerArchivo(archivo);
+    }
+    
+    private Directorio buscarDirectorioContenedor(Directorio directorioActual, Archivo archivoBuscado) {
+        if (directorioActual == null) return null;
+
+        //verifica si en este directorio etsa el archivo
+        if (directorioActual.getElementos() != null) {
+            Nodo aux = directorioActual.getElementos().getHead();
+            while (aux != null) {
+                Object elemento = aux.getElement();
+
+                if (elemento instanceof Archivo && elemento == archivoBuscado) {
+                    return directorioActual;
+                }
+
+                aux = aux.getNext();
+            }
+        }
+
+        //buscar recursivamente en subdirectorios
+        if (directorioActual.getElementos() != null) {
+            Nodo aux = directorioActual.getElementos().getHead();
+            while (aux != null) {
+                Object elemento = aux.getElement();
+
+                if (elemento instanceof Directorio) {
+                    Directorio encontrado = buscarDirectorioContenedor((Directorio) elemento, archivoBuscado);
+                    if (encontrado != null) {
+                        return encontrado;
+                    }
+                }
+
+                aux = aux.getNext();
+            }
+        }
+
+        return null;
+    }
+    
+    private boolean tienePermisosLectura(Archivo archivo) {
+
+        if (usuarioActual.getType().name().equals("ADMIN")) {
+            System.out.println("✓ ADMIN puede leer cualquier archivo");
+            return true;
+        }
+
+        boolean esPropietario = archivo.getUsuario().getName().equals(usuarioActual.getName());
+        boolean esDelAdmin = archivo.getUsuario().getName().equals("admin");
+
+        if (esPropietario) {
+            return true;
+        }
+
+        if (esDelAdmin) {
+            return true;
+        }
+        return false;
+    }
+    
+    private void leerArchivo(Archivo archivo) {
+
+        try {
+            //crear proceso de lectura
+            PCB procesoLeer = new PCB("leer_" + archivo.getName(), archivo.getName(), archivo, TipoProceso.LEER);
+            FileExplorer.agregarProcesoListo(procesoLeer);
+
+            JOptionPane.showMessageDialog(this, 
+                "Proceso de lectura creado exitosamente\n" +
+                "Archivo: " + archivo.getName() + "\n" +
+                "Tamaño: " + archivo.getSize() + " bloques\n" +
+                "El proceso se ha encolado para ejecución", 
+                "Proceso Creado", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception e) {
+            System.out.println("ERROR al crear proceso de lectura: " + e.getMessage());
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, 
+                "Error al crear proceso de lectura: " + e.getMessage(), 
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -2333,7 +2553,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_crear_btnMouseClicked
 
     private void leer_btnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_leer_btnMouseClicked
-        // TODO add your handling code here:
+        leer();
     }//GEN-LAST:event_leer_btnMouseClicked
 
     private void Modificar_btnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Modificar_btnMouseClicked
