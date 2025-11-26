@@ -6,6 +6,7 @@ package Estructuras;
 import Clases.PCB;
 import Tipos_de_Datos.*;
 /**
+ * AHHHH
  * Clase para crear colas para organizar los procesos
  * @author salom
  */

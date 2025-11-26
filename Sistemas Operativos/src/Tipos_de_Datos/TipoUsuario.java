@@ -5,7 +5,7 @@
 package Tipos_de_Datos;
 
 /**
- *
+ *AHHH
  * @author pjroj
  */
 public enum TipoUsuario {

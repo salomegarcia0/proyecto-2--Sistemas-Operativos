@@ -14,7 +14,8 @@ public class Archivo {
     private String name;
     private int size; //cantidad de bloques es la que esta dividio o se dividira
     private ListaEnlazada blockList;
-    private Usuario usuario;  
+    private Usuario usuario; 
+    
     //
     
     /*
@@ -30,6 +31,7 @@ public class Archivo {
     
     */
     private boolean eliminacion;
+    private boolean crear;
 
     public Archivo(String name, int size, ListaEnlazada blockList, Usuario usuario) {
         this.name = name;
@@ -37,7 +39,7 @@ public class Archivo {
         this.blockList = blockList;
         this.usuario = usuario;
         this.countLectura = this.countModificar = 0;
-        this.eliminacion =  false;
+        this.eliminacion = this.crear =  false;
     }
     
     public void aplicarCambios(String nombreArchivo){
@@ -64,6 +66,7 @@ public class Archivo {
         if(blockList.getSize() == size){
             System.out.println("Se completo la creacion del archivo " + name);
             blockList.print();
+            crear =  true;
         }
     }
     
@@ -133,6 +136,14 @@ public class Archivo {
     
     public boolean completeModificar(){
         return countModificar == size;
+    }
+
+    public boolean isCrear() {
+        return crear;
+    }
+
+    public void setCrear(boolean crear) {
+        this.crear = crear;
     }
         
     

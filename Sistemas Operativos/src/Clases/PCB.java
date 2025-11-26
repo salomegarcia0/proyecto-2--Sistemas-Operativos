@@ -13,6 +13,7 @@ import Main.FileExplorer;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
+ * AHHH
  * Clase para crear los procesos de la simualacion
  * @author salom
  */
@@ -80,6 +81,7 @@ public class PCB {
                     operacionCompletada = cabezalReversaCompleto.insertInfo(archivo);
                 //para FIFO,LIFO Y SSTF
                 } else {
+                    System.out.println("cabezalReversa");
                     operacionCompletada = cabezalReversa.insertInfo(archivo);
                 }
 
@@ -135,7 +137,7 @@ public class PCB {
                     
                 } else if (FileExplorer.isProcesoBloqueado() == false ){
                     if(operacionCompletada == true){
-                        System.out.println("Insersion de bloque nuevo completada");
+                        System.out.println("Insersion de bloque nuevo completada sin bloqueo");
                         //se verifica si es tamaño de bloques del archivo coincide con el tamaño de la lista de bloques del archivos
                         if(archivo.getSize() == archivo.getBlockList().getSize()){
                             System.out.println("El proceso ya termino por completo");
@@ -239,7 +241,7 @@ public class PCB {
                     
                 } else if (FileExplorer.isProcesoBloqueado() == false ){
                     if(operacionCompletada == true){
-                        System.out.println("Eliminacion de bloque completada");
+                        System.out.println("Eliminacion de bloque completada sin bloqueo");
                         
                         //se elimina la cabeza de la lista copia de bloques
                         listaBloques.deleteBegin();
@@ -349,7 +351,7 @@ public class PCB {
                     
                 } else if (FileExplorer.isProcesoBloqueado() == false ){
                     if(operacionCompletada == true){
-                        System.out.println("Lectura de bloque completada");
+                        System.out.println("Lectura de bloque completada sin bloqueo");
                         
                         //se aumenta el contador de bloques leidos del archivo
                         archivo.setCountLectura(archivo.getCountLectura()+1);
@@ -465,7 +467,7 @@ public class PCB {
                 } else if (FileExplorer.isProcesoBloqueado() == false ){
                     
                     if(operacionCompletada == true){
-                        System.out.println("La modificacion del bloque de '" + archivo.getName() + "' a '" + nombreArchivo + "' se a completado");
+                        System.out.println("La modificacion del bloque de '" + archivo.getName() + "' a '" + nombreArchivo + "' se a completado sin bloqueo");
                         
                         //se aumenta el contador de bloques leidos del archivo
                         archivo.setCountModificar(archivo.getCountModificar()+1);

@@ -6,7 +6,7 @@ package Clases;
 import Estructuras.ListaEnlazada;
 
 /**
- *
+ *AHHHHH
  * @author salom
  */
 public class Directorio {

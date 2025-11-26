@@ -40,7 +40,7 @@ public class CabezalReversa {
             SD.setReversa(false);
         } 
         
-        while (stopRead != false){
+        while (stopRead == false){
             //se pone en marca el hilo para simular el movimiento del cabezal en el disco SD
             Thread thread = new Thread(new Hilo(tiempoSimulado));
             thread.start();
@@ -88,25 +88,25 @@ public class CabezalReversa {
             }
             
             //dependiendo del sentido del lector se selecciona como el nuevo cabezal el siguiente o el anterior 
-            if(SD.isReversa()){
+            if(SD.isReversa() == false){
                 //se toma el nodo previo para luego setearlo como el nuevo cabezal
-                cabezal = cabezal.getPrevious();
+                cabezal = cabezal.getNext();
             } else {
                 //se toma el siguiente nodo para luego setearlo como el nuevo cabezal
-                cabezal = cabezal.getNext();
+                cabezal = cabezal.getPrevious();
             }
             
             //si el cabezal es null
             if (cabezal == null){
                 if(SD.isReversa()){
                     System.out.println("El cabezal llego al inicio, invirtiendo orden de lectura");
-                    SD.setReversa(false);
+                    SD.setReversa(true);
                     //como estaba en reversa el ultimo era la cabeza
                     SD.setLector(SD.getHead());
                 } else {
                     System.out.println("El cabezal llego al final, invirtiendo orden de lectura");
                     //como estaba en sentido normal el ultimo era la cola
-                    SD.setReversa(true);
+                    SD.setReversa(false);
                     SD.setLector(SD.getTail());
                 }
             } else {
@@ -159,7 +159,7 @@ public class CabezalReversa {
             SD.setReversa(false);
         }
         
-        while (stopRead != false){
+        while (stopRead == false){
             //se pone en marca el hilo para simular el movimiento del cabezal en el disco SD
             Thread thread = new Thread(new Hilo(tiempoSimulado));
             thread.start();
@@ -224,25 +224,25 @@ public class CabezalReversa {
             }
             
             //dependiendo del sentido del lector se selecciona como el nuevo cabezal el siguiente o el anterior 
-            if(SD.isReversa()){
+            if(SD.isReversa() == false){
                 //se toma el nodo previo para luego setearlo como el nuevo cabezal
-                cabezal = cabezal.getPrevious();
+                cabezal = cabezal.getNext();
             } else {
                 //se toma el siguiente nodo para luego setearlo como el nuevo cabezal
-                cabezal = cabezal.getNext();
+                cabezal = cabezal.getPrevious();
             }
             
             //si el cabezal es null
             if (cabezal == null){
                 if(SD.isReversa()){
                     System.out.println("El cabezal llego al inicio, invirtiendo orden de lectura");
-                    SD.setReversa(false);
+                    SD.setReversa(true);
                     //como estaba en reversa el ultimo era la cabeza
                     SD.setLector(SD.getHead());
                 } else {
                     System.out.println("El cabezal llego al final, invirtiendo orden de lectura");
                     //como estaba en sentido normal el ultimo era la cola
-                    SD.setReversa(true);
+                    SD.setReversa(false);
                     SD.setLector(SD.getTail());
                 }
             } else {
@@ -287,7 +287,7 @@ public class CabezalReversa {
             SD.setReversa(false);
         } 
         
-        while (stopRead != false){
+        while (stopRead == false){
             //se pone en marca el hilo para simular el movimiento del cabezal en el disco SD
             Thread thread = new Thread(new Hilo(tiempoSimulado));
             thread.start();
@@ -333,25 +333,25 @@ public class CabezalReversa {
             }
             
             //dependiendo del sentido del lector se selecciona como el nuevo cabezal el siguiente o el anterior 
-            if(SD.isReversa()){
+            if(SD.isReversa() == false){
                 //se toma el nodo previo para luego setearlo como el nuevo cabezal
-                cabezal = cabezal.getPrevious();
+                cabezal = cabezal.getNext();
             } else {
                 //se toma el siguiente nodo para luego setearlo como el nuevo cabezal
-                cabezal = cabezal.getNext();
+                cabezal = cabezal.getPrevious();
             }
             
             //si el cabezal es null
             if (cabezal == null){
                 if(SD.isReversa()){
                     System.out.println("El cabezal llego al inicio, invirtiendo orden de lectura");
-                    SD.setReversa(false);
+                    SD.setReversa(true);
                     //como estaba en reversa el ultimo era la cabeza
                     SD.setLector(SD.getHead());
                 } else {
                     System.out.println("El cabezal llego al final, invirtiendo orden de lectura");
                     //como estaba en sentido normal el ultimo era la cola
-                    SD.setReversa(true);
+                    SD.setReversa(false);
                     SD.setLector(SD.getTail());
                 }
             } else {
@@ -442,7 +442,7 @@ public class CabezalReversa {
         }
         
         
-        while (stopRead != false){
+        while (stopRead == false){
             //se pone en marca el hilo para simular el movimiento del cabezal en el disco SD
             Thread thread = new Thread(new Hilo(tiempoSimulado));
             thread.start();
@@ -500,25 +500,25 @@ public class CabezalReversa {
             }
             
             //dependiendo del sentido del lector se selecciona como el nuevo cabezal el siguiente o el anterior 
-            if(SD.isReversa()){
+            if(SD.isReversa() == false){
                 //se toma el nodo previo para luego setearlo como el nuevo cabezal
-                cabezal = cabezal.getPrevious();
+                cabezal = cabezal.getNext();
             } else {
                 //se toma el siguiente nodo para luego setearlo como el nuevo cabezal
-                cabezal = cabezal.getNext();
+                cabezal = cabezal.getPrevious();
             }
             
             //si el cabezal es null
             if (cabezal == null){
                 if(SD.isReversa()){
                     System.out.println("El cabezal llego al inicio, invirtiendo orden de lectura");
-                    SD.setReversa(false);
+                    SD.setReversa(true);
                     //como estaba en reversa el ultimo era la cabeza
                     SD.setLector(SD.getHead());
                 } else {
                     System.out.println("El cabezal llego al final, invirtiendo orden de lectura");
                     //como estaba en sentido normal el ultimo era la cola
-                    SD.setReversa(true);
+                    SD.setReversa(false);
                     SD.setLector(SD.getTail());
                 }
             } else {

@@ -5,6 +5,7 @@
 package Estructuras;
 import Clases.PCB;
 /**
+ * AHHHH
  * Clase para crear nodos de tipo PCB
  * @author salom
  */

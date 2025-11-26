@@ -70,13 +70,16 @@ public class interfazPrincipal extends javax.swing.JFrame {
         actualizarComboUsuarios();
         actualizarComboPoliticas();
         
-//        //Cada segundo se estarán actualizando los datos en las colas
-//        Timer timerColas = new Timer(1000, e -> {
-//            ColaListosMostrar();
-//            ColaBloqueadosMostrar();
-//            EjecutadoMostrar();
-//        });
-//        timerColas.start();   
+        FileExplorer.contarBloquesDisponiblesReales();
+        
+        //Cada segundo se estarán actualizando los datos en las colas
+        Timer timerColas = new Timer(1000, e -> {
+            ColaListosMostrar();
+            ColaBloqueadosMostrar();
+            ColaCompletadoMostrar();
+            EjecutadoMostrar();
+        });
+        timerColas.start();   
         
     }
     
@@ -715,7 +718,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         JPanel panelScrollbar =  new JPanel ();
         String tipoProceso = "";
         panelScrollbar.setBackground(Color.decode("#FFFFFF"));
-        if(!FileExplorer.getColaListos().isEmpty()){
+        if(!FileExplorer.getColaBloqueados().isEmpty()){
             while (pListo != null){
                 JPanel p =  new JPanel (new GridLayout(0, 1));
                 //configuraciones de diseño del proceso
@@ -754,6 +757,55 @@ public class interfazPrincipal extends javax.swing.JFrame {
                 pListo = pListo.getNext();
             } 
             jScrollPaneBloqueado.setViewportView(panelScrollbar);
+        }
+        
+    }
+    
+    private void ColaCompletadoMostrar(){
+        NodoProceso pListo = FileExplorer.getColaTerminado().getHead();
+        //configuraciones del panel de fondo del scrollball
+        JPanel panelScrollbar =  new JPanel ();
+        String tipoProceso = "";
+        panelScrollbar.setBackground(Color.decode("#FFFFFF"));
+        if(!FileExplorer.getColaTerminado().isEmpty()){
+            while (pListo != null){
+                JPanel p =  new JPanel (new GridLayout(0, 1));
+                //configuraciones de diseño del proceso
+                p.setBackground(Color.decode("#C6DFB9"));
+                p.setSize(150,300);
+                p.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+                //ID del proceso
+                JLabel id = new JLabel(Integer.toString(pListo.getProceso().getProcesoID()));
+                id.setFont(id.getFont().deriveFont(10f));
+                p.add(id,BorderLayout.CENTER);
+                //Nombre del proceso
+                JLabel proceso = new JLabel(pListo.getProceso().getProcesoNombre());
+                proceso.setFont(proceso.getFont().deriveFont(10f));
+                p.add(proceso, BorderLayout.CENTER);
+                //Tipo del proceso
+                if (pListo.getProceso().getTipoProceso() == TipoProceso.CREAR){
+                    tipoProceso = "CREAR";
+                } else if (pListo.getProceso().getTipoProceso() == TipoProceso.MODIFICAR){
+                    tipoProceso = "MODIFICAR";
+                } else if (pListo.getProceso().getTipoProceso() == TipoProceso.LEER){
+                    tipoProceso = "LEER";
+                } else {
+                    tipoProceso = "ELIMINAR";
+                }
+                JLabel tipo = new JLabel(tipoProceso);
+                tipo.setFont(tipo.getFont().deriveFont(10f));
+                p.add(tipo, BorderLayout.CENTER);
+                //PC y MAR
+                JLabel tiempo = new JLabel("Tiempo: " + Long.toString(pListo.getProceso().getTiempoEnCPU()));
+                tiempo.setFont(tiempo.getFont().deriveFont(10f));
+                p.add(tiempo, BorderLayout.CENTER);
+
+                //se agrega al scrollbar
+                panelScrollbar.add(p);
+
+                pListo = pListo.getNext();
+            } 
+            jScrollPaneCompletado.setViewportView(panelScrollbar);
         }
         
     }
@@ -836,7 +888,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
             "Tamano (Bloques): ", txtSize,
         };
         
-        int option = JOptionPane.showConfirmDialog(this, message, "Crar Archivo", JOptionPane.OK_CANCEL_OPTION);
+        int option = JOptionPane.showConfirmDialog(this, message, "Crear Archivo", JOptionPane.OK_CANCEL_OPTION);
         
         if(option == JOptionPane.OK_OPTION){
             String nombre = txtNombre.getText().trim();
@@ -852,8 +904,9 @@ public class interfazPrincipal extends javax.swing.JFrame {
             try{
                 int size = Integer.parseInt(sizeStr);
                 
-                SD disco = FileExplorer.getSD();
-                int espaciosDisponibles = contarBloquesDisponiblesReales(disco);
+//                SD disco = FileExplorer.getSD();
+//                int espaciosDisponibles = contarBloquesDisponiblesReales(disco);
+                int espaciosDisponibles = FileExplorer.getBloquesDisponibles();
                 
                 if(espaciosDisponibles < size){
                     JOptionPane.showMessageDialog(this, 
@@ -891,10 +944,37 @@ public class interfazPrincipal extends javax.swing.JFrame {
                     
                     PCB ProcesoCrear = new PCB("crear_" + nombre, nombre, nuevoArchivo, TipoProceso.CREAR);
                     FileExplorer.agregarProcesoListo(ProcesoCrear);
+                    //se elimina esa cantidad de bloques del SD
+                    FileExplorer.setBloquesDisponibles(FileExplorer.getBloquesDisponibles()-2);
                     
-                    actualizarInterfazCompleta();
+//                    System.out.println("cola listos " + FileExplorer.getColaListos().isEmpty());
+//                    System.out.println("cola bloqueados " + FileExplorer.getColaBloqueados().isEmpty());
+//                    System.out.println("size " + FileExplorer.getColaBloqueados().getSize());
+//                    FileExplorer.getColaBloqueados().print();
+//                    System.out.println("ejecutando " + FileExplorer.getProcesoEnEjecucion() == null);
                     
-                    JOptionPane.showMessageDialog(this, "Archivo creado Exitosamente", "Exito", JOptionPane.INFORMATION_MESSAGE);
+                    if(FileExplorer.getColaBloqueados().isEmpty() == true && FileExplorer.getProcesoEnEjecucion() == null){
+                        System.out.println("llegue");
+                        FileExplorer.Simulacion();
+                    }
+                    
+                    //------------------------
+                    Thread t1 = new Thread(() -> {
+                         System.out.println("hiloo");   
+                        //espera hasta que el proceso este listo   
+                        while(ProcesoCrear.getEstadoActual() != EstadoProceso.TERMINADO){
+                            try {
+                                Thread.sleep(10); // pausa de 10 ms
+                            } catch (InterruptedException e) {
+                                break;
+                            }
+                        }
+                        System.out.println("actualiceee");
+                        actualizarInterfazCompleta();
+                        JOptionPane.showMessageDialog(this, "Archivo creado Exitosamente", "Exito", JOptionPane.INFORMATION_MESSAGE);
+
+                    });
+                    t1.start();
 
                 }
             } catch(NumberFormatException e){
@@ -1160,8 +1240,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         jLabel27 = new javax.swing.JLabel();
         jLabel28 = new javax.swing.JLabel();
         jScrollPaneBloqueado = new javax.swing.JScrollPane();
-        panelProcesos = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
+        jPanel25 = new javax.swing.JPanel();
         leer_btn = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -1640,9 +1719,9 @@ public class interfazPrincipal extends javax.swing.JFrame {
 
         panel1.add(panelSD, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 60, 520, 390));
 
-        jPanel7.setBackground(new java.awt.Color(238, 238, 238));
-        jPanel7.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
-        jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jPanel25.setBackground(new java.awt.Color(238, 238, 238));
+        jPanel25.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, null, new java.awt.Color(153, 153, 153), new java.awt.Color(153, 153, 153)));
+        jPanel25.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         leer_btn.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         leer_btn.setForeground(new java.awt.Color(51, 51, 51));
@@ -1654,9 +1733,9 @@ public class interfazPrincipal extends javax.swing.JFrame {
                 leer_btnMouseClicked(evt);
             }
         });
-        jPanel7.add(leer_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
+        jPanel25.add(leer_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
 
-        panel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 500, 110, 30));
+        panel1.add(jPanel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 500, 110, 30));
 
         getContentPane().add(panel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 850, 620));
 
@@ -1788,6 +1867,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel22;
     private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel24;
+    private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -1808,8 +1888,8 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel lblBloquesOcupados;
     private javax.swing.JLabel lblBloquesTotales;
     private javax.swing.JLabel lblbloquesLibres;
-    private javax.swing.JLabel nombreProceso;
     private javax.swing.JLabel leer_btn;
+    private javax.swing.JLabel nombreProceso;
     private java.awt.Panel panel1;
     private javax.swing.JPanel panelDisco;
     private javax.swing.JTabbedPane panelSD;

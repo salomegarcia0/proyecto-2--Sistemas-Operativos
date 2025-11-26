@@ -9,15 +9,16 @@ import Estructuras.*;
 import Tipos_de_Datos.*;
 
 /**
- *
+ * MUERE
  * @author pjroj
  */
 public class FileExplorer {
     private static SD SD;
+    private static int bloquesDisponibles = 0;
     private static int sizeBloque = 100; //el valor del "tamaño de los bloques, es base a esto que es simularemos la "memoria disponible" en el SD
     private static Cola listo;
     private static Cola colaListos;
-    private static PCB procesoEnEjecucion;
+    private static PCB procesoEnEjecucion = null;
     private static Cola colaBloqueados;
     private static Cola colaTerminado;
     /*
@@ -26,7 +27,7 @@ public class FileExplorer {
     private static TipoPolitica politica = TipoPolitica.FIFO ; //inicialmente sera fifo
     
     //para definir el tiempo que dura una lectura en ms (queremos inicialmente 1000ms = 1seg)
-    private static int ciclo_reloj = 1000;
+    private static int ciclo_reloj = 500;
     //para saber cuantas lecturas se han completado hasta el momento
     //de modo que cuando llegue a a ser igual que el ioExceptionCycle, el proceso se pase a bloqueado
     private static int countLecturas;
@@ -34,7 +35,7 @@ public class FileExplorer {
     private static boolean procesoBloqueado;
     //ioExceptionCycle: cada cuantas lecturas ocurre una interrupcion de E/S
     //Cada 15 lecturas (asi lo definimos inicialmente)
-    private static int ioExceptionCycle = 15;
+    private static int ioExceptionCycle =30;
     //cuanto tiempo estara bloqueado el proceso cuando ocurre una operacion de E/S
     //Bloqueado durante 5 lecturas (asi lo definimos inicialmente)
     private static int ioCompletionTime = 5;
@@ -52,15 +53,20 @@ public class FileExplorer {
     
     
     static void funcionEjecucion(){
-        while (colaListos.isEmpty() != true && procesoEnEjecucion != null && colaBloqueados.isEmpty() != true ){
+        System.out.println("funcionEjecucion");
+        while (colaListos.isEmpty() == false){
             seleccionarProceso();
+            System.out.println("selecciono");
             ejecutarProceso();
+            System.out.println("ejecuto");
         }
     }
     
     static void funcionBloqueados(){
-        while (colaListos.isEmpty() != true && procesoEnEjecucion != null && colaBloqueados.isEmpty() != true ){
+        System.out.println("funcionBloqueados");
+        while (colaBloqueados.isEmpty() == false){
             moverBloqueadoAListo();
+            System.out.println("movio a listo");
         }
     }
     
@@ -409,21 +415,31 @@ public class FileExplorer {
     
     public static void ejecutarProceso(){
         if(procesoEnEjecucion != null){
-                System.out.println("Proceso " + procesoEnEjecucion.getProcesoNombre() + "se esta EJECUTANDO");
-                procesoEnEjecucion.ejecutar();
+            System.out.println("Proceso " + procesoEnEjecucion.getProcesoNombre() + "se esta EJECUTANDO");
+            procesoEnEjecucion.ejecutar();
                 
-                if(procesoEnEjecucion.getEstadoActual() == EstadoProceso.BLOQUEADO){
+            if(procesoEnEjecucion.getEstadoActual() == EstadoProceso.BLOQUEADO){
                 /*Mueve el proceso que estaba en ejecucion y que no se completo 
                 (proceso IO_BOUND a la cola de Bloqueados;
                 */
+                    System.out.println("me bloquee");
                     moverEjecutandoABloqueado(procesoEnEjecucion);
-                }else if(procesoEnEjecucion.getEstadoActual() == EstadoProceso.TERMINADO){
+            }else if(procesoEnEjecucion.getEstadoActual() == EstadoProceso.TERMINADO){
                 /*Mueve el proceso que estaba en ejecucion y que se completo a la cola
                 de procesos completados
                 */
+                    System.out.println("pase");
                     moverEjecutadoACompletado(procesoEnEjecucion);
+                    
                 }
             }
+            System.out.println("Cola Listos");
+            colaListos.print();
+            System.out.println("Cola Bloqueas");
+            colaBloqueados.print();
+            System.out.println("Cola Terminado");
+            colaTerminado.print();
+        
     }
     
     
@@ -547,6 +563,29 @@ public class FileExplorer {
         return index;
     }        
 
+    public static void contarBloquesDisponiblesReales(){
+               
+        int disponibles = 0;
+        NodoBloque actual = SD.getHead();
+        
+        while (actual != null){
+            if (actual.getElement().isAvailable()){
+                disponibles++;
+            }
+            actual = actual.getNext();
+        }
+        bloquesDisponibles = disponibles;
+        setBloquesDisponibles(disponibles);
+    }
+
+    public static int getBloquesDisponibles() {
+        return bloquesDisponibles;
+    }
+
+    public static void setBloquesDisponibles(int bloquesDisponibles) {
+        FileExplorer.bloquesDisponibles = bloquesDisponibles;
+    }
+    
     public static int getSizeBloque() {
         return sizeBloque;
     }
