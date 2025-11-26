@@ -1023,17 +1023,14 @@ public class interfazPrincipal extends javax.swing.JFrame {
                 return;
             }
             try {
-                System.out.println("Creando directorio en memoria");
                 Directorio nuevoDirectorio = new Directorio(nombre, usuarioActual, esPublico);
                 System.out.println("Directorio creado: " + nuevoDirectorio.getName());
 
-                System.out.println("Buscando directorio padre...");
                 Directorio directorioPadre = encontrarDirectorioPorNodo(parentNode);
 
                 if (directorioPadre != null){
                     System.out.println("Directorio padre encontrado: " + directorioPadre.getName());
-                    System.out.println("gregando directorio al directorio padre...");
-
+                    
                     directorioPadre.agregarElemento(nuevoDirectorio);
                     System.out.println("directorio agregado exitosamente");
 
@@ -1053,13 +1050,11 @@ public class interfazPrincipal extends javax.swing.JFrame {
                     }
                     System.out.println("    Total de elementos: " + contador);
 
-                    System.out.println("Actualizando interfaz...");
                     actualizarInterfazCompleta();
 
-                    //System.out.println("11. Guardando en JSON...");
+                    //System.out.println("Guardando en JSON...");
                     //guardarSistemaEnJSON();
 
-                    System.out.println("MOSTRANDO MENSAJE DE ÉXITO");
                     JOptionPane.showMessageDialog(this, 
                         "Directorio creado exitosamente\n" +
                         "Nombre: " + nombre + "\n" +
@@ -1067,12 +1062,10 @@ public class interfazPrincipal extends javax.swing.JFrame {
                         "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
                 } else {
-                    System.out.println("ERROR: directorioPadre es NULL");
                     JOptionPane.showMessageDialog(this, "Error: No se pudo encontrar el directorio padre", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             
             } catch (Exception e) {
-                System.out.println("ERROR GENERAL en crearDirectorio: " + e.getMessage());
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(this, "Error al crear el directorio: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -1089,9 +1082,9 @@ public class interfazPrincipal extends javax.swing.JFrame {
         String nombreNodo = node.getUserObject().toString();
         System.out.println("Nombre del nodo: '" + nombreNodo + "'");
 
-        // Si es el nodo raíz
+        // si es el nodo raiz
         if (nombreNodo.equals("root")) {
-            System.out.println("Es el nodo raíz, retornando sistema.getRoot()");
+            System.out.println("Es el nodo raiz, retornando sistema.getRoot()");
             return sistema.getRoot();
         }
 
@@ -1133,22 +1126,258 @@ public class interfazPrincipal extends javax.swing.JFrame {
         return null;
     }
     
+    //debug tambien que pesadilla
     private void listarDirectorios(Directorio dir, int nivel) {
-    String indent = "  ".repeat(nivel);
-    System.out.println(indent + dir.getName());
-    
-    if (dir.getElementos() != null) {
-        Nodo aux = dir.getElementos().getHead();
-        while (aux != null) {
-            Object elemento = aux.getElement();
-            if (elemento instanceof Directorio) {
-                listarDirectorios((Directorio) elemento, nivel + 1);
+        String indent = "  ".repeat(nivel);
+        System.out.println(indent + dir.getName());
+
+        if (dir.getElementos() != null) {
+            Nodo aux = dir.getElementos().getHead();
+            while (aux != null) {
+                Object elemento = aux.getElement();
+                if (elemento instanceof Directorio) {
+                    listarDirectorios((Directorio) elemento, nivel + 1);
+                }
+                aux = aux.getNext();
             }
-            aux = aux.getNext();
         }
     }
-}
-      
+    
+    private void modificar(){
+        DefaultMutableTreeNode nodoSeleccionado = (DefaultMutableTreeNode) arbolSistema.getLastSelectedPathComponent();
+        if (nodoSeleccionado == null){
+            JOptionPane.showMessageDialog(this, "Seleccione un elemento para modificar", "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        String nombreElemento = nodoSeleccionado.getUserObject().toString();
+        System.out.println("modifcando " + nombreElemento + "'");
+        
+        Object elemento = buscarElementoEnSistema(nodoSeleccionado);
+        if (elemento == null) {
+            JOptionPane.showMessageDialog(this, "Error: No se pudo encontrar el elemento", "Error", JOptionPane.ERROR_MESSAGE);
+            return;    
+        }
+        
+        if (elemento instanceof Archivo) {
+            modificarArchivo((Archivo) elemento, nodoSeleccionado);
+        } else if (elemento instanceof Directorio) {
+            modificarDirectorio((Directorio) elemento, nodoSeleccionado);
+        } else {
+            JOptionPane.showMessageDialog(this, "Tipo de elemento no soportado", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }
+    
+    private void modificarArchivo(Archivo archivo, DefaultMutableTreeNode nodoArchivo) {
+    
+        String nuevoNombre = JOptionPane.showInputDialog(this, 
+            "Nuevo nombre del archivo:", 
+            archivo.getName());
+
+        if (nuevoNombre != null && !nuevoNombre.trim().isEmpty()) {
+            String nombreTrimmed = nuevoNombre.trim();
+
+            if (nombreTrimmed.equals(archivo.getName())) {
+                JOptionPane.showMessageDialog(this, "Error, no se pudo cambiar el nombre", "Información", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            try {
+
+                PCB procesoModificar = new PCB( "modificar_" + archivo.getName(), nombreTrimmed, archivo, TipoProceso.MODIFICAR);
+                FileExplorer.agregarProcesoListo(procesoModificar);
+
+                System.out.println("proceso de modificacion creado y encolado");
+
+                // ACA ES DONDE DEBERIA PONER EL CONDICIONAL DE QUE EL PROCESO SE ENCUENRE N LA COLA DE LISTOS ANTES DE ACTUAIZAR 
+                actualizarInterfazCompleta();
+
+                // guardar en JSON
+                //guardarSistemaEnJSON();
+
+                System.out.println("Modificacion completada exitosamente");
+                JOptionPane.showMessageDialog(this, 
+                    "Archivo modificado exitosamente\n" +
+                    "Nombre anterior: " + archivo.getName() + "\n" +
+                    "Nombre nuevo: " + nombreTrimmed, 
+                    "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+            } catch (Exception e) {
+                System.out.println("ERROR al modificar archivo: " + e.getMessage());
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error al modificar el archivo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    
+    private void modificarDirectorio(Directorio directorio, DefaultMutableTreeNode nodoDirectorio) {
+
+        JTextField txtNombre = new JTextField(directorio.getName());
+
+        Object[] message = {
+            "Nuevo nombre del directorio:", txtNombre,
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Modificar Directorio", JOptionPane.OK_CANCEL_OPTION);
+
+        if (option == JOptionPane.OK_OPTION) {
+            String nuevoNombre = txtNombre.getText().trim();
+
+            if (nuevoNombre.isEmpty()) {
+                System.out.println("ERRO: nombre vacio");
+                JOptionPane.showMessageDialog(this, "El nombre no puede estar vacío", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            System.out.println("- Nombre: '" + nuevoNombre);
+
+            // verificar cambios
+            boolean nombreCambio = !nuevoNombre.equals(directorio.getName());
+
+            if (!nombreCambio) {
+                JOptionPane.showMessageDialog(this, "No se realizaron cambios", "Información", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            // aplicar cambios
+            if (nombreCambio) {
+                System.out.println("Cambiando nombre de directorio: '" + directorio.getName() + "' -> '" + nuevoNombre + "'");
+                directorio.setName(nuevoNombre);
+            }
+
+            // actualizar interfaz de una vez porque no necesita procespo
+            actualizarInterfazCompleta();
+
+            // Guardar en JSON
+            //guardarSistemaEnJSON();
+
+            System.out.println("Directorio modificado exitosamente");
+
+            StringBuilder mensaje = new StringBuilder("Directorio modificado exitosamente\n");
+            if (nombreCambio) {
+                mensaje.append("Nombre: ").append(nuevoNombre).append("\n");
+            }
+
+            JOptionPane.showMessageDialog(this, mensaje.toString(), "exito", JOptionPane.INFORMATION_MESSAGE);
+
+        } else {
+            System.out.println("Modificacion de directorio cancelada");
+        }
+    }
+
+    
+    private Object buscarElementoEnSistema(DefaultMutableTreeNode node) {
+
+        if (node == null) {
+            System.out.println("ERROR: Nodo es null");
+            return null;
+        }
+
+        String nombreElemento = node.getUserObject().toString();
+
+        // Si es el nodo raiz
+        if (nombreElemento.equals("root")) {
+            System.out.println("Es el nodo raiz");
+            return sistema.getRoot();
+        }
+
+        // LIMPIAR EL NOMBRE 
+        String nombreLimpio = limpiarNombreParaBusqueda(nombreElemento);
+       
+        // busca recursivamente
+        Object resultado = buscarElementoRecursivo(sistema.getRoot(), nombreLimpio);
+
+        if (resultado != null) {
+            if (resultado instanceof Archivo) {
+                System.out.println("  Archivo: " + ((Archivo)resultado).getName() + " - Usuario: " + ((Archivo)resultado).getUsuario().getName());
+            } else if (resultado instanceof Directorio) {
+                System.out.println("  Directorio: " + ((Directorio)resultado).getName() + " - Usuario: " + ((Directorio)resultado).getUsuario().getName());
+            }
+        } else {
+            System.out.println("elemento no encontrado");
+            System.out.println("Elementos disponibles en el sistema:");
+            listarTodosLosElementos(sistema.getRoot(), 0);
+        }
+
+        return resultado;
+    }
+
+
+    
+    private String limpiarNombreParaBusqueda(String nombreConFormato) {
+    
+        if (nombreConFormato.contains("(") && nombreConFormato.contains(")")) {
+            int indexParentesis = nombreConFormato.indexOf("(");
+            return nombreConFormato.substring(0, indexParentesis).trim();
+        }
+    
+        if (nombreConFormato.contains("-")) {
+            int indexGuion = nombreConFormato.indexOf("-");
+            return nombreConFormato.substring(0, indexGuion).trim();
+        }
+
+        return nombreConFormato.trim();
+    }
+
+    
+    private void listarTodosLosElementos(Directorio directorio, int nivel) {
+
+        if (directorio.getElementos() != null) {
+            Nodo aux = directorio.getElementos().getHead();
+            while (aux != null) {
+                Object elemento = aux.getElement();
+                if (elemento instanceof Directorio) {
+                    listarTodosLosElementos((Directorio) elemento, 1 + nivel);
+                }
+                aux = aux.getNext();
+            }
+        }
+    }
+
+
+    private Object buscarElementoRecursivo(Directorio directorioActual, String nombreBuscado) {
+        if (directorioActual == null) {
+            return null;
+        }
+
+        if (directorioActual.getName().equalsIgnoreCase(nombreBuscado)) {
+            System.out.println("directorio encontrado: " + directorioActual.getName());
+            return directorioActual;
+        }
+
+        // buscar en los elementos del directorio
+        if (directorioActual.getElementos() != null) {
+            Nodo aux = directorioActual.getElementos().getHead();
+            while (aux != null) {
+                Object elemento = aux.getElement();
+
+                if (elemento instanceof Archivo) {
+                    Archivo archivo = (Archivo) elemento;
+                    if (archivo.getName().equalsIgnoreCase(nombreBuscado)) {
+                        System.out.println("Archivo encontrado: " + archivo.getName());
+                        return archivo;
+                    }
+                } else if (elemento instanceof Directorio) {
+                    Directorio subDir = (Directorio) elemento;
+                    Object encontrado = buscarElementoRecursivo(subDir, nombreBuscado);
+                    if (encontrado != null) {
+                        return encontrado;
+                    }
+                }
+
+                aux = aux.getNext();
+            }
+        }
+
+        return null;
+    }
+    
+    private void eliminar(){
+        
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -1297,6 +1526,11 @@ public class interfazPrincipal extends javax.swing.JFrame {
         Modificar_btn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Modificar_btn.setText("Modificar");
         Modificar_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        Modificar_btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                Modificar_btnMouseClicked(evt);
+            }
+        });
         jPanel5.add(Modificar_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
 
         panel1.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 500, 110, 30));
@@ -1311,6 +1545,11 @@ public class interfazPrincipal extends javax.swing.JFrame {
         Eliminar_btn.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Eliminar_btn.setText("Eliminar");
         Eliminar_btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        Eliminar_btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                Eliminar_btnMouseClicked(evt);
+            }
+        });
         jPanel6.add(Eliminar_btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 110, 30));
 
         panel1.add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 550, 110, 30));
@@ -1776,6 +2015,14 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private void leer_btnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_leer_btnMouseClicked
         // TODO add your handling code here:
     }//GEN-LAST:event_leer_btnMouseClicked
+
+    private void Modificar_btnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Modificar_btnMouseClicked
+       modificar();
+    }//GEN-LAST:event_Modificar_btnMouseClicked
+
+    private void Eliminar_btnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Eliminar_btnMouseClicked
+        eliminar();
+    }//GEN-LAST:event_Eliminar_btnMouseClicked
 
     /**
      * @param args the command line arguments

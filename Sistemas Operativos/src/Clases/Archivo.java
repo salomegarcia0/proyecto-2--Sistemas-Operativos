@@ -146,5 +146,7 @@ public class Archivo {
         this.crear = crear;
     }
         
-    
+    public String toString(){
+        return this.name;
+    }
 }
