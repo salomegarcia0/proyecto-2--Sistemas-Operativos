@@ -8,12 +8,15 @@ import Clases.Archivo;
 import Clases.Bloque;
 import Clases.CargadorSistema;
 import Clases.Directorio;
+import Clases.PCB;
 import Clases.SistemaArchivos;
 import Clases.Usuario;
+import Estructuras.ListaEnlazada;
 import Estructuras.Nodo;
 import Estructuras.NodoBloque;
 import Estructuras.SD;
 import Main.FileExplorer;
+import Tipos_de_Datos.TipoProceso;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -22,9 +25,11 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
  *
@@ -45,6 +50,8 @@ public class interfazPrincipal extends javax.swing.JFrame {
             disco.crearSD(15);
             FileExplorer.setSD(disco);
         }
+        
+        FileExplorer.inicializarColasProcesos();
         
         initComponents();
         cargarArbol();
@@ -303,10 +310,13 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private void cargarTablaArchivosFiltrada(){
         modeloTablaArchivos = new DefaultTableModel(new Object[]{"Nombre", "Tamaño", "Primer Bloque", "Bloques", "Usuario"}, 0);
         
-        tablaArchivos.setModel(modeloTablaArchivos);
-        
-        if (sistema != null && sistema.getRoot() != null){
-            llenarTablaFiltrada(sistema.getRoot(), modeloTablaArchivos);
+        if(tablaArchivos != null){
+            
+            tablaArchivos.setModel(modeloTablaArchivos);
+            
+            if (sistema != null && sistema.getRoot() != null){
+                llenarTablaFiltrada(sistema.getRoot(), modeloTablaArchivos);
+            }
         }
     }
     
@@ -336,6 +346,9 @@ public class interfazPrincipal extends javax.swing.JFrame {
         
         generarBloquesSD();
         
+        repaint();
+        revalidate();
+        
     }
     
     //==========================================================================
@@ -358,7 +371,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         
         aplicarPoliticaEnSistema(politicaSeleccionada);
     }
-    
+//=================================================================================================  
     private void cargarDatosEnSD(){
         SD disco = FileExplorer.getSD();
         if (disco == null){
@@ -646,6 +659,12 @@ public class interfazPrincipal extends javax.swing.JFrame {
     //CRUD ACCCIONES PARA LA INTERFAZ
     
     private void crear(){
+        
+        if (usuarioActual == null || (!usuarioActual.getType().name().equals("ADMIN") && !usuarioActual.getType().name().equals("USER"))){
+            JOptionPane.showMessageDialog(this, "No tiene permisos para crear en este elemento", "Error", JOptionPane.ERROR_MESSAGE );
+            return;
+        }
+        
         DefaultMutableTreeNode nodoSeleccionado = (DefaultMutableTreeNode) arbolSistema.getLastSelectedPathComponent();
         if (nodoSeleccionado == null){
             JOptionPane.showMessageDialog(this, "Seleccione un directorio donde crear el elemento", "Error", JOptionPane.WARNING_MESSAGE);
@@ -665,11 +684,170 @@ public class interfazPrincipal extends javax.swing.JFrame {
     
     private void crearArchivo(DefaultMutableTreeNode parentNode){
         
+        JTextField txtNombre = new JTextField();
+        JTextField txtSize = new JTextField();
+        
+        Object[] message = {
+            "Nombre del archivo: ", txtNombre,
+            "Tamano (Bloques): ", txtSize,
+        };
+        
+        int option = JOptionPane.showConfirmDialog(this, message, "Crar Archivo", JOptionPane.OK_CANCEL_OPTION);
+        
+        if(option == JOptionPane.OK_OPTION){
+            String nombre = txtNombre.getText().trim();
+            String sizeStr = txtSize.getText().trim();
+            
+            System.out.println("Datos ingresados - Nombre: '" + nombre + "', Tamaño: '" + sizeStr + "'");
+            
+            if (nombre.isEmpty() || sizeStr.isEmpty()){
+                JOptionPane.showMessageDialog(this, "Complete todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            try{
+                int size = Integer.parseInt(sizeStr);
+                
+                SD disco = FileExplorer.getSD();
+                int espaciosDisponibles = contarBloquesDisponiblesReales(disco);
+                
+                if(espaciosDisponibles < size){
+                    JOptionPane.showMessageDialog(this, 
+                    "No hay suficiente espacio en el disco\n" +
+                    "Espacio disponible: " + espaciosDisponibles + " bloques\n" +
+                    "Espacio requerido: " + size + " bloques", 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                System.out.println("6. Creando archivo en memoria...");
+                Archivo nuevoArchivo = new Archivo(nombre, size, new ListaEnlazada(), usuarioActual);
+                
+                Directorio directorioPadre = encontrarDirectorioPorNodo(parentNode);
+                if (directorioPadre != null){
+                    directorioPadre.agregarElemento(nuevoArchivo);
+                    System.out.println("Archivo agregado al directorio: " + directorioPadre.getName());
+                    
+                    //===============================================================
+                    //Debug
+                    Nodo aux = directorioPadre.getElementos().getHead();
+                    int contador = 0;
+                    while (aux != null) {
+                        Object elemento = aux.getElement();
+                        if (elemento instanceof Archivo) {
+                            System.out.println("    - Archivo: " + ((Archivo)elemento).getName());
+                        } else if (elemento instanceof Directorio) {
+                            System.out.println("    - Directorio: " + ((Directorio)elemento).getName());
+                        }
+                        aux = aux.getNext();
+                        contador++;
+                    }
+                    System.out.println("    Total de elementos: " + contador);
+                    //================================================================
+                    
+                    PCB ProcesoCrear = new PCB("crear_" + nombre, nombre, nuevoArchivo, TipoProceso.CREAR);
+                    FileExplorer.agregarProcesoListo(ProcesoCrear);
+                    
+                    actualizarInterfazCompleta();
+                    
+                    JOptionPane.showMessageDialog(this, "Archivo creado Exitosamente", "Exito", JOptionPane.INFORMATION_MESSAGE);
+
+                }
+            } catch(NumberFormatException e){
+                JOptionPane.showMessageDialog(this, "El tamaño debe ser un número válido", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    
+    private int contarBloquesDisponiblesReales(SD disco){
+        if (disco == null) return 0;
+        
+        int disponibles = 0;
+        NodoBloque actual = disco.getHead();
+        
+        while (actual != null){
+            if (actual.getElement().isAvailable()){
+                disponibles++;
+            }
+            actual = actual.getNext();
+        }
+        return disponibles;
     }
     
     private void crearDirectorio(DefaultMutableTreeNode parentNode){
         
     }
+    
+    private Directorio encontrarDirectorioPorNodo(DefaultMutableTreeNode node) {
+    
+    if (node == null) {
+        System.out.println("ERROR: Nodo es null");
+        return null;
+    }
+    
+    String nombreNodo = node.getUserObject().toString();
+    System.out.println("Nombre del nodo: '" + nombreNodo + "'");
+    
+    // Si es el nodo raíz
+    if (nombreNodo.equals("root")) {
+        System.out.println("Es el nodo raíz, retornando sistema.getRoot()");
+        return sistema.getRoot();
+    }
+
+    Directorio resultado = buscarDirectorioRecursivo(sistema.getRoot(), nombreNodo);
+    
+    if (resultado != null) {
+        System.out.println("Directorio encontrado: " + resultado.getName());
+    } else {
+        System.out.println("Directorio NO encontrado: " + nombreNodo);
+        System.out.println("Directorios disponibles:");
+        listarDirectorios(sistema.getRoot(), 0);
+    }
+    
+    return resultado;
+}
+
+private Directorio buscarDirectorioRecursivo(Directorio actual, String nombreBuscado) {
+    if (actual == null) return null;
+    
+    if (actual.getName().equals(nombreBuscado)) {
+        return actual;
+    }
+
+    if (actual.getElementos() != null) {
+        Nodo aux = actual.getElementos().getHead();
+        while (aux != null) {
+            Object elemento = aux.getElement();
+            if (elemento instanceof Directorio) {
+                Directorio subDir = (Directorio) elemento;
+                Directorio encontrado = buscarDirectorioRecursivo(subDir, nombreBuscado);
+                if (encontrado != null) {
+                    return encontrado;
+                }
+            }
+            aux = aux.getNext();
+        }
+    }
+    
+    return null;
+    }
+    
+    private void listarDirectorios(Directorio dir, int nivel) {
+    String indent = "  ".repeat(nivel);
+    System.out.println(indent + dir.getName());
+    
+    if (dir.getElementos() != null) {
+        Nodo aux = dir.getElementos().getHead();
+        while (aux != null) {
+            Object elemento = aux.getElement();
+            if (elemento instanceof Directorio) {
+                listarDirectorios((Directorio) elemento, nivel + 1);
+            }
+            aux = aux.getNext();
+        }
+    }
+}
       
     /**
      * This method is called from within the constructor to initialize the form.
