@@ -1196,7 +1196,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         if (elemento instanceof Archivo) {
             eliminarArchivo((Archivo) elemento, nodoSeleccionado);
         } else if (elemento instanceof Directorio) {
-            //eliminarDirectorio((Directorio) elemento, nodoSeleccionado);
+            eliminarDirectorio((Directorio) elemento, nodoSeleccionado);
         } else {
             JOptionPane.showMessageDialog(this, "Tipo de elemento no soportado", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -1269,6 +1269,71 @@ public class interfazPrincipal extends javax.swing.JFrame {
                 // Eliminar el archivo de la lista de elementos del directorio
                 eliminarElementoDeDirectorio(directorioPadre, archivo);
 
+            }
+        }
+    }
+    
+    private void eliminarDirectorio(Directorio directorio, DefaultMutableTreeNode nodoDirectorio) {
+
+        try {
+            // eliminacion para todos los archivos del directorio
+            crearProcesosEliminacionRecursivos(directorio);
+
+            // eliminar el directorio de su directorio padre
+            eliminarDirectorioDeDirectorioPadre(directorio, nodoDirectorio);
+
+            // Actualizar interfaz
+            actualizarInterfazCompleta();
+
+            // Guardar en JSON
+            //guardarSistemaEnJSON();
+
+            System.out.println("Eliminación de directorio completada exitosamente");
+            JOptionPane.showMessageDialog(this, 
+                "Directorio eliminado exitosamente\n" +
+                "Nombre: " + directorio.getName() + "\n" +
+                "Se eliminaron todos los archivos y subdirectorios", 
+                "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception e) {
+            System.out.println("ERROR al eliminar directorio: " + e.getMessage());
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al eliminar el directorio: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void eliminarDirectorioDeDirectorioPadre(Directorio directorio, DefaultMutableTreeNode nodoDirectorio) {
+
+        DefaultMutableTreeNode nodoPadre = (DefaultMutableTreeNode) nodoDirectorio.getParent();
+        if (nodoPadre != null) {
+            Directorio directorioPadre = encontrarDirectorioPorNodo(nodoPadre);
+            if (directorioPadre != null) {
+                // Eliminar el directorio de la lista de elementos del directorio padre
+                eliminarElementoDeDirectorio(directorioPadre, directorio);
+                System.out.println("Directorio eliminado del directorio padre: " + directorioPadre.getName());
+            }
+        }
+    }
+    
+    private void crearProcesosEliminacionRecursivos(Directorio directorio) {
+        if (directorio.getElementos() != null) {
+            Nodo aux = directorio.getElementos().getHead();
+            while (aux != null) {
+                Object elemento = aux.getElement();
+
+                if (elemento instanceof Archivo) {
+                    Archivo archivo = (Archivo) elemento;
+                    // Crear proceso de eliminacion para cada archivo
+                    PCB procesoEliminar = new PCB("eliminar_" + archivo.getName(), archivo.getName(), archivo, TipoProceso.ELIMINAR);
+                    FileExplorer.agregarProcesoListo(procesoEliminar);
+                    System.out.println("Proceso creado para archivo: " + archivo.getName());
+
+                } else if (elemento instanceof Directorio) {
+                    // Llamar recursivamente para subdirectorios
+                    crearProcesosEliminacionRecursivos((Directorio) elemento);
+                }
+
+                aux = aux.getNext();
             }
         }
     }
