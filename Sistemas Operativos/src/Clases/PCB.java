@@ -160,7 +160,7 @@ public class PCB {
         } else if (tipoProceso == TipoProceso.ELIMINAR){
             
             boolean stop = false;
-            while(stop != true){
+            while(stop == false){
                 System.out.println("ELIMINAR");
                 //pediremos la cabeza del ListaBloques que es una copia de la lista del archivo
                 int index = (int) listaBloques.getHead().getElement();
@@ -247,7 +247,9 @@ public class PCB {
                         listaBloques.deleteBegin();
                         System.out.println("Bloques que faltan por eliminar");
                         listaBloques.print();
-                        
+                        System.out.println("Bloques de archivo por eliminar");
+                        archivo.getBlockList().print();
+                        System.out.println(archivo.getBlockList().isEmpty() == true);
                         //verifica si la lista de bloques del archivo esta vacio
                         if(archivo.getBlockList().isEmpty() == true){
                             System.out.println("Eliminacion completada");

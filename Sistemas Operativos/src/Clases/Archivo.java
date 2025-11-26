@@ -58,6 +58,8 @@ public class Archivo {
         if(countLectura == size){
             System.out.println("Se completo la solicitud de lectura del archivo " + name);
             System.out.println("ME LEISTE FELICIDADES :D");
+            JOptionPane.showMessageDialog(null, "ME LEISTE FELICIDADES :D", "Lectura", JOptionPane.INFORMATION_MESSAGE);
+        
             countLectura = 0;
         }
         
@@ -77,7 +79,7 @@ public class Archivo {
             System.out.println("Se completo la eliminacion del archivo " + name);
             //se elimina esa cantidad de bloques del SD
             FileExplorer.setBloquesDisponibles(FileExplorer.getBloquesDisponibles()+size);
-            JOptionPane.showMessageDialog(null, "Archivo " + name + " a sido elimilinado\nBloques disponibles: " + FileExplorer.getBloquesDisponibles() , "Exito", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Archivo " + name + " a sido elimilinado\nBloques disponibles: " + FileExplorer.getBloquesDisponibles() , "Exito Eliminar", JOptionPane.INFORMATION_MESSAGE);
         }
     }
     

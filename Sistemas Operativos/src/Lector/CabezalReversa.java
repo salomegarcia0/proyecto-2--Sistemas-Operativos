@@ -98,16 +98,18 @@ public class CabezalReversa {
             
             //si el cabezal es null
             if (cabezal == null){
-                if(SD.isReversa()){
+                if(SD.isReversa() == true){
                     System.out.println("El cabezal llego al inicio, invirtiendo orden de lectura");
-                    SD.setReversa(true);
+                    SD.setReversa(false);
                     //como estaba en reversa el ultimo era la cabeza
                     SD.setLector(SD.getHead());
+                    cabezal = SD.getLector();
                 } else {
                     System.out.println("El cabezal llego al final, invirtiendo orden de lectura");
                     //como estaba en sentido normal el ultimo era la cola
-                    SD.setReversa(false);
+                    SD.setReversa(true);
                     SD.setLector(SD.getTail());
+                    cabezal = SD.getLector();
                 }
             } else {
                 SD.setLector(cabezal);
@@ -185,8 +187,8 @@ public class CabezalReversa {
                 
                 //se elimina la ubicacion del bloque de la lista de bloques del archivo
                 ListaEnlazada list = archivo.getBlockList();
-                //se insertaria siempre el nuevo bloque al final de la lsita
-                list.deleteInIndex(bloque.getIndex());
+                //se elimina siempre el primer bloque de la lsita
+                list.deleteBegin();
                 archivo.setBlockList(list);
                 
                 //se reduce la cantidad de bloques en las que esta dividido el archivo
@@ -234,16 +236,18 @@ public class CabezalReversa {
             
             //si el cabezal es null
             if (cabezal == null){
-                if(SD.isReversa()){
+                if(SD.isReversa() == true){
                     System.out.println("El cabezal llego al inicio, invirtiendo orden de lectura");
-                    SD.setReversa(true);
+                    SD.setReversa(false);
                     //como estaba en reversa el ultimo era la cabeza
                     SD.setLector(SD.getHead());
+                    cabezal = SD.getLector();
                 } else {
                     System.out.println("El cabezal llego al final, invirtiendo orden de lectura");
                     //como estaba en sentido normal el ultimo era la cola
-                    SD.setReversa(false);
+                    SD.setReversa(true);
                     SD.setLector(SD.getTail());
+                    cabezal = SD.getLector();
                 }
             } else {
                 SD.setLector(cabezal);
@@ -343,16 +347,18 @@ public class CabezalReversa {
             
             //si el cabezal es null
             if (cabezal == null){
-                if(SD.isReversa()){
+                if(SD.isReversa() == true){
                     System.out.println("El cabezal llego al inicio, invirtiendo orden de lectura");
-                    SD.setReversa(true);
+                    SD.setReversa(false);
                     //como estaba en reversa el ultimo era la cabeza
                     SD.setLector(SD.getHead());
+                    cabezal = SD.getLector();
                 } else {
                     System.out.println("El cabezal llego al final, invirtiendo orden de lectura");
                     //como estaba en sentido normal el ultimo era la cola
-                    SD.setReversa(false);
+                    SD.setReversa(true);
                     SD.setLector(SD.getTail());
+                    cabezal = SD.getLector();
                 }
             } else {
                 SD.setLector(cabezal);
@@ -510,16 +516,18 @@ public class CabezalReversa {
             
             //si el cabezal es null
             if (cabezal == null){
-                if(SD.isReversa()){
+                if(SD.isReversa() == true){
                     System.out.println("El cabezal llego al inicio, invirtiendo orden de lectura");
-                    SD.setReversa(true);
+                    SD.setReversa(false);
                     //como estaba en reversa el ultimo era la cabeza
                     SD.setLector(SD.getHead());
+                    cabezal = SD.getLector();
                 } else {
                     System.out.println("El cabezal llego al final, invirtiendo orden de lectura");
                     //como estaba en sentido normal el ultimo era la cola
-                    SD.setReversa(false);
+                    SD.setReversa(true);
                     SD.setLector(SD.getTail());
+                    cabezal = SD.getLector();
                 }
             } else {
                 SD.setLector(cabezal);

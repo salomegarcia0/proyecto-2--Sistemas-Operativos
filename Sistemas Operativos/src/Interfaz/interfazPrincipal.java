@@ -779,6 +779,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         //configuraciones del panel de fondo del scrollball
         JPanel panelScrollbar =  new JPanel ();
         String tipoProceso = "";
+        String estado = "";
         panelScrollbar.setBackground(Color.decode("#FFFFFF"));
         if(!FileExplorer.getColaTerminado().isEmpty()){
             while (pListo != null){
@@ -808,6 +809,16 @@ public class interfazPrincipal extends javax.swing.JFrame {
                 JLabel tipo = new JLabel(tipoProceso);
                 tipo.setFont(tipo.getFont().deriveFont(10f));
                 p.add(tipo, BorderLayout.CENTER);
+                //Estado del proceso
+                //Tipo del proceso
+                if (pListo.getProceso().getEstadoActual() == EstadoProceso.ERROR){
+                    estado = "ERROR";
+                }  else {
+                    estado = "TERMINADO";
+                }
+                JLabel est = new JLabel(estado);
+                tipo.setFont(est.getFont().deriveFont(10f));
+                p.add(est, BorderLayout.CENTER);
                 //PC y MAR
                 JLabel tiempo = new JLabel("Tiempo: " + Long.toString(pListo.getProceso().getTiempoEnCPU()));
                 tiempo.setFont(tiempo.getFont().deriveFont(10f));
@@ -1202,19 +1213,47 @@ public class interfazPrincipal extends javax.swing.JFrame {
                 FileExplorer.agregarProcesoListo(procesoModificar);
 
                 System.out.println("proceso de modificacion creado y encolado");
-
-                // ACA ES DONDE DEBERIA PONER EL CONDICIONAL DE QUE EL PROCESO SE ENCUENRE N LA COLA DE LISTOS ANTES DE ACTUAIZAR 
-                actualizarInterfazCompleta();
+                
+                if(FileExplorer.getColaBloqueados().isEmpty() == true && FileExplorer.getProcesoEnEjecucion() == null){
+                        System.out.println("llegue");
+                        FileExplorer.Simulacion();
+                    }
+                    
+                    //------------------------
+                    Thread t1 = new Thread(() -> {
+                        System.out.println("hiloo modificar");   
+                        //espera hasta que el proceso este listo   
+                        while(procesoModificar.getEstadoActual() != EstadoProceso.TERMINADO){
+                            try {
+                                Thread.sleep(10); // pausa de 10 ms
+                            } catch (InterruptedException e) {
+                                break;
+                            }
+                        }
+                        System.out.println("actualiceee modificar");
+                        actualizarInterfazCompleta();
+                        // guardar en JSON
+                        //guardarSistemaEnJSON();
+                        if(procesoModificar.getEstadoActual() == EstadoProceso.TERMINADO){
+                            System.out.println("Modificacion completada exitosamente");
+                            JOptionPane.showMessageDialog(this, 
+                                "Archivo modificado exitosamente\n" +
+                                "Nombre anterior: " + archivo.getName() + "\n" +
+                                "Nombre nuevo: " + nombreTrimmed, 
+                                "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                        } else if (procesoModificar.getEstadoActual() == EstadoProceso.ERROR){
+                            System.out.println("Modificacion no se completo debido a otro proceso");
+                            JOptionPane.showMessageDialog(this, 
+                                "Archivo no se modificado debido a otro proceso\n" +
+                                "Se a movido a Terminado pero no se realizo" , 
+                                "No completado", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    });
+                    t1.start();
+                
 
                 // guardar en JSON
                 //guardarSistemaEnJSON();
-
-                System.out.println("Modificacion completada exitosamente");
-                JOptionPane.showMessageDialog(this, 
-                    "Archivo modificado exitosamente\n" +
-                    "Nombre anterior: " + archivo.getName() + "\n" +
-                    "Nombre nuevo: " + nombreTrimmed, 
-                    "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
             } catch (Exception e) {
                 System.out.println("ERROR al modificar archivo: " + e.getMessage());
@@ -1470,23 +1509,46 @@ public class interfazPrincipal extends javax.swing.JFrame {
             // crear proceso de eliminacion
             PCB procesoEliminar = new PCB("eliminar_" + archivo.getName(), archivo.getName(), archivo, TipoProceso.ELIMINAR);
             FileExplorer.agregarProcesoListo(procesoEliminar);
+            
+            if(FileExplorer.getColaBloqueados().isEmpty() == true && FileExplorer.getProcesoEnEjecucion() == null){
+                System.out.println("llegue eliminar");
+                FileExplorer.Simulacion();
+            }
 
             System.out.println("Proceso de eliminación creado y encolado");
 
             // eliminar el archivo del directorio padre
             eliminarArchivoDeDirectorioPadre(archivo, nodoArchivo);
 
+            
+            Thread t1 = new Thread(() -> {
+                System.out.println("hiloo eliminar uno");   
+                    //espera hasta que el proceso este listo   
+                    while(procesoEliminar.getEstadoActual() != EstadoProceso.TERMINADO){
+                    try {
+                        Thread.sleep(10); // pausa de 10 ms
+                    } catch (InterruptedException e) {
+                        break;
+                   }
+                }
+                System.out.println("actualiceee eliminar uno");
+                    // actualizar interfaz
+                actualizarInterfazCompleta();
+                // Guardar en JSON
+                //guardarSistemaEnJSON();
+
+                System.out.println("Eliminación completada exitosamente");
+                JOptionPane.showMessageDialog(this, 
+                    "Archivo eliminado exitosamente\n" +
+                    "Nombre: " + archivo.getName(), 
+                    "Éxito", JOptionPane.INFORMATION_MESSAGE);        
+
+            });
+            t1.start();
+            
             // actualizar interfaz
             actualizarInterfazCompleta();
 
-            // Guardar en JSON
-            //guardarSistemaEnJSON();
-
-            System.out.println("Eliminación completada exitosamente");
-            JOptionPane.showMessageDialog(this, 
-                "Archivo eliminado exitosamente\n" +
-                "Nombre: " + archivo.getName(), 
-                "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (Exception e) {
             System.out.println("ERROR al eliminar archivo: " + e.getMessage());
@@ -1563,6 +1625,36 @@ public class interfazPrincipal extends javax.swing.JFrame {
                     PCB procesoEliminar = new PCB("eliminar_" + archivo.getName(), archivo.getName(), archivo, TipoProceso.ELIMINAR);
                     FileExplorer.agregarProcesoListo(procesoEliminar);
                     System.out.println("Proceso creado para archivo: " + archivo.getName());
+                    
+                    if(FileExplorer.getColaBloqueados().isEmpty() == true && FileExplorer.getProcesoEnEjecucion() == null){
+                        System.out.println("llegue eliminar");
+                        FileExplorer.Simulacion();
+                    }
+                    Thread t1 = new Thread(() -> {
+                        System.out.println("hiloo eliminar uno");   
+                            //espera hasta que el proceso este listo   
+                            while(procesoEliminar.getEstadoActual() != EstadoProceso.TERMINADO){
+                            try {
+                                Thread.sleep(10); // pausa de 10 ms
+                            } catch (InterruptedException e) {
+                                break;
+                           }
+                        }
+                        System.out.println("actualiceee eliminar uno");
+                            // actualizar interfaz
+                        actualizarInterfazCompleta();
+                        // Guardar en JSON
+                        //guardarSistemaEnJSON();
+
+                        System.out.println("Eliminación completada exitosamente");
+                        JOptionPane.showMessageDialog(this, 
+                            "Archivo eliminado exitosamente\n" +
+                            "Nombre: " + archivo.getName(), 
+                            "Éxito", JOptionPane.INFORMATION_MESSAGE);        
+
+                    });
+                    
+                    
 
                 } else if (elemento instanceof Directorio) {
                     // Llamar recursivamente para subdirectorios
