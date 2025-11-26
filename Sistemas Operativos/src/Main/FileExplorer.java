@@ -24,7 +24,7 @@ public class FileExplorer {
     /*
     Variables booleanas para saber la politica que esta activa;
     */
-    private static TipoPolitica politica = TipoPolitica.FIFO ; //inicialmente sera fifo
+    private static TipoPolitica politica = TipoPolitica.SSTF ; //inicialmente sera fifo
     
     //para definir el tiempo que dura una lectura en ms (queremos inicialmente 1000ms = 1seg)
     private static int ciclo_reloj = 500;
@@ -324,12 +324,13 @@ public class FileExplorer {
                     
                     //si la distancia es cero, ese es el index mas optimo para el lector.
                     if(distancia == 0){
+                        
                         break;
                     }
                     
                     //se para la siguiente comparacion
                     nodoProceso = nodoProceso.getNext();
-                    indexDistancia = indexDistancia + 1;
+                    index = index + 1;
                 }
                 
                 System.out.println("Index del proceso seleccionado para SSTF: " + indexDistancia);
