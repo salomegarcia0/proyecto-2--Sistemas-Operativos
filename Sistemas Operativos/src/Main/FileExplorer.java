@@ -41,6 +41,13 @@ public class FileExplorer {
     //Reloj global del sistema
     private static long reloj_global;
     
+    
+    
+    
+    
+    
+    
+    //----------------------------------------------------------------
     /*
     Una vez creado un proceso se encola a la cola de listos y se le coloca el estado LISTO
     */
@@ -63,15 +70,114 @@ public class FileExplorer {
             */
             if (politica == TipoPolitica.FIFO){
                 System.out.println("Politica FIFO");
-                FileExplorer.setProcesoEnEjecucion(colaListos.desColarInicio());
+                PCB proceso = colaListos.desColarInicio();
+                
+                System.out.println("Proceso seleccionado:" + proceso.getProcesoNombre());
+                /*
+                se verifica condiciones extra:
+                1.ELIMINAR -> si se esta eliminando el archivo no se pueden hacer el resto de operaciones CRUD: LEER y MODIFICAR
+                2.MODIFICAR -> si se esta modificando el archivo no se pueden hacer operaciones CRUD: LEER (bloquear).
+                3.LEER -> si se esta leyendo el archivo no se puede hacer operaciones CRUD: MODIFICAR (bloquear)
+                */
+                //CASO 1 - para LEER y MODIFICAR
+                if(proceso.getTipoProceso() != TipoProceso.CREAR && proceso.getTipoProceso() != TipoProceso.ELIMINAR){
+                    if(proceso.getArchivo().isProcesoEliminizacion() == true || proceso.getArchivo() == null){
+                        if (proceso.getArchivo() == null){
+                            System.out.println("Este proceso no se puede realizar ya que el archivo no existe");
+                        } else {
+                            System.out.println("Este proceso no se puede realizar ya que hay una operacion de Eliminacion del archivo en proceso");
+                        }
+                        proceso.setEstadoActual(EstadoProceso.ERROR);
+                        System.out.println("Moviendo a la cola de Terminado con el estado ERROR");
+                        colaTerminado.enColar(proceso);
+                        //se llama a esta operacion de  nuevo para conseguir el siguiente PCB
+                        seleccionarProceso(); 
+                    }
+                    
+                //CASO 2 - para LEER
+                } else if (proceso.getTipoProceso() == TipoProceso.MODIFICAR){
+                    //se verifica si se han hecho lecturas antes se manda el proceso de modificar a Bloquear para darle chance a Lectura de terminar
+                    if (proceso.getArchivo().getCountLectura() > 0){
+                        System.out.println("Este proceso no se puede realizar ya que hay una operacion de Lectura de archivo en proceso");
+                         proceso.setEstadoActual(EstadoProceso.BLOQUEADO);
+                        System.out.println("Moviendo a la cola de bloqueado");
+                        colaBloqueados.enColar(proceso);
+                        //se llama a esta operacion de  nuevo para conseguir el siguiente PCB
+                        seleccionarProceso();
+                    } 
+                    
+                //CASO 3 - para MODIFICAR
+                } else if (proceso.getTipoProceso() == TipoProceso.LEER){
+                    //se verifica si se han hecho lecturas antes se manda el proceso de modificar a Bloquear para darle chance a Lectura de terminar
+                    if (proceso.getArchivo().getCountModificar()> 0){
+                        System.out.println("Este proceso no se puede realizar ya que hay una operacion de Modificacion de archivo en proceso");
+                        proceso.setEstadoActual(EstadoProceso.BLOQUEADO);
+                        System.out.println("Moviendo a la cola de bloqueado");
+                        colaBloqueados.enColar(proceso);
+                        //se llama a esta operacion de  nuevo para conseguir el siguiente PCB
+                        seleccionarProceso();
+                    } 
+                    
+                }
+                
+                FileExplorer.setProcesoEnEjecucion(proceso);
                 
             /*
             El ultimo proceso en entrar es el primero en ser atendido    
             */    
             } else if (politica == TipoPolitica.LIFO){
                 System.out.println("Politica LIFO");
+                PCB proceso = colaListos.desColarFinal();
+                
+                System.out.println("Proceso seleccionado:" + proceso.getProcesoNombre());
+                /*
+                se verifica condiciones extra:
+                1.ELIMINAR -> si se esta eliminando el archivo no se pueden hacer el resto de operaciones CRUD: LEER y MODIFICAR
+                2.MODIFICAR -> si se esta modificando el archivo no se pueden hacer operaciones CRUD: LEER (bloquear).
+                3.LEER -> si se esta leyendo el archivo no se puede hacer operaciones CRUD: MODIFICAR (bloquear)
+                */
+                //CASO 1 - para LEER y MODIFICAR
+                if(proceso.getTipoProceso() != TipoProceso.CREAR && proceso.getTipoProceso() != TipoProceso.ELIMINAR){
+                    if(proceso.getArchivo().isProcesoEliminizacion() == true || proceso.getArchivo() == null){
+                        if (proceso.getArchivo() == null){
+                            System.out.println("Este proceso no se puede realizar ya que el archivo no existe");
+                        } else {
+                            System.out.println("Este proceso no se puede realizar ya que hay una operacion de Eliminacion del archivo en proceso");
+                        }
+                        proceso.setEstadoActual(EstadoProceso.ERROR);
+                        System.out.println("Moviendo a la cola de Terminado con el estado ERROR");
+                        colaTerminado.enColar(proceso);
+                        //se llama a esta operacion de  nuevo para conseguir el siguiente PCB
+                        seleccionarProceso(); 
+                    }
+                    
+                //CASO 2 - para LEER
+                } else if (proceso.getTipoProceso() == TipoProceso.MODIFICAR){
+                    //se verifica si se han hecho lecturas antes se manda el proceso de modificar a Bloquear para darle chance a Lectura de terminar
+                    if (proceso.getArchivo().getCountLectura() > 0){
+                        System.out.println("Este proceso no se puede realizar ya que hay una operacion de Lectura de archivo en proceso");
+                         proceso.setEstadoActual(EstadoProceso.BLOQUEADO);
+                        System.out.println("Moviendo a la cola de bloqueado");
+                        colaBloqueados.enColar(proceso);
+                        //se llama a esta operacion de  nuevo para conseguir el siguiente PCB
+                        seleccionarProceso();
+                    } 
+                    
+                //CASO 3 - para MODIFICAR
+                } else if (proceso.getTipoProceso() == TipoProceso.LEER){
+                    //se verifica si se han hecho lecturas antes se manda el proceso de modificar a Bloquear para darle chance a Lectura de terminar
+                    if (proceso.getArchivo().getCountModificar()> 0){
+                        System.out.println("Este proceso no se puede realizar ya que hay una operacion de Modificacion de archivo en proceso");
+                        proceso.setEstadoActual(EstadoProceso.BLOQUEADO);
+                        System.out.println("Moviendo a la cola de bloqueado");
+                        colaBloqueados.enColar(proceso);
+                        //se llama a esta operacion de  nuevo para conseguir el siguiente PCB
+                        seleccionarProceso();
+                    } 
+                    
+                }
                 //se desencola el ultimo proceso que llego
-                FileExplorer.setProcesoEnEjecucion(colaListos.desColarFinal());
+                FileExplorer.setProcesoEnEjecucion(proceso);
                 
             /*
             Esta politica elige un proceso de la cola de Listos aleatoriamente  
@@ -81,9 +187,61 @@ public class FileExplorer {
                 Random rand = new Random();
                 //genera un valor random entre 0 y el tamaño de la lista menos 1
                 int numero = rand.nextInt(colaListos.getSize());
+                
                 //se busca por index del numero que obtuvimos anteriormente y desencolamos de la cola de listos
                 //el proceso que este en esa posicion para ser el nuevo proceso en ejecutar
-                FileExplorer.setProcesoEnEjecucion(colaListos.desColarIntermedio(numero));
+                PCB proceso = colaListos.desColarIntermedio(numero);
+                
+                System.out.println("Proceso seleccionado:" + proceso.getProcesoNombre());
+                /*
+                se verifica condiciones extra:
+                1.ELIMINAR -> si se esta eliminando el archivo no se pueden hacer el resto de operaciones CRUD: LEER y MODIFICAR
+                2.MODIFICAR -> si se esta modificando el archivo no se pueden hacer operaciones CRUD: LEER (bloquear).
+                3.LEER -> si se esta leyendo el archivo no se puede hacer operaciones CRUD: MODIFICAR (bloquear)
+                */
+                //CASO 1 - para LEER y MODIFICAR
+                if(proceso.getTipoProceso() != TipoProceso.CREAR && proceso.getTipoProceso() != TipoProceso.ELIMINAR){
+                    if(proceso.getArchivo().isProcesoEliminizacion() == true || proceso.getArchivo() == null){
+                        if (proceso.getArchivo() == null){
+                            System.out.println("Este proceso no se puede realizar ya que el archivo no existe");
+                        } else {
+                            System.out.println("Este proceso no se puede realizar ya que hay una operacion de Eliminacion del archivo en proceso");
+                        }
+                        proceso.setEstadoActual(EstadoProceso.ERROR);
+                        System.out.println("Moviendo a la cola de Terminado con el estado ERROR");
+                        colaTerminado.enColar(proceso);
+                        //se llama a esta operacion de  nuevo para conseguir el siguiente PCB
+                        seleccionarProceso(); 
+                    }
+                    
+                //CASO 2 - para LEER
+                } else if (proceso.getTipoProceso() == TipoProceso.MODIFICAR){
+                    //se verifica si se han hecho lecturas antes se manda el proceso de modificar a Bloquear para darle chance a Lectura de terminar
+                    if (proceso.getArchivo().getCountLectura() > 0){
+                        System.out.println("Este proceso no se puede realizar ya que hay una operacion de Lectura de archivo en proceso");
+                         proceso.setEstadoActual(EstadoProceso.BLOQUEADO);
+                        System.out.println("Moviendo a la cola de bloqueado");
+                        colaBloqueados.enColar(proceso);
+                        //se llama a esta operacion de  nuevo para conseguir el siguiente PCB
+                        seleccionarProceso();
+                    } 
+                    
+                //CASO 3 - para MODIFICAR
+                } else if (proceso.getTipoProceso() == TipoProceso.LEER){
+                    //se verifica si se han hecho lecturas antes se manda el proceso de modificar a Bloquear para darle chance a Lectura de terminar
+                    if (proceso.getArchivo().getCountModificar()> 0){
+                        System.out.println("Este proceso no se puede realizar ya que hay una operacion de Modificacion de archivo en proceso");
+                        proceso.setEstadoActual(EstadoProceso.BLOQUEADO);
+                        System.out.println("Moviendo a la cola de bloqueado");
+                        colaBloqueados.enColar(proceso);
+                        //se llama a esta operacion de  nuevo para conseguir el siguiente PCB
+                        seleccionarProceso();
+                    } 
+                    
+                }
+                
+                //el proceso que este en esa posicion para ser el nuevo proceso en ejecutar
+                FileExplorer.setProcesoEnEjecucion(proceso);
                 
             /*
                este busca el bloque mas cercano al cabezal 
@@ -154,10 +312,60 @@ public class FileExplorer {
                 
                 //una vez se haya encontrado el indexDistancia de proceso mas cercano al cabezal desencolamos de la cola de listos
                 //el proceso PCB que este en esa posicion para ser el nuevo proceso en ejecutar
-                FileExplorer.setProcesoEnEjecucion(colaListos.desColarIntermedio(indexDistancia));
+                PCB proceso = colaListos.desColarIntermedio(indexDistancia);
                 
-        
-        
+                System.out.println("Proceso seleccionado:" + proceso.getProcesoNombre());
+                /*
+                se verifica condiciones extra:
+                1.ELIMINAR -> si se esta eliminando el archivo no se pueden hacer el resto de operaciones CRUD: LEER y MODIFICAR
+                2.MODIFICAR -> si se esta modificando el archivo no se pueden hacer operaciones CRUD: LEER (bloquear).
+                3.LEER -> si se esta leyendo el archivo no se puede hacer operaciones CRUD: MODIFICAR (bloquear)
+                */
+                //CASO 1 - para LEER y MODIFICAR
+                if(proceso.getTipoProceso() != TipoProceso.CREAR && proceso.getTipoProceso() != TipoProceso.ELIMINAR){
+                    if(proceso.getArchivo().isProcesoEliminizacion() == true || proceso.getArchivo() == null){
+                        if (proceso.getArchivo() == null){
+                            System.out.println("Este proceso no se puede realizar ya que el archivo no existe");
+                        } else {
+                            System.out.println("Este proceso no se puede realizar ya que hay una operacion de Eliminacion del archivo en proceso");
+                        }
+                        proceso.setEstadoActual(EstadoProceso.ERROR);
+                        System.out.println("Moviendo a la cola de Terminado con el estado ERROR");
+                        colaTerminado.enColar(proceso);
+                        //se llama a esta operacion de  nuevo para conseguir el siguiente PCB
+                        seleccionarProceso(); 
+                    }
+                    
+                //CASO 2 - para LEER
+                } else if (proceso.getTipoProceso() == TipoProceso.MODIFICAR){
+                    //se verifica si se han hecho lecturas antes se manda el proceso de modificar a Bloquear para darle chance a Lectura de terminar
+                    if (proceso.getArchivo().getCountLectura() > 0){
+                        System.out.println("Este proceso no se puede realizar ya que hay una operacion de Lectura de archivo en proceso");
+                         proceso.setEstadoActual(EstadoProceso.BLOQUEADO);
+                        System.out.println("Moviendo a la cola de bloqueado");
+                        colaBloqueados.enColar(proceso);
+                        //se llama a esta operacion de  nuevo para conseguir el siguiente PCB
+                        seleccionarProceso();
+                    } 
+                    
+                //CASO 3 - para MODIFICAR
+                } else if (proceso.getTipoProceso() == TipoProceso.LEER){
+                    //se verifica si se han hecho lecturas antes se manda el proceso de modificar a Bloquear para darle chance a Lectura de terminar
+                    if (proceso.getArchivo().getCountModificar()> 0){
+                        System.out.println("Este proceso no se puede realizar ya que hay una operacion de Modificacion de archivo en proceso");
+                        proceso.setEstadoActual(EstadoProceso.BLOQUEADO);
+                        System.out.println("Moviendo a la cola de bloqueado");
+                        colaBloqueados.enColar(proceso);
+                        //se llama a esta operacion de  nuevo para conseguir el siguiente PCB
+                        seleccionarProceso();
+                    } 
+                    
+                }
+                
+                
+                //el proceso PCB que este en esa posicion para ser el nuevo proceso en ejecutar
+                FileExplorer.setProcesoEnEjecucion(proceso);
+            
             /*
             
             */    
@@ -178,6 +386,83 @@ public class FileExplorer {
         } else {
             FileExplorer.setProcesoEnEjecucion(null);
         }
+    }
+    
+    public static void ejecutarProceso(){
+        if(procesoEnEjecucion != null){
+                System.out.println("Proceso " + procesoEnEjecucion.getProcesoNombre() + "se esta EJECUTANDO");
+                procesoEnEjecucion.ejecutar();
+                
+                if(procesoEnEjecucion.getEstadoActual() == EstadoProceso.BLOQUEADO){
+                /*Mueve el proceso que estaba en ejecucion y que no se completo 
+                (proceso IO_BOUND a la cola de Bloqueados;
+                */
+                    moverEjecutandoABloqueado(procesoEnEjecucion);
+                }else if(procesoEnEjecucion.getEstadoActual() == EstadoProceso.TERMINADO){
+                /*Mueve el proceso que estaba en ejecucion y que se completo a la cola
+                de procesos completados
+                */
+                    moverEjecutadoACompletado(procesoEnEjecucion);
+                }
+            }
+    }
+    
+    
+    //para mover el proceso que termino de ejecutarse. Proceso con el estado TERMINADO
+    public static void moverEjecutadoACompletado(PCB proceso){
+        proceso.setEstadoActual(EstadoProceso.TERMINADO);
+        colaTerminado.enColar(proceso);
+        FileExplorer.setProcesoEnEjecucion(null); 
+    }
+    
+    /*para mover el proceso que no termino de ejecutarse, paso a Bloqueado
+    Proceso con estado BLOQUEADO
+    */
+    public static void moverEjecutandoABloqueado(PCB proceso){ // esto es para mover el proceso a bloqueados pero hay que ver lo de las interrpciones
+        proceso.setEstadoActual(EstadoProceso.BLOQUEADO);
+        colaBloqueados.enColar(proceso);
+        FileExplorer.setProcesoEnEjecucion(null);
+    }
+    
+    /*para mover el proceso que no se puede ejecutar ya sea por cuestiones de que se esta eliminado un archivo, o porque se
+    va a modificar un archivo y ya se esta leyendo o viceversa
+    Se coloca al proceos una etiqueta ERROR.
+    ---------------------------------------------------------------------
+    1.	Eliminar -> si se esta eliminando el archivo no se pueden hacer el resto de operaciones CRUD: LEER y MODIFICAR
+    2.  MODIFICAR -> si se esta modificando el archivo no se pueden hacer operaciones CRUD: LEER (bloquear).
+    3.	LEER -> si se esta leyendo el archivo no se puede hacer operaciones CRUD: MODIFICAR (bloquear)
+    
+    */
+    public static void moverEjecutandoACompletadoError(PCB proceso){ // esto es para mover el proceso a bloqueados pero hay que ver lo de las interrpciones
+        proceso.setEstadoActual(EstadoProceso.ERROR);
+        colaTerminado.enColar(proceso);
+        FileExplorer.setProcesoEnEjecucion(null);
+    }
+    
+    /*
+    para mover el proceso que esta en la cola de bloqueados a la cola de listos.
+    */
+    public static void moverBloqueadoAListo(){
+        if (!colaBloqueados.isEmpty()){
+            //simula el tiempo de bloqueado del proceso PCB
+            try {
+                //el tiempo simulado va a ser cuandos ciclos (lecturas) dede pasar el PCB multiplicados por la duracion de cada
+                //ciclo del reloj en ms.
+                Thread.sleep(ioCompletionTime*ciclo_reloj);
+                System.out.println("\nYa se cumplio el tiempo de bloqueo, devolviendo a la cola de listos\n");
+            } catch (InterruptedException e) {
+                    e.printStackTrace();
+            }
+            //se desencola el proceso de la cola de bloqueados.
+            PCB procesoReanudando = colaBloqueados.desColarInicio();
+            //se le cambia el estado del proceso a LISTO
+            procesoReanudando.setEstadoActual(EstadoProceso.LISTO);
+            //se encola el proceso de regreso a la cola de listos.
+            colaListos.enColar(procesoReanudando);
+            System.out.println(procesoReanudando.getProcesoNombre()+ " reanudado");
+             
+        }
+        
     }
     
     

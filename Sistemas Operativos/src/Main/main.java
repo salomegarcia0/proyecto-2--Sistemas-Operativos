@@ -47,6 +47,14 @@ public class main {
 //        
 //        System.out.println("FIN DE PRUEBA");
 
+//        Thread t1 = new Thread(() -> funcionA());
+//        Thread t2 = new Thread(() -> funcionB());
+//            
+//            t1.start();
+//            t2.start();
+            
+            
+
         
         SistemaArchivos sistema = CargadorSistema.cargarSistema();
         if (sistema == null){
@@ -59,4 +67,17 @@ public class main {
         v1.setVisible(true);
     }
     
+//    static void funcionA(){
+//        for (int i = 0; i < 5; i++) {
+//            System.out.println("A ejecutando paso " + i);
+//            try { Thread.sleep(5000); } catch (InterruptedException e) {}   
+//        }
+//    }
+//    
+//    static void funcionB(){
+//        for (int i = 0; i < 5; i++) {
+//            System.out.println("B ejecutando paso " + i);
+//            try { Thread.sleep(7000);} catch (InterruptedException e) {}   
+//        }
+//    }
 }

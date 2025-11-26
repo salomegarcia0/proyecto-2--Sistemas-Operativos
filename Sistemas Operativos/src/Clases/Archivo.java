@@ -74,6 +74,10 @@ public class Archivo {
             //AQUI FALTARIA VER COMO HACER PARA ELIMANAR ESTE ARCHIVO, NO COMO TAL LA CLASE SINO DEL ARBOL ANTES DE ELIMAR LA CLASE
         }
     }
+    
+    public boolean isProcesoEliminizacion(){
+        return size > blockList.getSize();
+    }
 
     public String getName() {
         return name;
