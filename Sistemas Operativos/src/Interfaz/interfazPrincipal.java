@@ -726,7 +726,17 @@ public class interfazPrincipal extends javax.swing.JFrame {
             } 
             jScrollPaneListo.setViewportView(panelScrollbar);
         }
+        if(FileExplorer.getColaBloqueados().isEmpty()){
+            JPanel p =  new JPanel (new GridLayout(0, 1));
+            //configuraciones de diseño del proceso
+                p.setBackground(Color.decode("#FFFFFF"));
+                p.setSize(150,300);
+                p.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+            //se agrega al scrollbar
+            panelScrollbar.add(p);
+            jScrollPaneListo.setViewportView(panelScrollbar);
         
+        }
     }
     
     private void ColaBloqueadosMostrar(){
@@ -734,6 +744,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
         //configuraciones del panel de fondo del scrollball
         JPanel panelScrollbar =  new JPanel ();
         String tipoProceso = "";
+        String estado = "";
         panelScrollbar.setBackground(Color.decode("#FFFFFF"));
         if(!FileExplorer.getColaBloqueados().isEmpty()){
             while (pListo != null){
@@ -763,6 +774,14 @@ public class interfazPrincipal extends javax.swing.JFrame {
                 JLabel tipo = new JLabel(tipoProceso);
                 tipo.setFont(tipo.getFont().deriveFont(10f));
                 p.add(tipo, BorderLayout.CENTER);
+                //Estado del proceso
+                //Tipo del proceso
+                if (pListo.getProceso().getEstadoActual() == EstadoProceso.BLOQUEADO){
+                    estado = "BLOQUEADO";
+                } 
+                JLabel est = new JLabel(estado);
+                tipo.setFont(est.getFont().deriveFont(10f));
+                p.add(est, BorderLayout.CENTER);
                 //PC y MAR
                 JLabel tiempo = new JLabel("Tiempo: " + Long.toString(pListo.getProceso().getTiempoEnCPU()));
                 tiempo.setFont(tiempo.getFont().deriveFont(10f));
@@ -775,7 +794,17 @@ public class interfazPrincipal extends javax.swing.JFrame {
             } 
             jScrollPaneBloqueado.setViewportView(panelScrollbar);
         }
+        if(FileExplorer.getColaBloqueados().isEmpty()){
+            JPanel p =  new JPanel (new GridLayout(0, 1));
+            //configuraciones de diseño del proceso
+                p.setBackground(Color.decode("#FFFFFF"));
+                p.setSize(150,300);
+                p.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+            //se agrega al scrollbar
+            panelScrollbar.add(p);
+            jScrollPaneBloqueado.setViewportView(panelScrollbar);
         
+        }
     }
     
     private void ColaCompletadoMostrar(){
@@ -835,6 +864,17 @@ public class interfazPrincipal extends javax.swing.JFrame {
             } 
             jScrollPaneCompletado.setViewportView(panelScrollbar);
         }
+        if(FileExplorer.getColaTerminado().isEmpty()){
+            JPanel p =  new JPanel (new GridLayout(0, 1));
+                //configuraciones de diseño del proceso
+                p.setBackground(Color.decode("#FFFFFF"));
+                p.setSize(150,300);
+                p.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+            //se agrega al scrollbar
+            panelScrollbar.add(p);
+            jScrollPaneCompletado.setViewportView(panelScrollbar);
+        
+        }
         
     }
     
@@ -859,14 +899,12 @@ public class interfazPrincipal extends javax.swing.JFrame {
                 mensaje = "ELIMINAR";
             }
             tipoProceso.setText(mensaje);
-            Tiempo.setText(pEjecutado.getTiempoEnCPU()+" ms");
             
             
         }else if(pEjecutado == null){
             idProceso.setText("000000");
             nombreProceso.setText("vacio");
             tipoProceso.setText("----");
-            Tiempo.setText("00 ms");
         }
     }
         
@@ -1114,6 +1152,7 @@ public class interfazPrincipal extends javax.swing.JFrame {
                         System.out.println("actualiceee modificar");
                         actualizarInterfazCompleta();
                         JOptionPane.showMessageDialog(this, "Archivo creado Exitosamente", "Exito", JOptionPane.INFORMATION_MESSAGE);
+                        //se guarda en el json
                         guardarSistemaEnJSON();
                     });
                     t1.start();
@@ -1350,12 +1389,12 @@ public class interfazPrincipal extends javax.swing.JFrame {
                                 "Se a movido a Terminado pero no se realizo" , 
                                 "No completado", JOptionPane.INFORMATION_MESSAGE);
                         }
+                        // guardar en JSON
+                        guardarSistemaEnJSON();
                     });
                     t1.start();
                 
 
-                // guardar en JSON
-                guardarSistemaEnJSON();
 
             } catch (Exception e) {
                 System.out.println("ERROR al modificar archivo: " + e.getMessage());
@@ -1753,7 +1792,9 @@ public class interfazPrincipal extends javax.swing.JFrame {
                             "Archivo eliminado exitosamente\n" +
                             "Nombre: " + archivo.getName(), 
                             "Éxito", JOptionPane.INFORMATION_MESSAGE);        
-
+                        
+                        // guardar en JSON
+                        guardarSistemaEnJSON();
                     });
                     
                     
@@ -1901,12 +1942,35 @@ public class interfazPrincipal extends javax.swing.JFrame {
             PCB procesoLeer = new PCB("leer_" + archivo.getName(), archivo.getName(), archivo, TipoProceso.LEER);
             FileExplorer.agregarProcesoListo(procesoLeer);
 
-            JOptionPane.showMessageDialog(this, 
-                "Proceso de lectura creado exitosamente\n" +
-                "Archivo: " + archivo.getName() + "\n" +
-                "Tamaño: " + archivo.getSize() + " bloques\n" +
-                "El proceso se ha encolado para ejecución", 
-                "Proceso Creado", JOptionPane.INFORMATION_MESSAGE);
+            
+            if(FileExplorer.getColaBloqueados().isEmpty() == true && FileExplorer.getProcesoEnEjecucion() == null){
+                System.out.println("llegue eliminar");
+                FileExplorer.Simulacion();
+            }
+            Thread t1 = new Thread(() -> {
+                System.out.println("hiloo leer");   
+                //espera hasta que el proceso este listo   
+                while(procesoLeer.getEstadoActual() != EstadoProceso.TERMINADO){
+                    try {
+                        Thread.sleep(10); // pausa de 10 ms
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+                System.out.println("actualiceee leer");
+                // actualizar interfaz
+                actualizarInterfazCompleta();
+                // Guardar en JSON
+                //guardarSistemaEnJSON();
+                        JOptionPane.showMessageDialog(this, 
+                        "Proceso de lectura creado exitosamente\n" +
+                        "Archivo: " + archivo.getName() + "\n" +
+                        "Tamaño: " + archivo.getSize() + " bloques\n" +
+                        "El proceso se ha encolado para ejecución", 
+                        "Proceso Creado", JOptionPane.INFORMATION_MESSAGE);      
+
+            });
+            
 
         } catch (Exception e) {
             System.out.println("ERROR al crear proceso de lectura: " + e.getMessage());
@@ -2003,8 +2067,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
         nombreProceso = new javax.swing.JLabel();
         jLabel24 = new javax.swing.JLabel();
         tipoProceso = new javax.swing.JLabel();
-        Tiempo = new javax.swing.JLabel();
-        jLabel26 = new javax.swing.JLabel();
         jLabel25 = new javax.swing.JLabel();
         jLabel27 = new javax.swing.JLabel();
         jLabel28 = new javax.swing.JLabel();
@@ -2419,8 +2481,8 @@ public class interfazPrincipal extends javax.swing.JFrame {
 
         jPanel7.setBackground(new java.awt.Color(255, 255, 255));
         jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        jPanel7.add(jScrollPaneCompletado, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 350, 470, 100));
-        jPanel7.add(jScrollPaneListo, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 200, 470, 100));
+        jPanel7.add(jScrollPaneCompletado, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 330, 470, 100));
+        jPanel7.add(jScrollPaneListo, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 180, 470, 100));
 
         jPanel12.setBackground(new java.awt.Color(255, 255, 255));
         jPanel12.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 4, true));
@@ -2460,37 +2522,26 @@ public class interfazPrincipal extends javax.swing.JFrame {
         tipoProceso.setText("-----");
         jPanel12.add(tipoProceso, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 60, 80, 20));
 
-        Tiempo.setForeground(new java.awt.Color(0, 0, 0));
-        Tiempo.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        Tiempo.setText("00 ms");
-        jPanel12.add(Tiempo, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 80, 70, 20));
-
-        jLabel26.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel26.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel26.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel26.setText("Tiempo:");
-        jPanel12.add(jLabel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, 60, 20));
-
-        jPanel7.add(jPanel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 180, 130));
+        jPanel7.add(jPanel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 180, 100));
 
         jLabel25.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel25.setForeground(new java.awt.Color(0, 0, 0));
         jLabel25.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel25.setText("COLA COMPLETADO");
-        jPanel7.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 320, 140, -1));
+        jPanel7.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 300, 140, -1));
 
         jLabel27.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel27.setForeground(new java.awt.Color(0, 0, 0));
         jLabel27.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel27.setText("COLA LISTO");
-        jPanel7.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 170, -1, -1));
+        jPanel7.add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, -1, -1));
 
         jLabel28.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel28.setForeground(new java.awt.Color(0, 0, 0));
         jLabel28.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel28.setText("COLA BLOQUEADO");
-        jPanel7.add(jLabel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 470, 140, -1));
-        jPanel7.add(jScrollPaneBloqueado, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 500, 470, 100));
+        jPanel7.add(jLabel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 450, 140, -1));
+        jPanel7.add(jScrollPaneBloqueado, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 480, 470, 100));
 
         jScrollPaneProcesos.setViewportView(jPanel7);
 
@@ -2603,7 +2654,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel Aplicar_btn;
     private javax.swing.JLabel Eliminar_btn;
     private javax.swing.JLabel Modificar_btn;
-    private javax.swing.JLabel Tiempo;
     private javax.swing.JTree arbolSistema;
     private javax.swing.JComboBox<String> comboPoliticas;
     private javax.swing.JComboBox<String> comboUsuarios;
@@ -2627,7 +2677,6 @@ public class interfazPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
-    private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel3;

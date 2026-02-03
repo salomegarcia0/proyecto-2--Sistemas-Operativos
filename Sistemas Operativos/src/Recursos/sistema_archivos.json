@@ -15,27 +15,25 @@
   ],
   "sistemaArchivos": {
     "nombre": "root",
-    "tipo": "DIRECTORIO",
     "usuario": "admin",
-    "size": 13,
+    "size": 504,
     "cantidadArchivos": 4,
-    "cantidadSubDir": 4,
+    "cantidadSubDir": 12,
     "esPublico": true,
     "contenido": [
       {
         "nombre": "sistema",
-        "tipo": "DIRECTORIO",
         "usuario": "admin",
-        "size": 8,
-        "cantidadArchivos": 2,
-        "cantidadSubDir": 2,
+        "size": 55,
+        "cantidadArchivos": 6,
+        "cantidadSubDir": 9,
         "esPublico": false,
         "contenido": [
           {
-            "name": "config.txt",
             "tipo": "ARCHIVO",
-            "usuario": "admin",
+            "name": "config.txt",
             "size": 3,
+            "usuario": "admin",
             "blockList": [
               0,
               1,
@@ -44,62 +42,67 @@
           },
           {
             "nombre": "logs",
-            "tipo": "DIRECTORIO",
             "usuario": "admin",
             "size": 5,
             "cantidadArchivos": 1,
             "cantidadSubDir": 0,
             "esPublico": false,
+            "contenido": [],
+            "tipo": "DIRECTORIO"
+          },
+          {
+            "nombre": "comida",
+            "usuario": "admin",
+            "size": 6,
+            "cantidadArchivos": 3,
+            "cantidadSubDir": 0,
+            "esPublico": true,
             "contenido": [
               {
-                "name": "system.log",
                 "tipo": "ARCHIVO",
+                "name": "patata",
+                "size": 2,
                 "usuario": "admin",
-                "size": 5,
                 "blockList": [
                   3,
-                  4,
-                  5,
-                  6,
-                  7
+                  4
                 ]
               }
-            ]
+            ],
+            "tipo": "DIRECTORIO"
           }
-        ]
+        ],
+        "tipo": "DIRECTORIO"
       },
       {
         "nombre": "home",
-        "tipo": "DIRECTORIO",
         "usuario": "admin",
-        "size": 5,
+        "size": 175,
         "cantidadArchivos": 2,
-        "cantidadSubDir": 2,
+        "cantidadSubDir": 6,
         "esPublico": false,
         "contenido": [
           {
             "nombre": "user1",
-            "tipo": "DIRECTORIO",
             "usuario": "user1",
-            "size": 5,
+            "size": 75,
             "cantidadArchivos": 2,
-            "cantidadSubDir": 1,
+            "cantidadSubDir": 5,
             "esPublico": false,
             "contenido": [
               {
                 "nombre": "documentos",
-                "tipo": "DIRECTORIO",
                 "usuario": "user1",
-                "size": 5,
-                "cantidadArchivos": 2,
+                "size": 25,
+                "cantidadArchivos": 10,
                 "cantidadSubDir": 0,
                 "esPublico": false,
                 "contenido": [
                   {
-                    "name": "tarea.pdf",
                     "tipo": "ARCHIVO",
-                    "usuario": "user1",
+                    "name": "tarea.pdf",
                     "size": 3,
+                    "usuario": "user1",
                     "blockList": [
                       8,
                       9,
@@ -107,20 +110,23 @@
                     ]
                   },
                   {
-                    "name": "notas.txt",
                     "tipo": "ARCHIVO",
-                    "usuario": "user1",
+                    "name": "notas.txt",
                     "size": 2,
+                    "usuario": "user1",
                     "blockList": [
                       11,
                       12
                     ]
                   }
-                ]
+                ],
+                "tipo": "DIRECTORIO"
               }
-            ]
+            ],
+            "tipo": "DIRECTORIO"
           }
-        ]
+        ],
+        "tipo": "DIRECTORIO"
       }
     ]
   }

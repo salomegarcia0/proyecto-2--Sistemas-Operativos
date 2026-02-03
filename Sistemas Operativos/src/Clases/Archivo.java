@@ -58,7 +58,7 @@ public class Archivo {
         if(countLectura == size){
             System.out.println("Se completo la solicitud de lectura del archivo " + name);
             System.out.println("ME LEISTE FELICIDADES :D");
-            JOptionPane.showMessageDialog(null, "ME LEISTE FELICIDADES :D", "Lectura", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "ME LEISTE FELICIDADES :D", "Lectura de " + name, JOptionPane.INFORMATION_MESSAGE);
         
             countLectura = 0;
         }

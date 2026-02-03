@@ -96,29 +96,6 @@ public class Cola {
     
     // Funcion para eliminar un proceso al final de la cola 
     public PCB desColarFinal() {
-//        if (isEmpty()) {
-//            System.out.println("La lista esta vacia");
-//            return null;
-//        } else {
-//            NodoProceso pointer = getHead();
-//            //me posiciono en el antepenultimo PCB de la cola
-//            while (pointer.getNext() != getTail()){
-//                pointer = pointer.getNext();
-//            }
-//            PCB proceso = getTail().getProceso();
-//            if(pointer != getHead()){
-//                setTail(pointer);
-//                pointer.setNext(null);
-//                size--;
-//            }else {
-//                setHead(null);
-//                pointer.setNext(null);
-//                setTail(null);
-//                size--;
-//            }
-//            
-//            return proceso;
-//        }
         if (isEmpty()) {
             System.out.println("La lista esta vacia");
             return null;

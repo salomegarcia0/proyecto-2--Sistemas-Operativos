@@ -27,7 +27,7 @@ public class FileExplorer {
     private static TipoPolitica politica = TipoPolitica.SSTF ; //inicialmente sera fifo
     
     //para definir el tiempo que dura una lectura en ms (queremos inicialmente 1000ms = 1seg)
-    private static int ciclo_reloj = 500;
+    private static int ciclo_reloj = 1000;
     //para saber cuantas lecturas se han completado hasta el momento
     //de modo que cuando llegue a a ser igual que el ioExceptionCycle, el proceso se pase a bloqueado
     private static int countLecturas;
@@ -425,12 +425,17 @@ public class FileExplorer {
                 */
                     System.out.println("me bloquee");
                     moverEjecutandoABloqueado(procesoEnEjecucion);
+                    //ejecuta el mover de bloqueado a listo
+                    Thread t2 = new Thread(() -> funcionBloqueados());
+                    //inicia ambos en paralelo   
+                    t2.start();
             }else if(procesoEnEjecucion.getEstadoActual() == EstadoProceso.TERMINADO){
                 /*Mueve el proceso que estaba en ejecucion y que se completo a la cola
                 de procesos completados
                 */
                     System.out.println("pase");
                     moverEjecutadoACompletado(procesoEnEjecucion);
+                    
                     
                 }
             }
@@ -483,19 +488,30 @@ public class FileExplorer {
             //se desencola el proceso de la cola de bloqueados.
             PCB procesoReanudando = colaBloqueados.desColarInicio();
             //simula el tiempo de bloqueado del proceso PCB
+            
+            System.out.println("DURACION BLOQUEO"+ioCompletionTime*ciclo_reloj);
+            Thread thread = new Thread(new Hilo(ioCompletionTime*ciclo_reloj));
+            thread.start();
             try {
-                //el tiempo simulado va a ser cuandos ciclos (lecturas) dede pasar el PCB multiplicados por la duracion de cada
-                //ciclo del reloj en ms.
-                Thread.sleep(ioCompletionTime*ciclo_reloj);
-                System.out.println("\nYa se cumplio el tiempo de bloqueo, devolviendo a la cola de listos\n");
+                thread.join(); // espera a que el hilo termine antes de continuar
             } catch (InterruptedException e) {
-                    e.printStackTrace();
+                e.printStackTrace();
             }
+            System.out.println("\nYa se cumplio el tiempo de bloqueo, devolviendo a la cola de listos\n");
+            
+            
+            
             //se le cambia el estado del proceso a LISTO
             procesoReanudando.setEstadoActual(EstadoProceso.LISTO);
             //se encola el proceso de regreso a la cola de listos.
             colaListos.enColar(procesoReanudando);
             System.out.println(procesoReanudando.getProcesoNombre()+ " reanudado");
+//            if(!colaListos.isEmpty()){
+//                Thread t1 = new Thread(() -> Simulacion());
+//                //inicia ambos en paralelo   
+//                t1.start();
+//            }
+            
              
         }
         
